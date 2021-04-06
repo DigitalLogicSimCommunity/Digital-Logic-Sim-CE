@@ -10756,6 +10756,16 @@ PrefabInstance:
       propertyPath: editChipMenu
       value: 
       objectReference: {fileID: 376607988}
+    - target: {fileID: 4750937598926047522, guid: d48b4f02647794ac2aba95960c3d59ab,
+        type: 3}
+      propertyPath: groupSpacing
+      value: 0.13
+      objectReference: {fileID: 0}
+    - target: {fileID: 4750937598926047522, guid: d48b4f02647794ac2aba95960c3d59ab,
+        type: 3}
+      propertyPath: handleSize.y
+      value: 0.25
+      objectReference: {fileID: 0}
     - target: {fileID: 4750937599765430253, guid: d48b4f02647794ac2aba95960c3d59ab,
         type: 3}
       propertyPath: m_RootOrder
@@ -10815,6 +10825,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Chip Editor
+      objectReference: {fileID: 0}
+    - target: {fileID: 4750937600310344738, guid: d48b4f02647794ac2aba95960c3d59ab,
+        type: 3}
+      propertyPath: groupSpacing
+      value: 0.13
+      objectReference: {fileID: 0}
+    - target: {fileID: 4750937600310344738, guid: d48b4f02647794ac2aba95960c3d59ab,
+        type: 3}
+      propertyPath: handleSize.y
+      value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: 5233960783680084672, guid: d48b4f02647794ac2aba95960c3d59ab,
         type: 3}
