@@ -1,5 +1,7 @@
 ﻿using System.IO;
+using System.Collections.Generic;
 using UnityEngine;
+using Newtonsoft.Json;
 
 public static class SaveSystem {
 
@@ -64,6 +66,26 @@ public static class SaveSystem {
 			savedProjectPaths[i] = pathSections[pathSections.Length - 1];
 		}
 		return savedProjectPaths;
+	}
+
+
+	public static Dictionary<string, List<int>> LoadHDDContents () {
+		string hddSavePath = Path.Combine(CurrentSaveProfileDirectoryPath, "HDDContents.json");
+		if (System.IO.File.Exists(hddSavePath)){
+			//Load HDD contents from file
+			FileInfo saveFile = new FileInfo(hddSavePath);
+			string jsonString = saveFile.OpenText().ReadToEnd();
+			return JsonConvert.DeserializeObject<Dictionary<string, List<int>>>(jsonString);
+		}
+		return new Dictionary<string, List<int>> {};
+	}
+
+	public static void SaveHDDContents (Dictionary<string, List<int>> contents) {
+		string hddSavePath = Path.Combine(CurrentSaveProfileDirectoryPath, "HDDContents.json");
+		string jsonStr = JsonConvert.SerializeObject(contents);
+		//Format json string
+		jsonStr = jsonStr.Replace("{", "{\n\t").Replace("}", "\n}").Replace("],", "],\n\t");
+		System.IO.File.WriteAllText(hddSavePath, jsonStr);
 	}
 
 	public static string SaveDataDirectoryPath {
