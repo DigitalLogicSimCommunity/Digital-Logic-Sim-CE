@@ -11,6 +11,8 @@ public class SavedChip {
 	public int creationIndex;
 	public Color colour;
 	public Color nameColour;
+	public string folderName;
+	public float scale;
 
 	// Names of all chips used as components in this new chip (each name appears only once)
 	public string[] componentNameList;
@@ -24,6 +26,8 @@ public class SavedChip {
 		creationIndex = chipSaveData.creationIndex;
 		colour = chipSaveData.chipColour;
 		nameColour = chipSaveData.chipNameColour;
+		folderName = chipSaveData.folderName;
+		scale = chipSaveData.scale;
 
 		// Create list of (unique) names of all chips used to make this chip
 		componentNameList = chipSaveData.componentChips.Select (x => x.chipName).Distinct ().ToArray ();

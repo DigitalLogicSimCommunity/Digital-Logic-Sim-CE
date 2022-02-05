@@ -22,16 +22,10 @@ public static class ChipSaver {
 
 		// Write to file
 		string savePath = SaveSystem.GetPathToSaveFile(chipEditor.chipName);
-		using (StreamWriter writer = new StreamWriter(savePath))
-		{
-			writer.Write(saveString);
-		}
+		SaveSystem.WriteFile(savePath, saveString);
 
 		string wireLayoutSavePath = SaveSystem.GetPathToWireSaveFile(chipEditor.chipName);
-		using (StreamWriter writer = new StreamWriter(wireLayoutSavePath))
-		{
-			writer.Write(wiringSaveString);
-		}
+		SaveSystem.WriteFile(wireLayoutSavePath, wiringSaveString);
 	}
 
 	public static void Export(Chip exportedChip, string destinationPath) {
@@ -151,13 +145,7 @@ public static class ChipSaver {
 
 	public static bool IsSafeToDelete(string chipName)
 	{
-		String[] notValidArray = {
-			"AND", "NOT", "OR", "XOR", "HDD",
-			"4 BIT ENCODER", "4 BIT DECODER",
-			"8 BIT ENCODER", "8 BIT DECODER",
-			"16 BIT ENCODER", "16 BIT DECODER"
-		};
-		if (notValidArray.Any(chipName.Contains)) {
+		if (Manager.instance.AllChipNames(true, false).Contains(chipName)) {
 			return false;
 		}
 

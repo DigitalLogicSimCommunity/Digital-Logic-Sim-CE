@@ -22,14 +22,20 @@ public class Pin : MonoBehaviour {
 	// Current state of the pin: 0 == LOW, 1 == HIGH
 	int currentState;
 
+	bool interact;
+
 	// Appearance
 	Color defaultCol = Color.black;
-	Color interactCol = new Color (0.7f, 0.7f, 0.7f);
+	Color interactCol;
+	Color onCol;
+	Color onColBus;
 	Material material;
+
+	bool simActive;
 
 	public static float radius {
 		get {
-			float diameter = 0.215f;
+			float diameter = ScalingManager.pinSize / 2;
 			return diameter / 2;
 		}
 	}
@@ -43,14 +49,47 @@ public class Pin : MonoBehaviour {
 	void Awake () {
 		material = GetComponent<MeshRenderer> ().material;
 		material.color = defaultCol;
+		interact = false;
 	}
 
 	void Start () {
+		simActive = Simulation.instance.active;
+		interactCol = UIManager.Palette.selectedColor;
+		onCol = UIManager.Palette.onCol;
+		onColBus = UIManager.Palette.busColor;
 		SetScale ();
 	}
 
 	public void SetScale () {
 		transform.localScale = Vector3.one * radius * 2;
+	}
+
+	public void tellPinSimIsOff()
+	{
+		simActive = false;
+		UpdateColor();
+	}
+
+	public void tellPinSimIsOn()
+	{
+		simActive = true;
+		UpdateColor();
+	}
+
+	public void UpdateColor() {
+		if (material) {
+			Color newColor = new Color();
+			if (interact) {
+				newColor = interactCol;
+			} else if (simActive && currentState == 1) {
+				newColor = wireType == WireType.Simple ? onCol : onColBus;
+			} else {
+				newColor = defaultCol;
+			}
+			if (material.color != newColor) {
+				material.color = newColor;
+			}
+		}
 	}
 
 	// Get the current state of the pin: 0 == LOW, 1 == HIGH
@@ -73,7 +112,6 @@ public class Pin : MonoBehaviour {
 	// Passes the signal on to any connected pins / electronic component
 	public void ReceiveSignal (int signal) {
 		currentState = signal;
-
 		if (pinType == PinType.ChipInput && !cyclic) {
 			chip.ReceiveInputSignal (this);
 		} else if (pinType == PinType.ChipOutput) {
@@ -81,6 +119,7 @@ public class Pin : MonoBehaviour {
 				childPins[i].ReceiveSignal (signal);
 			}
 		}
+		UpdateColor();
 	}
 
 	public static void MakeConnection (Pin pinA, Pin pinB) {
@@ -122,13 +161,15 @@ public class Pin : MonoBehaviour {
 	}
 
 	public void MouseEnter () {
+		interact = true;
 		transform.localScale = Vector3.one * interactionRadius * 2;
-		material.color = interactCol;
+		UpdateColor();
 	}
 
 	public void MouseExit () {
+		interact = false;
 		transform.localScale = Vector3.one * radius * 2;
-		material.color = defaultCol;
+		UpdateColor();
 	}
 
 }

@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -7,16 +7,20 @@ using UnityEngine.UI;
 
 
 public class MainMenu : MonoBehaviour {
+	public static MainMenu instance; 
 
 	public TMP_InputField projectNameField;
 	public Button confirmProjectButton;
 	public Toggle fullscreenToggle;
 	public Toggle advancedChips;
 
+	
+
 	public static int advancedChipsEnabled;
 
 
 	void Awake () {
+		instance = this;
 		advancedChipsEnabled = PlayerPrefs.GetInt("AdvancedChips", 1);
 		fullscreenToggle.onValueChanged.AddListener (SetFullScreen);
 		advancedChips.SetIsOnWithoutNotify(advancedChipsEnabled == 1);
@@ -38,7 +42,7 @@ public class MainMenu : MonoBehaviour {
     public void StartNewProject () {
 		string projectName = projectNameField.text;
 		SaveSystem.SetActiveProject (projectName);
-		UnityEngine.SceneManagement.SceneManager.LoadScene (1);
+		UnityEngine.SceneManagement.SceneManager.LoadScene(1);
 	}
 
 	public void SetResolution16x9 (int width) {
@@ -59,7 +63,6 @@ public class MainMenu : MonoBehaviour {
 		}
 
 	}
-
 
 	public void Quit () {
 		Application.Quit ();

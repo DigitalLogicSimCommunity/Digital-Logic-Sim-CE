@@ -6,6 +6,7 @@ public class Palette : ScriptableObject {
 	public Color offCol;
 	public Color highZCol;
 	public Color busColor;
+	public Color selectedColor;
 
 	public Color nonInteractableCol;
 }

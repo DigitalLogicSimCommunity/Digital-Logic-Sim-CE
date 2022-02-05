@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using System;
 
 public static class InputHelper {
 	static Camera _mainCamera;
@@ -30,6 +33,19 @@ public static class InputHelper {
 			return hit.collider.gameObject;
 		}
 		return null;
+	}
+
+	public static List<GameObject> GetUIObjectsUnderMouse() {
+		List<GameObject> objects = new List<GameObject>();
+		PointerEventData pointerData = new PointerEventData(EventSystem.current) {
+			position = Input.mousePosition
+		};
+		List<RaycastResult> results = new List<RaycastResult>();
+		EventSystem.current.RaycastAll(pointerData, results);
+		foreach(RaycastResult result in results) {
+			objects.Add(result.gameObject);
+		}
+		return objects;
 	}
 
 	public static bool AnyOfTheseKeysDown (params KeyCode[] keys) {

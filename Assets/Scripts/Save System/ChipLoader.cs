@@ -1,21 +1,17 @@
 ﻿using System;
-using System.Collections;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
 public static class ChipLoader {
 
-	public static SavedChip[] GetAllSavedChips(string[] chipPaths)
-    {
+	public static SavedChip[] GetAllSavedChips(string[] chipPaths) {
 		SavedChip[] savedChips = new SavedChip[chipPaths.Length];
 
 		// Read saved chips from file
-		for (int i = 0; i < chipPaths.Length; i++)
-		{
-			using (StreamReader reader = new StreamReader(chipPaths[i]))
-			{
-				string chipSaveString = reader.ReadToEnd();
+		for (int i = 0; i < chipPaths.Length; i++) {
+				string chipSaveString = SaveSystem.ReadFile(chipPaths[i]);
 
 				// If the save does not contain wireType and contains outputPinNames then its a previous version save (v 0.25 expected)
 				if (!chipSaveString.Contains("wireType") || chipSaveString.Contains("outputPinNames") || !chipSaveString.Contains("outputPins")) {
@@ -26,34 +22,53 @@ public static class ChipLoader {
 				} else {
 					savedChips[i] = JsonUtility.FromJson<SavedChip>(chipSaveString);
 				}
-				
+		}
+
+		foreach (SavedChip chip in savedChips) {
+			if (String.IsNullOrEmpty(chip.folderName)) {
+				chip.folderName = "User";
+			}
+			if (float.IsNaN(chip.scale)) {
+				chip.scale = 1f;
 			}
 		}
 		return savedChips;
 	}
 
-	public static void LoadAllChips (string[] chipPaths, Manager manager)
-	{
+	public static async void LoadAllChips (string[] chipPaths, Manager manager) {
+		var sw = System.Diagnostics.Stopwatch.StartNew();
 		SavedChip[] savedChips = GetAllSavedChips(chipPaths);
+		ProgressBar progressBar = ProgressBar.New("Loading All Chips...", wholeNumbers: true);
+		progressBar.Open(0, savedChips.Length + manager.builtinChips.Length);
+		progressBar.SetValue(0, "Start Loading...");
 
 		SortChipsByOrderOfCreation (ref savedChips);
 		// Maintain dictionary of loaded chips (initially just the built-in chips)
 		Dictionary<string, Chip> loadedChips = new Dictionary<string, Chip> ();
 		for (int i = 0; i < manager.builtinChips.Length; i++) {
 			Chip builtinChip = manager.builtinChips[i];
+			progressBar.SetValue(i, "Loading '" + builtinChip.chipName + "'...");
 			loadedChips.Add (builtinChip.chipName, builtinChip);
+			await Task.Yield();
 		}
 		for (int i = 0; i < savedChips.Length; i++) {
 			SavedChip chipToTryLoad = savedChips[i];
-			ChipSaveData loadedChipData = LoadChip (chipToTryLoad, loadedChips, manager.wirePrefab);
-			Chip loadedChip = manager.LoadChip (loadedChipData);
-			if (loadedChip is CustomChip custom)
-				custom.ApplyWireModes();
-			loadedChips.Add (loadedChip.chipName, loadedChip);
+			progressBar.SetValue(i + manager.builtinChips.Length, "Loading '" + chipToTryLoad.name + "'...");
+			try {
+				ChipSaveData loadedChipData = LoadChip (chipToTryLoad, loadedChips, manager.wirePrefab);
+				Chip loadedChip = manager.LoadChip (loadedChipData);
+				loadedChips.Add (loadedChip.chipName, loadedChip);
+			} catch(Exception e) {
+				DLSLogger.LogWarning("Custom Chip '" + chipToTryLoad.name + "' could not be loaded!", e.ToString());
+			}
+			await Task.Yield();
 		}
+		progressBar.SetValue(progressBar.progressBar.maxValue, "Done!");
+		progressBar.Close();
+		DLSLogger.Log("Load time: " + sw.ElapsedMilliseconds.ToString() + "ms");
 	}
 
-	// Instantiates all components that make up the given clip, and connects them up with wires
+	// Instantiates all components that make up the given chip, and connects them up with wires
 	// The components are parented under a single "holder" object, which is returned from the function
 	static ChipSaveData LoadChip (SavedChip chipToLoad, Dictionary<string, Chip> previouslyLoadedChips, Wire wirePrefab) {
 		ChipSaveData loadedChipData = new ChipSaveData ();
@@ -63,6 +78,8 @@ public static class ChipLoader {
 		loadedChipData.chipColour = chipToLoad.colour;
 		loadedChipData.chipNameColour = chipToLoad.nameColour;
 		loadedChipData.creationIndex = chipToLoad.creationIndex;
+		loadedChipData.folderName = chipToLoad.folderName;
+		loadedChipData.scale = chipToLoad.scale;
 
 		// Spawn component chips (the chips used to create this chip)
 		// These will have been loaded already, and stored in the previouslyLoadedChips dictionary
@@ -72,7 +89,7 @@ public static class ChipLoader {
 			Vector2 pos = new Vector2 ((float) componentToLoad.posX, (float) componentToLoad.posY);
 
 			if (!previouslyLoadedChips.ContainsKey (componentName)) {
-				Debug.LogError ("Failed to load sub component: " + componentName + " While loading " + chipToLoad.name);
+				DLSLogger.LogError ("Failed to load sub component: " + componentName + " While loading " + chipToLoad.name);
 			}
 
 			Chip loadedComponentChip = GameObject.Instantiate (previouslyLoadedChips[componentName], pos, Quaternion.identity);
@@ -118,6 +135,8 @@ public static class ChipLoader {
 		loadedChipData.chipColour = chipToLoad.colour;
 		loadedChipData.chipNameColour = chipToLoad.nameColour;
 		loadedChipData.creationIndex = chipToLoad.creationIndex;
+		loadedChipData.folderName = chipToLoad.folderName;
+		loadedChipData.scale = chipToLoad.scale;
 		List<Wire> wiresToLoad = new List<Wire>();
 
 		// Spawn component chips (the chips used to create this chip)
@@ -128,7 +147,7 @@ public static class ChipLoader {
 			Vector2 pos = new Vector2 ((float) componentToLoad.posX, (float) componentToLoad.posY);
 
 			if (!previouslyLoadedChips.ContainsKey (componentName)) {
-				Debug.LogError ("Failed to load sub component: " + componentName + " While loading " + chipToLoad.name);
+				DLSLogger.LogError ("Failed to load sub component: " + componentName + " While loading " + chipToLoad.name);
 			}
 
 			Chip loadedComponentChip = GameObject.Instantiate (previouslyLoadedChips[componentName], pos, Quaternion.identity, chipEditor.chipImplementationHolder);
@@ -218,8 +237,20 @@ public static class ChipLoader {
 
 		// Set wires anchor points
 		for (int i = 0; i < wireLayout.serializableWires.Length; i++) {
-			string startPinName = loadedChipData.componentChips[wireLayout.serializableWires[i].parentChipIndex].outputPins[wireLayout.serializableWires[i].parentChipOutputIndex].pinName;
-			string endPinName = loadedChipData.componentChips[wireLayout.serializableWires[i].childChipIndex].inputPins[wireLayout.serializableWires[i].childChipInputIndex].pinName;
+			string startPinName; 
+			string endPinName;
+			
+			SavedWire wire = wireLayout.serializableWires[i];
+			// This fixes a bug which caused chips to be unable to be viewed/edited if some of input/output pins were swaped.
+			try {
+				startPinName = loadedChipData.componentChips[wire.parentChipIndex].outputPins[wire.parentChipOutputIndex].pinName;
+				endPinName = loadedChipData.componentChips[wire.childChipIndex].inputPins[wire.childChipInputIndex].pinName;
+			} catch (IndexOutOfRangeException) {
+				// Swap input pins with output pins.
+				startPinName = loadedChipData.componentChips[wire.parentChipIndex].inputPins[wire.parentChipOutputIndex].pinName;
+				endPinName = loadedChipData.componentChips[wire.childChipIndex].outputPins[wire.childChipInputIndex].pinName;
+			}
+			//
 
 			int wireIndex = Array.FindIndex(loadedChipData.wires, w => w.startPin.pinName == startPinName && w.endPin.pinName == endPinName);
 			if (wireIndex >= 0) {
@@ -230,8 +261,7 @@ public static class ChipLoader {
 		return loadedChipData;
 	}
 
-	public static void Import(string path)
-	{
+	public static void Import(string path) {
 		SavedChip[] allChips = SaveSystem.GetAllSavedChips();
 		List<string> newChipsPath = new List<string>();
 		Dictionary<string, string> nameUpdateLookupTable = new Dictionary<string, string>();

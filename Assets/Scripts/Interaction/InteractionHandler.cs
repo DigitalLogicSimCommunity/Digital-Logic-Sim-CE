@@ -31,6 +31,10 @@ public abstract class InteractionHandler : MonoBehaviour {
 		return true;
 	}
 
+	protected virtual void ReleaseFocus() {
+		hasFocus = false;
+	}
+
 	// Request to have focus from whichever handler has focus at the moment.
 	// If succesful, HasFocus will be set to true.
 	protected virtual void RequestFocus () {

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public static class MathUtility {
@@ -125,5 +126,18 @@ public static class MathUtility {
 	public static Vector3 V2ToXYZ (Vector2 v2, float yValue) {
 		return new Vector3 (v2.x, yValue, v2.y);
 	}
+
+	/// <summary>returns the the center point of all <c>positions</c>.</summary>
+	public static Vector3 Center (List<Vector3> positions) {
+        Vector3 center = Vector3.zero;
+        if (positions.Count == 0) {
+            return center;
+        }
+        foreach(Vector3 pos in positions) {
+            center += pos;
+        }
+        center /= positions.Count;
+        return center;
+    }
 
 }

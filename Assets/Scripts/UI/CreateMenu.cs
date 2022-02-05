@@ -1,18 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class CreateMenu : MonoBehaviour {
 
-	public event System.Action onChipCreatePressed;
-
-	public Button menuOpenButton;
-	public GameObject menuHolder;
 	public TMP_InputField chipNameField;
+	public TMP_Dropdown folderDropdown;
 	public Button doneButton;
-	public Button cancelButton;
 	public Slider hueSlider;
 	public Slider saturationSlider;
 	public Slider valueSlider;
@@ -22,21 +17,16 @@ public class CreateMenu : MonoBehaviour {
 	public Color[] suggestedColours;
 	int suggestedColourIndex;
 
-	void Start () {
-		doneButton.onClick.AddListener (FinishCreation);
-		menuOpenButton.onClick.AddListener (OpenMenu);
-		cancelButton.onClick.AddListener (CloseMenu);
+	string validChars = "abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789()[]-";
 
-		chipNameField.onValueChanged.AddListener (ChipNameFieldChanged);
+	List <string> allChipNames = new List<string>();
+
+	void Awake () {
 		suggestedColourIndex = Random.Range (0, suggestedColours.Length);
-
-		hueSlider.onValueChanged.AddListener (ColourSliderChanged);
-		saturationSlider.onValueChanged.AddListener (ColourSliderChanged);
-		valueSlider.onValueChanged.AddListener (ColourSliderChanged);
 	}
 
 	void Update () {
-		if (menuHolder.activeSelf) {
+		if (UIManager.instance.GetMenuByType(MenuType.CreateChipMenu).isActive) {
 			// Force name input field to remain focused
 			if (!chipNameField.isFocused) {
 				chipNameField.Select ();
@@ -46,39 +36,55 @@ public class CreateMenu : MonoBehaviour {
 		}
 	}
 
-	void ColourSliderChanged (float sliderValue) {
+	public void SelectFolder() {
+		Manager.ActiveChipEditor.chipFolder = folderDropdown.options[folderDropdown.value].text;
+	}
+
+	public void ColourSliderChanged () {
 		Color chipCol = Color.HSVToRGB (hueSlider.value, saturationSlider.value, valueSlider.value);
 		UpdateColour (chipCol);
 	}
 
-	void ChipNameFieldChanged (string value) {
-		string formattedName = value.ToUpper ();
-		doneButton.interactable = IsValidChipName (formattedName.Trim ());
-		chipNameField.text = formattedName;
-		Manager.ActiveChipEditor.chipName = formattedName.Trim ();
-	}
-
-	bool IsValidChipName (string chipName) {
-		return chipName != "AND" && chipName != "NOT" && chipName.Length != 0;
-	}
-
-	void OpenMenu () {
-		menuHolder.SetActive (true);
-		chipNameField.text = "";
-		ChipNameFieldChanged ("");
-		chipNameField.Select ();
-		SetSuggestedColour ();
-	}
-
-	void CloseMenu () {
-		menuHolder.SetActive (false);
-	}
-
-	void FinishCreation () {
-		if (onChipCreatePressed != null) {
-			onChipCreatePressed.Invoke ();
+	public void ChipNameFieldChanged (bool endEdit = false) {
+		string text = chipNameField.text.ToUpper();
+		string validName = "";
+		for (int i = 0; i < text.Length; i++) {
+			if (i < 12 && validChars.Contains(text[i].ToString())) {
+				validName += text[i];
+			}
 		}
-		CloseMenu ();
+		validName = endEdit ? validName.Trim() : validName.TrimStart();
+		
+		if (IsAvailableName(validName) && validName.Length > 0) {
+			Manager.ActiveChipEditor.chipName = validName;
+			doneButton.interactable = true;
+		} else {
+			doneButton.interactable = false;
+		}
+		chipNameField.text = validName;
+	}
+
+	bool IsAvailableName (string chipName) {
+		return !allChipNames.Contains(chipName);
+	}
+
+	public void Prepare() {
+		allChipNames = Manager.instance.AllChipNames();
+		folderDropdown.ClearOptions();
+		folderDropdown.AddOptions(ChipBarUI.instance.selectedFolderDropdown.options.GetRange(2, 
+			ChipBarUI.instance.selectedFolderDropdown.options.Count - 3
+		));
+		folderDropdown.value = ChipBarUI.selectedFolderIndex > 1 ? ChipBarUI.selectedFolderIndex - 2 : 0;
+		doneButton.interactable = false;
+		chipNameField.SetTextWithoutNotify("");
+		SetSuggestedColour();
+	}
+
+
+	public void FinishCreation () {
+		Manager.ActiveChipEditor.chipFolder = folderDropdown.options[folderDropdown.value].text;
+		Manager.ActiveChipEditor.scale = ScalingManager.scale;
+		Manager.instance.SaveAndPackageChip();
 	}
 
 	void SetSuggestedColour () {

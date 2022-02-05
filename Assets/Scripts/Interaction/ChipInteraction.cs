@@ -4,19 +4,15 @@ using UnityEngine;
 
 public class ChipInteraction : InteractionHandler {
 
-	public enum State { None, PlacingNewChips, MovingOldChips, SelectingChips }
+	public enum State { None, PlacingNewChips, MovingOldChips, SelectingChips, PasteNewChips }
 	public event System.Action<Chip> onDeleteChip;
 
 	public BoxCollider2D chipArea;
 	public Transform chipHolder;
 	public LayerMask chipMask;
 	public Material selectionBoxMaterial;
-	public float chipStackSpacing = 0.15f;
-	public float selectionBoundsBorderPadding = 0.1f;
 	public Color selectionBoxCol;
 	public Color invalidPlacementCol;
-
-	public EditChipMenu editChipMenu;
 
 	const float dragDepth = -50;
 	const float chipDepth = -0.2f;
@@ -25,22 +21,28 @@ public class ChipInteraction : InteractionHandler {
 
 	State currentState;
 	List<Chip> newChipsToPlace;
-	List<Chip> selectedChips;
+	List<KeyValuePair<Chip, Vector3>> newChipsToPaste;
+	public static List<Chip> selectedChips;
 	Vector2 selectionBoxStartPos;
 	Mesh selectionMesh;
 	Vector3[] selectedChipsOriginalPos;
 
+	[HideInInspector]
+	public List<Pin> visiblePins;
+
+	List<Chip> chipsToPaste;
+
 	void Awake () {
 		newChipsToPlace = new List<Chip> ();
+		newChipsToPaste = new List<KeyValuePair<Chip, Vector3>> ();
+		chipsToPaste = new List<Chip>();
 		selectedChips = new List<Chip> ();
 		allChips = new List<Chip> ();
+		visiblePins = new List<Pin> ();
 		MeshShapeCreator.CreateQuadMesh (ref selectionMesh);
-        editChipMenu = GameObject.Find("Edit Chip Menu").GetComponent<EditChipMenu>();
-		editChipMenu.Init();
 	}
 
 	public override void OrderedUpdate () {
-
 		switch (currentState) {
 			case State.None:
 				HandleSelection ();
@@ -48,6 +50,9 @@ public class ChipInteraction : InteractionHandler {
 				break;
 			case State.PlacingNewChips:
 				HandleNewChipPlacement ();
+				break;
+			case State.PasteNewChips:
+				HandlePasteChipPlacement ();
 				break;
 			case State.SelectingChips:
 				HandleSelectionBox ();
@@ -59,31 +64,88 @@ public class ChipInteraction : InteractionHandler {
 		DrawSelectedChipBounds ();
 	}
 
+	public Pin[] UnconnectedInputPins {
+		get {
+			List<Pin> unconnected = new List<Pin>();
+			foreach(Chip chip in allChips) {
+				foreach(Pin pin in chip.inputPins) {
+					if (pin.wireType == Pin.WireType.Simple && !pin.HasParent) {
+						unconnected.Add(pin);
+					}
+				}
+			}
+			return unconnected.ToArray();
+		}
+	}
+
+	public Pin[] UnconnectedOutputPins {
+		get {
+			List<Pin> unconnected = new List<Pin>();
+			foreach(Chip chip in allChips) {
+				foreach(Pin pin in chip.outputPins) {
+					if (pin.childPins.Count == 0) {
+						unconnected.Add(pin);
+					}
+				}
+			}
+			return unconnected.ToArray();
+		}
+	}
+
 	public void LoadChip (Chip chip) {
 		chip.transform.parent = chipHolder;
 		allChips.Add (chip);
+		visiblePins.AddRange(chip.inputPins);
+		visiblePins.AddRange(chip.outputPins);
+		foreach (Pin pin in chip.outputPins) {
+			pin.UpdateColor();
+		}
+	}
+
+	public List<Chip> SelectedChips{
+		get {
+			return selectedChips;
+		}
+	}
+
+	public List<Chip> PasteChips (List<KeyValuePair<Chip, Vector3>> clipboard) {
+		Vector3 mouseWorldPos = new Vector3 (InputHelper.MouseWorldPos.x, InputHelper.MouseWorldPos.y, 0);
+		currentState = State.PasteNewChips;
+		if (newChipsToPaste.Count == 0) {
+			selectedChips.Clear();
+		}
+		// newChipsToPaste.Clear();
+		// chipsToPaste.Clear();
+
+		foreach (KeyValuePair<Chip, Vector3> clipboardItem in clipboard) {
+			var newChip = Instantiate(clipboardItem.Key, clipboardItem.Value, Quaternion.identity);
+			newChip.transform.SetParent(chipHolder);
+			newChip.gameObject.SetActive(true);
+			newChip.GetComponent<ChipPackage>().SetSizeAndSpacing(newChip);
+			selectedChips.Add(newChip);
+			newChipsToPaste.Add(new KeyValuePair<Chip, Vector3>(newChip, clipboardItem.Value));
+			chipsToPaste.Add(newChip);
+		}
+		return chipsToPaste;
+		
 	}
 
 	public void SpawnChip (Chip chipPrefab) {
 		RequestFocus ();
 		if (HasFocus) {
-			if (Input.GetMouseButtonDown(0))
-			{
+			if (Input.GetMouseButtonDown(0)) {
 				// Spawn chip
 				currentState = State.PlacingNewChips;
-				if (newChipsToPlace.Count == 0)
-				{
+				if (newChipsToPlace.Count == 0) {
 					selectedChips.Clear();
 				}
 				var newChip = Instantiate(chipPrefab, parent: chipHolder);
 				newChip.gameObject.SetActive(true);
+				newChip.GetComponent<ChipPackage>().SetSizeAndSpacing(newChip);
 				selectedChips.Add(newChip);
 				newChipsToPlace.Add(newChip);
-			}
-			else if (Input.GetMouseButtonDown(1))
-			{
-				// Open chip edit menu
-				editChipMenu.EditChip(chipPrefab);
+			} else if (Input.GetMouseButtonDown(1) && ChipBarUI.selectedFolderIndex > 1) {
+				UIManager.instance.OpenMenu(MenuType.EditChipMenu);
 			}
 		}
 	}
@@ -133,16 +195,23 @@ public class ChipInteraction : InteractionHandler {
 				selectedChips.RemoveAt (i);
 			}
 			newChipsToPlace.Clear ();
+			newChipsToPaste.Clear();
+			chipsToPaste.Clear();
 		}
 
 	}
 
-	void DeleteChip (Chip chip) {
+	public void DeleteChip (Chip chip) {
 		if (onDeleteChip != null) {
 			onDeleteChip.Invoke (chip);
 		}
-
 		allChips.Remove (chip);
+		foreach (Pin pin in chip.inputPins) {
+			visiblePins.Remove(pin);
+		}
+		foreach (Pin pin in chip.outputPins) {
+			visiblePins.Remove(pin);
+		}
 		Destroy (chip.gameObject);
 	}
 
@@ -217,7 +286,8 @@ public class ChipInteraction : InteractionHandler {
 	void HandleNewChipPlacement () {
 		// Cancel placement if esc or right mouse down
 		if (InputHelper.AnyOfTheseKeysDown (KeyCode.Escape, KeyCode.Backspace, KeyCode.Delete) || Input.GetMouseButtonDown (1)) {
-			CancelPlacement ();
+			CancelPlacement (newChipsToPlace.ToArray());
+			newChipsToPlace.Clear();
 		}
 		// Move selected chip/s and place them on left mouse down
 		else {
@@ -228,33 +298,67 @@ public class ChipInteraction : InteractionHandler {
 				Chip chipToPlace = newChipsToPlace[i];
 				chipToPlace.transform.position = mousePos + Vector2.down * offsetY;
 				SetDepth (chipToPlace, dragDepth);
-				offsetY += chipToPlace.BoundsSize.y + chipStackSpacing;
+				offsetY += chipToPlace.BoundsSize.y + ScalingManager.chipStackSpace;
 			}
 
 			// Place object
-			if (Input.GetMouseButtonDown (0) && SelectedChipsWithinPlacementArea ()) {
-				PlaceNewChips ();
+			if (Input.GetMouseButtonDown (0) && SelectedChipsWithinPlacementArea () && !InputHelper.MouseOverUIObject()) {
+				PlaceNewChips (newChipsToPlace.ToArray());
+				newChipsToPlace.Clear();
 			}
 		}
 	}
 
-	void PlaceNewChips () {
+	void HandlePasteChipPlacement () {
+		// Cancel placement if esc or right mouse down
+		if (InputHelper.AnyOfTheseKeysDown (KeyCode.Escape, KeyCode.Backspace, KeyCode.Delete) || Input.GetMouseButtonDown (1)) {
+			CancelPlacement (chipsToPaste.ToArray());
+			newChipsToPaste.Clear();
+			chipsToPaste.Clear();
+		}
+		// Move selected chip/s and place them on left mouse down
+		else {
+			Vector3 mousePos = new Vector3(InputHelper.MouseWorldPos.x, InputHelper.MouseWorldPos.y, 0);
+
+			foreach (KeyValuePair<Chip, Vector3> chipToPaste in newChipsToPaste) {
+				chipToPaste.Key.transform.position = chipToPaste.Value + mousePos;
+				SetDepth (chipToPaste.Key, dragDepth);
+			}
+
+			// Place object
+			if (Input.GetMouseButtonDown (0) && SelectedChipsWithinPlacementArea () && !InputHelper.MouseOverUIObject()) {
+				PlaceNewChips (chipsToPaste.ToArray());
+				newChipsToPaste.Clear();
+				chipsToPaste.Clear();
+			}
+
+		}
+	}
+
+	void PlaceNewChips (Chip[] chipsToPlace) {
 		float startDepth = (allChips.Count > 0) ? allChips[allChips.Count - 1].transform.position.z : 0;
-		for (int i = 0; i < newChipsToPlace.Count; i++) {
-			SetDepth (newChipsToPlace[i], startDepth + (newChipsToPlace.Count - i) * chipDepth);
+		for (int i = 0; i < chipsToPlace.Length; i++) {
+			SetDepth (chipsToPlace[i], startDepth + (newChipsToPlace.Count - i) * chipDepth);
 		}
 
-		allChips.AddRange (newChipsToPlace);
+		allChips.AddRange (chipsToPlace);
+		foreach (Chip chip in chipsToPlace) {
+			visiblePins.AddRange(chip.inputPins);
+			visiblePins.AddRange(chip.outputPins);
+			foreach (Pin pin in chip.outputPins) {
+				pin.UpdateColor();
+			}
+		}
+		
+		
 		selectedChips.Clear ();
-		newChipsToPlace.Clear ();
 		currentState = State.None;
 	}
 
-	void CancelPlacement () {
-		for (int i = newChipsToPlace.Count - 1; i >= 0; i--) {
-			Destroy (newChipsToPlace[i].gameObject);
+	void CancelPlacement (Chip[] chipsToPlace) {
+		for (int i = chipsToPlace.Length - 1; i >= 0; i--) {
+			Destroy (chipsToPlace[i].gameObject);
 		}
-		newChipsToPlace.Clear ();
 		selectedChips.Clear ();
 		currentState = State.None;
 	}
@@ -269,16 +373,16 @@ public class ChipInteraction : InteractionHandler {
 
 		foreach (var item in selectedChips) {
 			var pos = item.transform.position + Vector3.forward * -0.5f;
-			float sizeX = item.BoundsSize.x + (Pin.radius + selectionBoundsBorderPadding * 0.75f);
-			float sizeY = item.BoundsSize.y + selectionBoundsBorderPadding;
+			float sizeX = item.BoundsSize.x + (Pin.radius + ScalingManager.chipInteractionBoundsBorder * 0.75f);
+			float sizeY = item.BoundsSize.y + ScalingManager.chipInteractionBoundsBorder;
 			Matrix4x4 matrix = Matrix4x4.TRS (pos, Quaternion.identity, new Vector3 (sizeX, sizeY, 1));
 			Graphics.DrawMesh (selectionMesh, matrix, selectionBoxMaterial, 0);
 		}
 	}
 
 	bool SelectedChipsWithinPlacementArea () {
-		float bufferX = Pin.radius + selectionBoundsBorderPadding * 0.75f;
-		float bufferY = selectionBoundsBorderPadding;
+		float bufferX = Pin.radius + ScalingManager.chipInteractionBoundsBorder * 0.75f;
+		float bufferY = ScalingManager.chipInteractionBoundsBorder;
 		Bounds area = chipArea.bounds;
 
 		for (int i = 0; i < selectedChips.Count; i++) {

@@ -9,7 +9,7 @@ public class PinNameDisplayManager : MonoBehaviour {
 	ChipEditorOptions editorDisplayOptions;
 	Pin highlightedPin;
 
-	List<PinNameDisplay> pinNameDisplays;
+	[HideInInspector] public List<PinNameDisplay> pinNameDisplays;
 	List<Pin> pinsToDisplay;
 
 	void Awake () {
@@ -20,6 +20,13 @@ public class PinNameDisplayManager : MonoBehaviour {
 
 		pinNameDisplays = new List<PinNameDisplay> ();
 		pinsToDisplay = new List<Pin> ();
+	}
+
+	public void UpdateTextSize (float fontSize) {
+		foreach (PinNameDisplay display in pinNameDisplays) {
+			display.nameUI.fontSize = fontSize;
+		}
+
 	}
 
 	void LateUpdate () {

@@ -7,6 +7,8 @@ public class ChipSaveData {
 	public Color chipColour;
 	public Color chipNameColour;
 	public int creationIndex;
+	public string folderName;
+	public float scale;
 
 	// All chips used as components in this new chip (including input and output signals)
 	public Chip[] componentChips;
@@ -36,6 +38,8 @@ public class ChipSaveData {
 		chipColour = chipEditor.chipColour;
 		chipNameColour = chipEditor.chipNameColour;
 		creationIndex = chipEditor.creationIndex;
+		folderName = chipEditor.chipFolder;
+		scale = chipEditor.scale;
 	}
 
 	public int ComponentChipIndex (Chip componentChip) {

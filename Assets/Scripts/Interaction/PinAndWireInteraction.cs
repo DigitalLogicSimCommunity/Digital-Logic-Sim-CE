@@ -9,7 +9,7 @@ public class PinAndWireInteraction : InteractionHandler {
 	public event System.Action<Pin> onMouseOverPin;
 	public event System.Action<Pin> onMouseExitPin;
 
-	enum State { None, PlacingWire }
+	public enum State { None, PlacingWire, PasteWires }
 	public LayerMask pinMask;
 	public LayerMask wireMask;
 	public Transform wireHolder;
@@ -23,12 +23,28 @@ public class PinAndWireInteraction : InteractionHandler {
 	Dictionary<Pin, Wire> wiresByChipInputPin;
 	public List<Wire> allWires { get; private set; }
 
+	ChipInteraction chipInteraction;
+	ChipInterfaceEditor inputEditor;
+	ChipInterfaceEditor outputEditor;
+
+	List<Wire> wiresToPaste;
+
 	void Awake () {
 		allWires = new List<Wire> ();
+		wiresToPaste = new List<Wire>();
 		wiresByChipInputPin = new Dictionary<Pin, Wire> ();
 	}
 
+	public State CurrentState {
+		get {
+			return currentState;
+		}
+	}
+
 	public void Init (ChipInteraction chipInteraction, ChipInterfaceEditor inputEditor, ChipInterfaceEditor outputEditor) {
+		this.chipInteraction = chipInteraction;
+		this.inputEditor = inputEditor;
+		this.outputEditor = outputEditor;
 		chipInteraction.onDeleteChip += DeleteChipWires;
 		inputEditor.onDeleteChip += DeleteChipWires;
 		outputEditor.onDeleteChip += DeleteChipWires;
@@ -49,15 +65,45 @@ public class PinAndWireInteraction : InteractionHandler {
 				case State.PlacingWire:
 					HandleWirePlacement ();
 					break;
+				case State.PasteWires:
+					HandlePasteWires();
+					break;
 			}
 		}
 
+	}
+
+
+	public void PasteWires (List<WireInformation> wires, List<Chip> chips) {
+		wiresToPaste.Clear();
+		foreach (WireInformation wire in wires) {
+			Wire newWire = Instantiate (wirePrefab, parent : wireHolder);
+			allWires.Add(newWire);
+			newWire.Connect (
+				chips[wire.startChipIndex].outputPins[wire.startChipPinIndex],
+				chips[wire.endChipIndex].inputPins[wire.endChipPinIndex]
+			);
+			newWire.SetAnchorPoints(wire.anchorPoints);
+			newWire.endPin.parentPin = newWire.startPin;
+			newWire.startPin.childPins.Add(newWire.endPin);
+			wiresByChipInputPin.Add(newWire.ChipInputPin, newWire);
+			wiresToPaste.Add(newWire);
+		}
+		currentState = State.PasteWires;
 	}
 
 	public void LoadWire (Wire wire) {
 		wire.transform.parent = wireHolder;
 		allWires.Add (wire);
 		wiresByChipInputPin.Add (wire.ChipInputPin, wire);
+	}
+
+	public List<Pin> AllVisiblePins() {
+		List<Pin> pins = new List<Pin>();
+		pins.AddRange(chipInteraction.visiblePins);
+		pins.AddRange(inputEditor.visiblePins);
+		pins.AddRange(outputEditor.visiblePins);
+		return pins;
 	}
 
 	void HandleWireHighlighting () {
@@ -118,6 +164,21 @@ public class PinAndWireInteraction : InteractionHandler {
 		}
 	}
 
+	void HandlePasteWires() {
+		if (InputHelper.AnyOfTheseKeysDown (KeyCode.Escape, KeyCode.Backspace, KeyCode.Delete) || Input.GetMouseButtonDown (1)) {
+			foreach (Wire wire in wiresToPaste) {
+				DestroyWire(wire);
+			}
+			wiresToPaste.Clear();
+			currentState = State.None;
+		} else if (Input.GetMouseButtonDown(0)) {
+			wiresToPaste.Clear();
+			currentState = State.None;
+			Invoke("ConnectionChanged", 0.01f);
+		}
+	}
+
+
 	public Wire GetWire (Pin childPin) {
 		if (wiresByChipInputPin.ContainsKey (childPin)) {
 			return wiresByChipInputPin[childPin];
@@ -155,6 +216,7 @@ public class PinAndWireInteraction : InteractionHandler {
 		wiresByChipInputPin.Remove (wire.ChipInputPin);
 		allWires.Remove (wire);
 		Pin.RemoveConnection (wire.startPin, wire.endPin);
+		wire.endPin.ReceiveSignal(0);
 		Destroy (wire.gameObject);
 	}
 
@@ -165,6 +227,7 @@ public class PinAndWireInteraction : InteractionHandler {
 				RequestFocus ();
 				if (HasFocus) {
 					currentState = State.PlacingWire;
+					//wirePrefab.GetComponent<Wire>().thickness = ScalingManager.wireThickness * 1.5f;
 					wireToPlace = Instantiate (wirePrefab, parent : wireHolder);
 
 					// Creating new wire starting from pin
@@ -257,6 +320,10 @@ public class PinAndWireInteraction : InteractionHandler {
 		}
 
 		return true;
+	}
+
+	void ConnectionChanged() {
+		onConnectionChanged?.Invoke ();
 	}
 
 }

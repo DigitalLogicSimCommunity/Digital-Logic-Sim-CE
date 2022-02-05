@@ -82,12 +82,9 @@ public class SaveCompatibility : MonoBehaviour
 		// Update save file. Delete the old one a create one with the updated version 
 		string savePath = SaveSystem.GetPathToSaveFile( FixStr(JsonConvert.SerializeObject(lol.name), (char)0x22));
 		File.Delete(savePath);
-		using (StreamWriter writer = new StreamWriter(savePath))
-		{
-			writer.Write(JsonConvert.SerializeObject(lol, Formatting.Indented));
-			writer.Close();
-		}
+		string serialized = JsonConvert.SerializeObject(lol, Formatting.Indented);
+		SaveSystem.WriteFile(savePath, serialized);
 
-		return JsonConvert.SerializeObject(lol, Formatting.Indented);
+		return serialized;
 	}
 }

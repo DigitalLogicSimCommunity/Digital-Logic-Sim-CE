@@ -9,11 +9,20 @@ public class PinNameDisplay : MonoBehaviour {
 
 	public void Set (Pin pin) {
 
+		nameUI.fontSize = ScalingManager.pinDisplayFontSize;
+
 		if (string.IsNullOrEmpty (pin.pinName)) {
 			nameUI.text = "UNNAMED PIN";
 		} else {
 			nameUI.text = pin.pinName;
 		}
+
+		backgroundPadding.x = ScalingManager.pinDisplayPadding;
+		nameUI.rectTransform.localPosition = new Vector3(
+			nameUI.rectTransform.localPosition.x, 
+			ScalingManager.pinDisplayTextOffset, 
+			nameUI.rectTransform.localPosition.z
+		);
 
 		float backgroundSizeX = nameUI.preferredWidth + backgroundPadding.x;
 		float backgroundSizeY = nameUI.preferredHeight + backgroundPadding.y;

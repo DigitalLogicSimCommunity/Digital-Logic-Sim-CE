@@ -28,16 +28,20 @@ public class ChipInterfaceEditor : InteractionHandler {
 	public UnityEngine.UI.Toggle twosComplementToggle;
 	public TMPro.TMP_Dropdown modeDropdown;
 	public Transform signalHolder;
+	public Transform barGraphic;
+	public ChipInterfaceEditor otherEditor;
 
 	[Header ("Appearance")]
-	public Vector2 handleSize;
 	public Color handleCol;
 	public Color highlightedHandleCol;
 	public Color selectedHandleCol;
-	public float propertiesUIX;
 	public Vector2 propertiesHeightMinMax;
 	public bool showPreviewSignal;
-	public float groupSpacing = 1;
+
+	[HideInInspector]
+	public List<Pin> visiblePins;
+
+	const float handleSizeX = 0.15f;
 
 	string currentEditorName;
 	public ChipEditor CurrentEditor {
@@ -72,6 +76,7 @@ public class ChipInterfaceEditor : InteractionHandler {
 		signals = new List<ChipSignal> ();
 		selectedSignals = new List<ChipSignal> ();
 		groupsByID = new Dictionary<int, ChipSignal[]> ();
+		visiblePins = new List<Pin>();
 
 		inputBounds = GetComponent<BoxCollider2D> ();
 		MeshShapeCreator.CreateQuadMesh (ref quadMesh);
@@ -88,11 +93,19 @@ public class ChipInterfaceEditor : InteractionHandler {
 			previewSignal.transform.SetParent (transform, true);
 			previewSignals[i] = previewSignal;
 		}
-
 		propertiesUI.gameObject.SetActive (false);
 		deleteButton.onClick.AddListener (DeleteSelected);
 		FindObjectOfType<CreateGroup> ().onGroupSizeSettingPressed += SetGroupSize;
 		modeDropdown.onValueChanged.AddListener(ModeChanged);
+	}
+
+
+	void Update() {
+		if (Input.GetMouseButtonDown(0) && !InputHelper.MouseOverUIObject()) {
+			ReleaseFocus();
+			ClearSelectedSignals();
+			propertiesUI.gameObject.SetActive(false);
+		}
 	}
 
 	// Event handler when changed input or output pin wire type
@@ -128,9 +141,15 @@ public class ChipInterfaceEditor : InteractionHandler {
 		if (!InputHelper.MouseOverUIObject ()) {
 			UpdateColours ();
 			HandleInput ();
+		} else {
+			if (HasFocus) {
+				ReleaseFocus();
+				HidePreviews();
+			}
 		}
 		DrawSignalHandles ();
 	}
+
 
 	void SetGroupSize (int groupSize) {
 		currentGroupSize = groupSize;
@@ -140,12 +159,14 @@ public class ChipInterfaceEditor : InteractionHandler {
 		signal.transform.parent = signalHolder;
 		signal.signalName = signal.outputPins[0].pinName;
 		signals.Add (signal);
+		visiblePins.Add(signal.outputPins[0]);
 	}
 
 	public void LoadSignal (OutputSignal signal) {
 		signal.transform.parent = signalHolder;
 		signal.signalName = signal.inputPins[0].pinName;
 		signals.Add (signal);
+		visiblePins.Add(signal.inputPins[0]);
 	}
 
 	void HandleInput () {
@@ -157,6 +178,8 @@ public class ChipInterfaceEditor : InteractionHandler {
 		}
 
 		if (HasFocus) {
+			otherEditor.ReleaseFocus();
+			otherEditor.ClearSelectedSignals();
 
 			highlightedSignal = GetSignalUnderMouse ();
 
@@ -203,7 +226,7 @@ public class ChipInterfaceEditor : InteractionHandler {
 
 			HidePreviews ();
 			if (highlightedSignal == null && !isDragging) {
-				if (mouseInInputBounds) {
+				if (mouseInInputBounds && !InputHelper.MouseOverUIObject()) {
 
 					if (InputHelper.AnyOfTheseKeysDown (KeyCode.Plus, KeyCode.KeypadPlus, KeyCode.Equals)) {
 						currentGroupSize = Mathf.Clamp (currentGroupSize + 1, 1, maxGroupSize);
@@ -218,11 +241,15 @@ public class ChipInterfaceEditor : InteractionHandler {
 		}
 	}
 
+	public void ClearSelectedSignals() {
+		selectedSignals.Clear();
+	}
+
 	float CalcY (float mouseY, int groupSize, int index) {
 		float centreY = mouseY;
-		float halfExtent = groupSpacing * (groupSize - 1f);
-		float maxY = centreY + halfExtent + handleSize.y / 2f;
-		float minY = centreY - halfExtent - handleSize.y / 2f;
+		float halfExtent = ScalingManager.groupSpacing * (groupSize - 1f);
+		float maxY = centreY + halfExtent + ScalingManager.handleSizeY / 2f;
+		float minY = centreY - halfExtent - ScalingManager.handleSizeY / 2f;
 
 		if (maxY > BoundsTop) {
 			centreY -= (maxY - BoundsTop);
@@ -250,6 +277,10 @@ public class ChipInterfaceEditor : InteractionHandler {
 	// Handles spawning if user clicks, otherwise displays preview
 	void HandleSpawning () {
 
+		if (InputHelper.MouseOverUIObject()) {
+			return;
+		}
+
 		float containerX = chipContainer.position.x + chipContainer.localScale.x / 2 * ((editorType == EditorType.Input) ? -1 : 1);
 		float centreY = ClampY (InputHelper.MouseWorldPos.y);
 
@@ -263,11 +294,14 @@ public class ChipInterfaceEditor : InteractionHandler {
 				Vector3 spawnPos = new Vector3 (containerX, posY, chipContainer.position.z + forwardDepth);
 
 				ChipSignal spawnedSignal = Instantiate (signalPrefab, spawnPos, Quaternion.identity, signalHolder);
+				spawnedSignal.GetComponent<IOScaler>().UpdateScale();
 				if (isGroup) {
 					spawnedSignal.GroupID = currentGroupID;
 					spawnedSignal.displayGroupDecimalValue = true;
 				}
 				signals.Add (spawnedSignal);
+				visiblePins.AddRange(spawnedSignal.inputPins);
+				visiblePins.AddRange(spawnedSignal.outputPins);
 				spawnedSignals[i] = spawnedSignal;
 
 			}
@@ -316,7 +350,7 @@ public class ChipInterfaceEditor : InteractionHandler {
 	}
 
 	float ClampY (float y) {
-		return Mathf.Clamp (y, BoundsBottom + handleSize.y / 2f, BoundsTop - handleSize.y / 2f);
+		return Mathf.Clamp (y, BoundsBottom + ScalingManager.handleSizeY / 2f, BoundsTop - ScalingManager.handleSizeY / 2f);
 	}
 
 	protected override bool CanReleaseFocus () {
@@ -341,6 +375,7 @@ public class ChipInterfaceEditor : InteractionHandler {
 	void UpdateUIProperties () {
 		if (selectedSignals.Count > 0) {
 			Vector3 centre = (selectedSignals[0].transform.position + selectedSignals[selectedSignals.Count - 1].transform.position) / 2;
+			float propertiesUIX = ScalingManager.propertiesUIX * (editorType == EditorType.Input ? 1 : -1);
 			propertiesUI.transform.position = new Vector3 (centre.x + propertiesUIX, centre.y, propertiesUI.transform.position.z);
 
 			// Update signal properties
@@ -378,8 +413,8 @@ public class ChipInterfaceEditor : InteractionHandler {
 
 			const float selectionBufferY = 0.1f;
 
-			float halfSizeX = transform.localScale.x / 2f;
-			float halfSizeY = (handleSize.y + selectionBufferY) / 2f;
+			float halfSizeX = handleSizeX;
+			float halfSizeY = (ScalingManager.handleSizeY + selectionBufferY) / 2f;
 			bool insideX = mousePos.x >= handleCentre.x - halfSizeX && mousePos.x <= handleCentre.x + halfSizeX;
 			bool insideY = mousePos.y >= handleCentre.y - halfSizeY && mousePos.y <= handleCentre.y + halfSizeY;
 
@@ -455,6 +490,12 @@ public class ChipInterfaceEditor : InteractionHandler {
 			}
 			onDeleteChip?.Invoke (signalToDelete);
 			signals.Remove (signalToDelete);
+			foreach(Pin pin in signalToDelete.inputPins) {
+				visiblePins.Remove(pin);
+			}
+			foreach(Pin pin in signalToDelete.outputPins) {
+				visiblePins.Remove(pin);
+			}
 			Destroy (signalToDelete.gameObject);
 		}
 		onChipsAddedOrDeleted?.Invoke ();
@@ -478,7 +519,7 @@ public class ChipInterfaceEditor : InteractionHandler {
 				break;
 		}
 
-		Vector3 scale = new Vector3 (handleSize.x, handleSize.y, 1);
+		Vector3 scale = new Vector3 (handleSizeX, ScalingManager.handleSizeY, 1);
 		Vector3 pos3D = new Vector3 (transform.position.x, y, transform.position.z + renderZ);
 		Matrix4x4 handleMatrix = Matrix4x4.TRS (pos3D, Quaternion.identity, scale);
 		Graphics.DrawMesh (quadMesh, handleMatrix, currentHandleMat, 0);
@@ -499,4 +540,33 @@ public class ChipInterfaceEditor : InteractionHandler {
 		highlightedHandleMat.color = highlightedHandleCol;
 		selectedHandleMat.color = selectedHandleCol;
 	}
+
+	public void UpdateScale() {
+		transform.localPosition = new Vector3(
+			ScalingManager.ioBarDistance * (editorType == EditorType.Input ? -1f : 1f), 
+			transform.localPosition.y, 
+			transform.localPosition.z
+		);
+		barGraphic.localScale = new Vector3(ScalingManager.ioBarGraphicWidth, 1, 1);
+		GetComponent<BoxCollider2D>().size = new Vector2(ScalingManager.ioBarGraphicWidth, 1);
+
+		foreach (ChipSignal chipSignal in previewSignals) {
+			chipSignal.GetComponent<IOScaler>().UpdateScale();
+		}
+
+		foreach (ChipSignal[] group in groupsByID.Values) {
+			float yPos = 0;
+			foreach(ChipSignal sig in group) {
+				yPos += sig.transform.localPosition.y;
+			}
+			float handleNewY = yPos /= group.Length;
+
+			for (int i = 0; i < group.Length; i++) {
+				float y = CalcY (handleNewY, group.Length, i);
+				SetYPos (group[i].transform, y);
+			}
+		}
+		UpdateUIProperties();
+	}
+
 }

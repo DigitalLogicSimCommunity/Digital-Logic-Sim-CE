@@ -1,13 +1,25 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class CustomChip : Chip {
 
-
 	public InputSignal[] inputSignals;
 	public OutputSignal[] outputSignals;
+
+	public Pin pseudoInput;
+
+	public string folderName = "User";
+
+	[UnityEngine.HideInInspector]
+	public Pin[] unconnectedInputs;
+
+
+
+	public void Init() {
+		GameObject pseudoPins = Instantiate(new GameObject("Pseudo Pins"), parent: this.transform, false);
+		
+	}
 
 	// Applies wire types from signals to pins
 	public void ApplyWireModes()
@@ -22,8 +34,15 @@ public class CustomChip : Chip {
 		}
 	}
 
+	public bool HasNoInputs {
+		get {
+			return inputPins.Length == 0;
+		}
+	}
+
 	public override void ReceiveInputSignal (Pin pin) {
 		base.ReceiveInputSignal (pin);
+		
 	}
 
 	protected override void ProcessOutput () {
@@ -31,12 +50,20 @@ public class CustomChip : Chip {
 		for (int i = 0; i < inputPins.Length; i++) {
 			inputSignals[i].SendSignal (inputPins[i].State);
 		}
+		foreach (Pin pin in unconnectedInputs) {
+			pin.ReceiveSignal(0);
+			pin.chip.ReceiveInputSignal(pin);
+		}
 
 		// Pass processed signals on to ouput pins
 		for (int i = 0; i < outputPins.Length; i++) {
 			int outputState = outputSignals[i].inputPins[0].State;
 			outputPins[i].ReceiveSignal (outputState);
 		}
+	}
+
+	public void ProcessOutputNoInputs () {
+		ProcessOutput();
 	}
 
 }

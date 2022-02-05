@@ -4,7 +4,10 @@ using UnityEngine;
 
 public class ChipPackage : MonoBehaviour {
 
-	public bool builtinChip;
+	public enum ChipType {User, Basic, Advanced};
+
+
+	public ChipType chipType;
 	public TMPro.TextMeshPro nameText;
 	public Transform container;
 	public Pin chipPinPrefab;
@@ -15,11 +18,12 @@ public class ChipPackage : MonoBehaviour {
 	const string pinHolderName = "Pin Holder";
 
 	void Awake () {
-		if (builtinChip) {
+		if (chipType != ChipType.User) {
 			BuiltinChip builtinChip = GetComponent<BuiltinChip> ();
 			SetSizeAndSpacing (GetComponent<Chip> ());
 			SetColour (builtinChip.packageColour);
 		}
+		nameText.fontSize = ScalingManager.packageFontSize;
 	}
 
 	public void PackageCustomChip (ChipEditor chipEditor) {
@@ -31,6 +35,7 @@ public class ChipPackage : MonoBehaviour {
 		// Add and set up the custom chip component
 		CustomChip chip = gameObject.AddComponent<CustomChip> ();
 		chip.chipName = chipEditor.chipName;
+		chip.folderName = chipEditor.chipFolder;
 
 		// Set input signals
 		chip.inputSignals = new InputSignal[chipEditor.inputsEditor.signals.Count];
@@ -50,6 +55,7 @@ public class ChipPackage : MonoBehaviour {
 
 		// Parent chip holder to the template, and hide
 		Transform implementationHolder = chipEditor.chipImplementationHolder;
+
 		implementationHolder.parent = transform;
 		implementationHolder.localPosition = Vector3.zero;
 		implementationHolder.gameObject.SetActive (false);
@@ -84,7 +90,7 @@ public class ChipPackage : MonoBehaviour {
 	}
 
 	public void SetSizeAndSpacing (Chip chip) {
-		nameText.fontSize = 2.5f;
+		nameText.fontSize = ScalingManager.packageFontSize;
 
 		float containerHeightPadding = 0;
 		float containerWidthPadding = 0.1f;

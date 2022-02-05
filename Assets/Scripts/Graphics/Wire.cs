@@ -6,15 +6,13 @@ public class Wire : MonoBehaviour {
 
 	public Material simpleMat;
 
-	LineRenderer lineRenderer;
+	[HideInInspector]
+	public LineRenderer lineRenderer;
 	public Color editCol;
-	public Palette palette;
-	//public Color
+	Palette palette;
 	public Color placedCol;
 	public float curveSize = 0.5f;
 	public int resolution = 10;
-	public float thickness = 1;
-	public float selectedThickness = 1.2f;
 	bool selected;
 
 	bool wireConnected;
@@ -34,9 +32,12 @@ public class Wire : MonoBehaviour {
 
 	void Awake () {
 		lineRenderer = GetComponent<LineRenderer> ();
+		lineRenderer.startWidth = ScalingManager.wireSelectedThickness * thicknessMultiplier;
+		lineRenderer.endWidth = ScalingManager.wireSelectedThickness * thicknessMultiplier;
 	}
 
 	void Start () {
+		palette = UIManager.Palette;
 		lineRenderer.material = simpleMat;
 		mat = lineRenderer.material;
 	}
@@ -56,11 +57,15 @@ public class Wire : MonoBehaviour {
 	public void tellWireSimIsOff()
 	{
 		simActive = false;
+		startPin.tellPinSimIsOff();
+		endPin.tellPinSimIsOff();
 	}
 
 	public void tellWireSimIsOn()
 	{
 		simActive = true;
+		startPin.tellPinSimIsOn();
+		endPin.tellPinSimIsOn();
 	}
 
 	public void SetAnchorPoints (Vector2[] newAnchorPoints) {
@@ -84,8 +89,8 @@ public class Wire : MonoBehaviour {
 			//transform.position = new Vector3 (transform.position.x, transform.position.y, inputPin.sequentialState * -0.01f);
 
 		}
-		lineRenderer.startWidth = ((selected) ? selectedThickness : thickness) * thicknessMultiplier;
-		lineRenderer.endWidth = ((selected) ? selectedThickness : thickness) * thicknessMultiplier;
+		lineRenderer.startWidth = ((selected) ? ScalingManager.wireSelectedThickness : ScalingManager.wireThickness) * thicknessMultiplier;
+		lineRenderer.endWidth = ((selected) ? ScalingManager.wireSelectedThickness : ScalingManager.wireThickness) * thicknessMultiplier;
 
 	}
 
@@ -114,19 +119,25 @@ public class Wire : MonoBehaviour {
 		if (wireConnected) {
 			Color onCol = palette.onCol;
 			Color offCol = palette.offCol;
+			Color selectedCol = palette.selectedColor;
 
-			// High Z
-			if (ChipOutputPin.State == -1) {
-				onCol = palette.highZCol;
-				offCol = palette.highZCol;
-			} if (simActive) {
-				if (startPin.wireType != Pin.WireType.Simple) {
-					mat.color = (ChipOutputPin.State == 0) ? offCol : palette.busColor;
-				} else {
-					mat.color = (ChipOutputPin.State == 0) ? offCol : onCol;
-				}
+			if (selected) {
+				mat.color = selectedCol;
 			} else {
-				mat.color = offCol;
+
+				// High Z
+				if (ChipOutputPin.State == -1) {
+					onCol = palette.highZCol;
+					offCol = palette.highZCol;
+				} if (simActive) {
+					if (startPin.wireType != Pin.WireType.Simple) {
+						mat.color = (ChipOutputPin.State == 0) ? offCol : palette.busColor;
+					} else {
+						mat.color = (ChipOutputPin.State == 0) ? offCol : onCol;
+					}
+				} else {
+					mat.color = offCol;
+				}
 			}
 		} else {
 			mat.color = Color.black;
@@ -197,12 +208,33 @@ public class Wire : MonoBehaviour {
 
 	// Connect the input pin to the output pin
 	public void Place (Pin endPin) {
+		
 		this.endPin = endPin;
 		anchorPoints[anchorPoints.Count - 1] = endPin.transform.position;
 		UpdateSmoothedLine ();
 
 		wireConnected = true;
 		UpdateCollider ();
+
+		if (endPin.pinType == Pin.PinType.ChipOutput) {
+			SwapStartEndPoints();
+		}
+
+		if (Simulation.instance.active) {
+			tellWireSimIsOn();
+		}
+	}
+
+	void SwapStartEndPoints() {
+		Pin temp = startPin;
+		startPin = endPin;
+		endPin = temp;
+
+		anchorPoints.Reverse();
+		drawPoints.Reverse();
+
+		UpdateSmoothedLine();
+		UpdateCollider();
 	}
 
 	// Update position of wire end point (for when initially placing the wire)
@@ -219,7 +251,7 @@ public class Wire : MonoBehaviour {
 
 	void UpdateCollider () {
 		wireCollider.points = drawPoints.ToArray ();
-		wireCollider.edgeRadius = thickness * thicknessMultiplier;
+		wireCollider.edgeRadius = ScalingManager.wireThickness * thicknessMultiplier;
 	}
 
 	void UpdateSmoothedLine () {

@@ -2,16 +2,18 @@
 using UnityEngine;
 
 public class Simulation : MonoBehaviour {
+	public static Simulation instance;
 
 	public static int simulationFrame { get; private set; }
 
-	static Simulation instance;
 	InputSignal[] inputSignals;
 	ChipEditor chipEditor;
 	public bool active = false;
 
 	public float minStepTime = 0.075f;
 	float lastStepTime;
+
+	List<CustomChip> standaloneChips = new List<CustomChip>();
 
 	public void ToogleActive() {
 		// Method called by the "Run/Stop" button that toogles simulation active/inactive
@@ -26,17 +28,33 @@ public class Simulation : MonoBehaviour {
     }
 
 	void Awake () {
+		instance = this;
 		simulationFrame = 0;
 	}
-	
 
 	void Update () {
-
 		// If simulation is off StepSimulation is not executed. 
 		if (Time.time - lastStepTime > minStepTime && active) {
 			lastStepTime = Time.time;
 			simulationFrame++;
 			StepSimulation ();
+		} 
+	}
+
+	void StepSimulation () {
+		RefreshChipEditorReference();
+		ClearOutputSignals();
+		InitChips();
+		ProcessInputs();
+	}
+
+	public void ResetSimulation() {
+		StopSimulation();
+		simulationFrame = 0;
+		
+		if (active) {
+			FindObjectOfType<RunButton>().SetOff();
+			active = false;
 		}
 	}
 
@@ -53,6 +71,15 @@ public class Simulation : MonoBehaviour {
 		for (int i = 0; i < inputSignals.Count; i++) {
 			((InputSignal)inputSignals[i]).SendSignal();
 		}
+		foreach (Chip chip in chipEditor.chipInteraction.allChips) {
+			if (chip is CustomChip custom) {
+				// if (custom.HasNoInputs) {
+				// 	custom.ProcessOutputNoInputs();
+				// }
+				custom.pseudoInput?.ReceiveSignal(0);
+				if (custom.pseudoInput != null) {}
+			}
+		}
 	}
 
 	void StopSimulation() {
@@ -63,6 +90,9 @@ public class Simulation : MonoBehaviour {
 			// Tell all wires the simulation is inactive makes them all inactive (gray colored)
 			allWires[i].tellWireSimIsOff();
 		}
+		foreach (Pin pin in chipEditor.pinAndWireInteraction.AllVisiblePins()) {
+			pin.tellPinSimIsOff();
+		}
 
 		// If sim is not active all output signals are set with a temporal value of 0
 		// (group signed/unsigned displayed value) and get gray colored (turned off)
@@ -72,19 +102,16 @@ public class Simulation : MonoBehaviour {
 	void ResumeSimulation() {
 		StepSimulation();
 
+		foreach (Pin pin in chipEditor.pinAndWireInteraction.AllVisiblePins()) {
+			pin.tellPinSimIsOn();
+		}
+
 		var allWires = chipEditor.pinAndWireInteraction.allWires;
 		for (int i = 0; i < allWires.Count; i++)
 		{
 			// Tell all wires the simulation is active makes them all active (dynamic colored based on the circuits logic)
 			allWires[i].tellWireSimIsOn();
 		}
-	}
-
-	void StepSimulation () {
-		RefreshChipEditorReference();
-		ClearOutputSignals();
-		InitChips();
-		ProcessInputs();		
 	}
 
     private void InitChips() {
@@ -97,16 +124,9 @@ public class Simulation : MonoBehaviour {
 
     void RefreshChipEditorReference () {
 		if (chipEditor == null) {
-			chipEditor = FindObjectOfType<ChipEditor> ();
+			chipEditor = Manager.ActiveChipEditor;
 		}
 	}
 
-	static Simulation Instance {
-		get {
-			if (!instance) {
-				instance = FindObjectOfType<Simulation> ();
-			}
-			return instance;
-		}
-	}
+
 }

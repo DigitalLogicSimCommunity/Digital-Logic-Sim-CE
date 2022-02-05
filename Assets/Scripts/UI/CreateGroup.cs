@@ -16,9 +16,7 @@ public class CreateGroup : MonoBehaviour
 
     int groupSizeValue;
 
-    // Start is called before the first frame update
-    void Start ()
-    {
+    void Start () {
         menuActive = false;
         groupSizeValue = 8;
         setSizeButton.onClick.AddListener (SetGroupSize);
@@ -26,7 +24,14 @@ public class CreateGroup : MonoBehaviour
     }
 
     void SetCurrentText (string groupSize) {
-        groupSizeValue = int.Parse(groupSize);
+		if(groupSize != "" && groupSize != "-") {
+			int result = int.Parse(groupSize);
+			result = result <= 1 ? 1 : result;
+        	groupSizeValue = result > 16 ? 16 : result;
+			groupSizeInput.SetTextWithoutNotify(groupSizeValue.ToString());
+		} else if (groupSize == "-") {
+			groupSizeInput.SetTextWithoutNotify("");
+		}
     }
 
     public void CloseMenu () {
@@ -35,8 +40,7 @@ public class CreateGroup : MonoBehaviour
         menuHolder.SetActive(false);
     }
 
-    public void OpenMenu ()
-    {
+    public void OpenMenu () {
         menuActive = true;
         menuHolder.SetActive(true);
     }
