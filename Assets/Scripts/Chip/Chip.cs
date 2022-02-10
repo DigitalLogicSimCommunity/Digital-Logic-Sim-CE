@@ -4,80 +4,73 @@ using UnityEngine;
 
 public class Chip : MonoBehaviour {
 
-    public string chipName = "Untitled";
-    public Pin[] inputPins;
-    public Pin[] outputPins;
+  public string chipName = "Untitled";
+  public Pin[] inputPins;
+  public Pin[] outputPins;
 
-    // Number of input signals received (on current simulation step)
-    int numInputSignalsReceived;
-    int lastSimulatedFrame;
-    int lastSimulationInitFrame;
+  // Number of input signals received (on current simulation step)
+  int numInputSignalsReceived;
+  int lastSimulatedFrame;
+  int lastSimulationInitFrame;
 
-    // Cached components
-    [HideInInspector]
-    public BoxCollider2D bounds;
+  // Cached components
+  [HideInInspector]
+  public BoxCollider2D bounds;
 
-    protected virtual void Awake () {
-        bounds = GetComponent<BoxCollider2D> ();
+  protected virtual void Awake() { bounds = GetComponent<BoxCollider2D>(); }
+
+  protected virtual void Start() { SetPinIndices(); }
+
+  public void InitSimulationFrame() {
+    if (lastSimulationInitFrame != Simulation.simulationFrame) {
+      lastSimulationInitFrame = Simulation.simulationFrame;
+      ProcessCycleAndUnconnectedInputs();
+    }
+  }
+
+  // Receive input signal from pin: either pin has power, or pin does not have
+  // power. Once signals from all input pins have been received, calls the
+  // ProcessOutput() function.
+  public virtual void ReceiveInputSignal(Pin pin) {
+    // Reset if on new step of simulation
+    if (lastSimulatedFrame != Simulation.simulationFrame) {
+      lastSimulatedFrame = Simulation.simulationFrame;
+      numInputSignalsReceived = 0;
+      InitSimulationFrame();
     }
 
-    protected virtual void Start () {
-        SetPinIndices ();
+    numInputSignalsReceived++;
+
+    if (numInputSignalsReceived == inputPins.Length) {
+      ProcessOutput();
     }
+  }
 
-    public void InitSimulationFrame () {
-        if (lastSimulationInitFrame != Simulation.simulationFrame) {
-            lastSimulationInitFrame = Simulation.simulationFrame;
-            ProcessCycleAndUnconnectedInputs ();
-        }
+  void ProcessCycleAndUnconnectedInputs() {
+    for (int i = 0; i < inputPins.Length; i++) {
+      if (inputPins[i].cyclic) {
+        ReceiveInputSignal(inputPins[i]);
+      } else if (!inputPins[i].HasParent) {
+        inputPins[i].ReceiveSignal(0);
+        // ReceiveInputSignal (inputPins[i]);
+      }
     }
+  }
 
-    // Receive input signal from pin: either pin has power, or pin does not have power.
-    // Once signals from all input pins have been received, calls the ProcessOutput() function.
-    public virtual void ReceiveInputSignal (Pin pin) {
-        // Reset if on new step of simulation
-        if (lastSimulatedFrame != Simulation.simulationFrame) {
-            lastSimulatedFrame = Simulation.simulationFrame;
-            numInputSignalsReceived = 0;
-            InitSimulationFrame ();
-        }
+  // Called once all inputs to the component are known.
+  // Sends appropriate output signals t o output pins
+  protected virtual void ProcessOutput() {}
 
-        numInputSignalsReceived++;
-
-        if (numInputSignalsReceived == inputPins.Length) {
-            ProcessOutput ();
-        }
+  void SetPinIndices() {
+    for (int i = 0; i < inputPins.Length; i++) {
+      inputPins[i].index = i;
     }
-
-    void ProcessCycleAndUnconnectedInputs () {
-        for (int i = 0; i < inputPins.Length; i++) {
-            if (inputPins[i].cyclic) {
-                ReceiveInputSignal (inputPins[i]);
-            } else if (!inputPins[i].HasParent) {
-                inputPins[i].ReceiveSignal (0);
-                // ReceiveInputSignal (inputPins[i]);
-            }
-        }
+    for (int i = 0; i < outputPins.Length; i++) {
+      outputPins[i].index = i;
     }
+  }
 
-    // Called once all inputs to the component are known.
-    // Sends appropriate output signals t o output pins
-    protected virtual void ProcessOutput () {
-
-    }
-
-    void SetPinIndices () {
-        for (int i = 0; i < inputPins.Length; i++) {
-            inputPins[i].index = i;
-        }
-        for (int i = 0; i < outputPins.Length; i++) {
-            outputPins[i].index = i;
-        }
-    }
-
-    public Vector2 BoundsSize {
-        get {
-            return bounds.size;
-        }
-    }
+  public Vector2 BoundsSize {
+    get { return bounds.size; }
+  }
 }
