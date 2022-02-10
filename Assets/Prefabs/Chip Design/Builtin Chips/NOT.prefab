@@ -39,7 +39,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 31073214721464209}
-  m_Mesh: {fileID: 0}
+  m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &1382211563834361938
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -284,7 +284,6 @@ MonoBehaviour:
   - {fileID: 177712572887147738}
   outputPins:
   - {fileID: 2075130120421150586}
-  canBeEdited: 0
   bounds: {fileID: 0}
   packageColour: {r: 0.54901963, g: 0.16862746, b: 0.14117648, a: 0}
 --- !u!114 &-7470250890380526709
