@@ -24,14 +24,14 @@ public class CreateGroup : MonoBehaviour
     }
 
     void SetCurrentText (string groupSize) {
-		if(groupSize != "" && groupSize != "-") {
-			int result = int.Parse(groupSize);
-			result = result <= 1 ? 1 : result;
-        	groupSizeValue = result > 16 ? 16 : result;
-			groupSizeInput.SetTextWithoutNotify(groupSizeValue.ToString());
-		} else if (groupSize == "-") {
-			groupSizeInput.SetTextWithoutNotify("");
-		}
+        if(groupSize != "" && groupSize != "-") {
+            int result = int.Parse(groupSize);
+            result = result <= 1 ? 1 : result;
+            groupSizeValue = result > 16 ? 16 : result;
+            groupSizeInput.SetTextWithoutNotify(groupSizeValue.ToString());
+        } else if (groupSize == "-") {
+            groupSizeInput.SetTextWithoutNotify("");
+        }
     }
 
     public void CloseMenu () {
