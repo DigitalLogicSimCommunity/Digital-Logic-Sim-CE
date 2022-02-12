@@ -43,15 +43,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ebdca5816a0f64de49dfb5974430306c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   simpleMat: {fileID: 2100000, guid: 0e3c3d148264a480d9fd4a7a95df012d, type: 2}
   editCol: {r: 0, g: 0, b: 0, a: 0}
   palette: {fileID: 11400000, guid: bed15cc57ce1e4a35bde62f3a99891c7, type: 2}
   placedCol: {r: 0, g: 0, b: 0, a: 0}
   curveSize: 0.3
   resolution: 20
-  thickness: 0.5
+  thickness: 0.75
   selectedThickness: 0.85
   startPin: {fileID: 0}
   endPin: {fileID: 0}
@@ -107,7 +107,16 @@ LineRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.7529661
+        value: 3
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1
+        value: 3
         inSlope: 0
         outSlope: 0
         tangentMode: 0

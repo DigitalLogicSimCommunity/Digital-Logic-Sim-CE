@@ -157,8 +157,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 85b497f44243f4a26bbdedfec0c3e09a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   pinType: 0
   wireType: 0
   chip: {fileID: 1267900139923996690}
@@ -277,14 +277,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0ce5eea30956940ffb9acd62063235a7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   chipName: NOT
   inputPins:
   - {fileID: 177712572887147738}
   outputPins:
   - {fileID: 2075130120421150586}
-  canBeEdited: 0
   bounds: {fileID: 0}
   packageColour: {r: 0.54901963, g: 0.16862746, b: 0.14117648, a: 0}
 --- !u!114 &-7470250890380526709
@@ -297,13 +296,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 56121cab9da574d2b97c854754749ada, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  builtinChip: 1
+  m_Name:
+  m_EditorClassIdentifier:
+  chipType: 1
   nameText: {fileID: 2886115464730570716}
   container: {fileID: 322412531872686230}
   chipPinPrefab: {fileID: 8774343771143846598, guid: 3f5693e72562648d19f39eace0ccffd6,
     type: 3}
+  override_width_and_height: 0
+  override_width: 1
+  override_height: 1
 --- !u!61 &866551715762075300
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -418,8 +420,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
@@ -576,8 +578,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 85b497f44243f4a26bbdedfec0c3e09a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   pinType: 1
   wireType: 0
   chip: {fileID: 1267900139923996690}
