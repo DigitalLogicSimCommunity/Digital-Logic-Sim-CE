@@ -208,8 +208,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0ab54cfd34da341fe8cf2d0420adc299, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   chipName: SIGNAL OUT
   inputPins:
   - {fileID: 5081617511579427308}
@@ -222,7 +222,7 @@ MonoBehaviour:
   pinRenderer: {fileID: 7264883394423657326}
   wireRenderer: {fileID: 4557980508572362864}
   wireType: 0
-  signalName: 
+  signalName:
 --- !u!114 &245980143848404051
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -233,8 +233,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1ef67dba0f91a4af9afa5d1cd9e77af7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   mode: 1
   pin: {fileID: 5081617511579427308}
   wire: {fileID: 6470299847229130160}
@@ -371,12 +371,12 @@ PrefabInstance:
     - target: {fileID: 8774343771143846598, guid: 3f5693e72562648d19f39eace0ccffd6,
         type: 3}
       propertyPath: chip
-      value: 
+      value:
       objectReference: {fileID: 894826051406503273}
     - target: {fileID: 8774343771143846598, guid: 3f5693e72562648d19f39eace0ccffd6,
         type: 3}
       propertyPath: pinName
-      value: 
+      value:
       objectReference: {fileID: 0}
     - target: {fileID: 8774343771143846598, guid: 3f5693e72562648d19f39eace0ccffd6,
         type: 3}
@@ -401,8 +401,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 85b497f44243f4a26bbdedfec0c3e09a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
 --- !u!23 &7264883394423657326 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: 6598688158339663940, guid: 3f5693e72562648d19f39eace0ccffd6,
