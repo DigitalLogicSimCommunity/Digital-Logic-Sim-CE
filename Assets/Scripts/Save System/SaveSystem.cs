@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Linq;
+using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
@@ -19,15 +20,21 @@ public static class SaveSystem {
   }
 
   public static string[] GetChipSavePaths() {
-    return Directory.GetFiles(CurrentSaveProfileDirectoryPath,
-                              "*" + fileExtension);
+    DirectoryInfo directory =
+        new DirectoryInfo(CurrentSaveProfileDirectoryPath);
+    FileInfo[] files = directory.GetFiles("*" + fileExtension);
+    var filtered =
+        files.Where(f => !f.Attributes.HasFlag(FileAttributes.Hidden));
+    List<string> result = new List<string>(); foreach (var f in filtered) {
+      result.Add(f.ToString());
+    } return result.ToArray();
+    // return Directory.GetFiles(CurrentSaveProfileDirectoryPath, "*" +
+    // fileExtension);
   }
 
   public static void LoadAll(Manager manager) {
     // Load any saved chips
-    var sw = System.Diagnostics.Stopwatch.StartNew();
     ChipLoader.LoadAllChips(GetChipSavePaths(), manager);
-    Debug.Log("Load time: " + sw.ElapsedMilliseconds);
   }
 
   public static SavedChip[] GetAllSavedChips() {
@@ -66,13 +73,18 @@ public static class SaveSystem {
     return savedProjectPaths;
   }
 
+  public static string SaveDataDirectoryPath {
+    get {
+      const string saveFolderName = "SaveData";
+      return Path.Combine(Application.persistentDataPath, saveFolderName);
+    }
+  }
+
   public static Dictionary<string, List<int>> LoadHDDContents() {
-    string hddSavePath =
+    string hddSaveFile =
         Path.Combine(CurrentSaveProfileDirectoryPath, "HDDContents.json");
-    if (System.IO.File.Exists(hddSavePath)) {
-      // Load HDD contents from file
-      FileInfo saveFile = new FileInfo(hddSavePath);
-      string jsonString = saveFile.OpenText().ReadToEnd();
+    if (File.Exists(hddSaveFile)) {
+      string jsonString = ReadFile(hddSaveFile);
       return JsonConvert.DeserializeObject<Dictionary<string, List<int>>>(
           jsonString);
     }
@@ -80,20 +92,44 @@ public static class SaveSystem {
   }
 
   public static void SaveHDDContents(Dictionary<string, List<int>> contents) {
-    string hddSavePath =
+    string hddSaveFile =
         Path.Combine(CurrentSaveProfileDirectoryPath, "HDDContents.json");
     string jsonStr = JsonConvert.SerializeObject(contents);
     // Format json string
     jsonStr = jsonStr.Replace("{", "{\n\t")
                   .Replace("}", "\n}")
                   .Replace("],", "],\n\t");
-    System.IO.File.WriteAllText(hddSavePath, jsonStr);
+    WriteFile(hddSaveFile, jsonStr);
   }
 
-  public static string SaveDataDirectoryPath {
-    get {
-      const string saveFolderName = "SaveData";
-      return Path.Combine(Application.persistentDataPath, saveFolderName);
+  public static Dictionary<string, int> LoadCustomFolders() {
+    string customFoldersFile =
+        Path.Combine(CurrentSaveProfileDirectoryPath, "CustomFolders.json");
+    if (File.Exists(customFoldersFile)) {
+      string jsonString = ReadFile(customFoldersFile);
+      return JsonConvert.DeserializeObject<Dictionary<string, int>>(jsonString);
+      ;
+    }
+    return new Dictionary<string, int>();
+  }
+
+  public static void SaveCustomFolders(Dictionary<string, int> folders) {
+    string customFoldersFile =
+        Path.Combine(CurrentSaveProfileDirectoryPath, "CustomFolders.json");
+    string jsonString =
+        JsonConvert.SerializeObject(folders, Formatting.Indented);
+    WriteFile(customFoldersFile, jsonString);
+  }
+
+  public static string ReadFile(string path) {
+    using (StreamReader reader = new StreamReader(path)) {
+      return reader.ReadToEnd();
+    }
+  }
+
+  public static void WriteFile(string path, string content) {
+    using (StreamWriter writer = new StreamWriter(path))  {
+      writer.Write(content);
     }
   }
 }
