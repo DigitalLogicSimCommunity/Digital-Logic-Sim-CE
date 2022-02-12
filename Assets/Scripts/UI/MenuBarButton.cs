@@ -4,28 +4,28 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class MenuBarButton : MonoBehaviour,
-                             IPointerEnterHandler,
-                             IPointerExitHandler {
+    IPointerEnterHandler,
+    IPointerExitHandler {
 
-  public GameObject dropdown;
+    public GameObject dropdown;
 
-  public GameObject[] subMenus;
+    public GameObject[] subMenus;
 
-  void Start() {
-    dropdown.SetActive(false);
-    foreach (GameObject subMenu in subMenus) {
-      subMenu.SetActive(false);
+    void Start() {
+        dropdown.SetActive(false);
+        foreach (GameObject subMenu in subMenus) {
+            subMenu.SetActive(false);
+        }
     }
-  }
 
-  public void OnPointerEnter(PointerEventData eventData) {
-    dropdown.SetActive(true);
-  }
-
-  public void OnPointerExit(PointerEventData eventData) {
-    dropdown.SetActive(false);
-    foreach (GameObject subMenu in subMenus) {
-      subMenu.SetActive(false);
+    public void OnPointerEnter(PointerEventData eventData) {
+        dropdown.SetActive(true);
     }
-  }
+
+    public void OnPointerExit(PointerEventData eventData) {
+        dropdown.SetActive(false);
+        foreach (GameObject subMenu in subMenus) {
+            subMenu.SetActive(false);
+        }
+    }
 }

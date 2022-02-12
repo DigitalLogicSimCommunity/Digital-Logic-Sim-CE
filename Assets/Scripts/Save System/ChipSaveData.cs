@@ -3,44 +3,47 @@ using UnityEngine;
 
 public class ChipSaveData {
 
-  public string chipName;
-  public Color chipColour;
-  public Color chipNameColour;
-  public int creationIndex;
-  public string folderName;
-  public float scale;
+    public string chipName;
+    public Color chipColour;
+    public Color chipNameColour;
+    public int creationIndex;
+    public string folderName;
+    public float scale;
 
-  // All chips used as components in this new chip (including input and output
-  // signals)
-  public Chip[] componentChips;
-  // All wires in the chip (in case saving of wire layout is desired)
-  public Wire[] wires;
+    // All chips used as components in this new chip (including input and output
+    // signals)
+    public Chip[] componentChips;
+    // All wires in the chip (in case saving of wire layout is desired)
+    public Wire[] wires;
 
-  public ChipSaveData() {}
+    public ChipSaveData() {}
 
-  public ChipSaveData(ChipEditor chipEditor) {
-    List<Chip> componentChipList = new List<Chip>();
+    public ChipSaveData(ChipEditor chipEditor) {
+        List<Chip> componentChipList = new List<Chip>();
 
-    var sortedInputs = chipEditor.inputsEditor.signals;
-    sortedInputs.Sort(
-        (a, b) => b.transform.position.y.CompareTo(a.transform.position.y));
-    var sortedOutputs = chipEditor.outputsEditor.signals; sortedOutputs.Sort(
-        (a, b) => b.transform.position.y.CompareTo(a.transform.position.y));
+        var sortedInputs = chipEditor.inputsEditor.signals;
+        sortedInputs.Sort(
+            (a, b) => b.transform.position.y.CompareTo(a.transform.position.y));
+        var sortedOutputs = chipEditor.outputsEditor.signals;
+        sortedOutputs.Sort(
+            (a, b) => b.transform.position.y.CompareTo(a.transform.position.y));
 
-    componentChipList.AddRange(sortedInputs);
+        componentChipList.AddRange(sortedInputs);
         componentChipList.AddRange(sortedOutputs);
 
         componentChipList.AddRange(chipEditor.chipInteraction.allChips);
         componentChips = componentChipList.ToArray();
 
         wires = chipEditor.pinAndWireInteraction.allWires.ToArray();
-        chipName = chipEditor.chipName; chipColour = chipEditor.chipColour;
+        chipName = chipEditor.chipName;
+        chipColour = chipEditor.chipColour;
         chipNameColour = chipEditor.chipNameColour;
         creationIndex = chipEditor.creationIndex;
-        folderName = chipEditor.chipFolder; scale = chipEditor.scale;
-  }
+        folderName = chipEditor.chipFolder;
+        scale = chipEditor.scale;
+    }
 
-  public int ComponentChipIndex(Chip componentChip) {
-    return System.Array.IndexOf(componentChips, componentChip);
-  }
+    public int ComponentChipIndex(Chip componentChip) {
+        return System.Array.IndexOf(componentChips, componentChip);
+    }
 }

@@ -11,48 +11,54 @@ using UnityEngine;
 
 public abstract class InteractionHandler : MonoBehaviour {
 
-  InteractionHandler[] allHandlers;
-  bool hasFocus;
+    InteractionHandler[] allHandlers;
+    bool hasFocus;
 
-  public void InitAllHandlers(InteractionHandler[] allHandlers) {
-    this.allHandlers = allHandlers;
-  }
-
-  public abstract void OrderedUpdate();
-
-  // Handle losing focus
-  protected virtual void FocusLost() {}
-
-  // Is this interaction handler willing to relinquish focus right now?
-  protected virtual bool CanReleaseFocus() { return true; }
-
-  protected virtual void ReleaseFocus() { hasFocus = false; }
-
-  // Request to have focus from whichever handler has focus at the moment.
-  // If succesful, HasFocus will be set to true.
-  protected virtual void RequestFocus() {
-    if (!hasFocus) {
-      bool noHandlersHaveFocus = true;
-      foreach (var otherHandler in allHandlers) {
-        if (otherHandler.hasFocus) {
-          noHandlersHaveFocus = false;
-          if (otherHandler.CanReleaseFocus()) {
-            otherHandler.hasFocus = false;
-            otherHandler.FocusLost();
-            hasFocus = true;
-            break;
-          }
-        }
-      }
-
-      if (noHandlersHaveFocus) {
-        hasFocus = true;
-      }
+    public void InitAllHandlers(InteractionHandler[] allHandlers) {
+        this.allHandlers = allHandlers;
     }
-  }
 
-  // Does this system currently have focus?
-  protected bool HasFocus {
-    get { return hasFocus; }
-  }
+    public abstract void OrderedUpdate();
+
+    // Handle losing focus
+    protected virtual void FocusLost() {}
+
+    // Is this interaction handler willing to relinquish focus right now?
+    protected virtual bool CanReleaseFocus() {
+        return true;
+    }
+
+    protected virtual void ReleaseFocus() {
+        hasFocus = false;
+    }
+
+    // Request to have focus from whichever handler has focus at the moment.
+    // If succesful, HasFocus will be set to true.
+    protected virtual void RequestFocus() {
+        if (!hasFocus) {
+            bool noHandlersHaveFocus = true;
+            foreach (var otherHandler in allHandlers) {
+                if (otherHandler.hasFocus) {
+                    noHandlersHaveFocus = false;
+                    if (otherHandler.CanReleaseFocus()) {
+                        otherHandler.hasFocus = false;
+                        otherHandler.FocusLost();
+                        hasFocus = true;
+                        break;
+                    }
+                }
+            }
+
+            if (noHandlersHaveFocus) {
+                hasFocus = true;
+            }
+        }
+    }
+
+    // Does this system currently have focus?
+    protected bool HasFocus {
+        get {
+            return hasFocus;
+        }
+    }
 }
