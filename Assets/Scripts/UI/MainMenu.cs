@@ -8,7 +8,7 @@ public class MainMenu : MonoBehaviour {
   public TMP_InputField projectNameField;
   public Button confirmProjectButton;
   public Toggle fullscreenToggle;
-  
+
   void Awake() {
     instance = this;
     fullscreenToggle.onValueChanged.AddListener(SetFullScreen);
@@ -20,7 +20,7 @@ public class MainMenu : MonoBehaviour {
       fullscreenToggle.SetIsOnWithoutNotify(Screen.fullScreen);
     }
   }
-  
+
   public void StartNewProject() {
     string projectName = projectNameField.text;
     SaveSystem.SetActiveProject(projectName);
