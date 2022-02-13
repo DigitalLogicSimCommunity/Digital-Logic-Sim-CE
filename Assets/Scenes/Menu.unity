@@ -1205,7 +1205,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Version 0.36 - CE <size=25><color=#505050> (12 Feb 2022)</color></size>
+  m_text: Version 0.36 - Community Edition <size=25><color=#505050> (12 Feb 2022)</color></size>
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2546,8 +2546,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 813.1501, y: -485.5349}
-  m_SizeDelta: {x: 20.699768, y: -54.869873}
+  m_AnchoredPosition: {x: 0, y: -483.65002}
+  m_SizeDelta: {x: 20, y: -51.09999}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1006289741
 MonoBehaviour:
