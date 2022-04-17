@@ -106,6 +106,7 @@ public class Manager : MonoBehaviour {
   public void UpdateChip() {
     Chip updatedChip = TryPackageAndReplaceChip(activeChipEditor.chipName);
     ChipSaver.Update(activeChipEditor, updatedChip);
+    chipEditorMode = ChipEditorMode.Create;
     LoadNewEditor();
   }
 
@@ -193,7 +194,12 @@ public class Manager : MonoBehaviour {
   }
 
   public void LoadMainMenu() {
-    UnityEngine.SceneManagement.SceneManager.LoadScene(0);
+    if (chipEditorMode == ChipEditorMode.Update) {
+      chipEditorMode = ChipEditorMode.Create;
+      LoadNewEditor();
+    } else {
+      UnityEngine.SceneManagement.SceneManager.LoadScene(0);
+    }
   }
 
   public List<string> AllChipNames(bool builtin = true, bool custom = true) {

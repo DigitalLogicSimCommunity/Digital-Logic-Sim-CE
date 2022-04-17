@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Linq;
 using UnityEngine;
+using Color = UnityEngine.Color;
 using Debug = UnityEngine.Debug;
 
 public class DisplayScreen : BuiltinChip
