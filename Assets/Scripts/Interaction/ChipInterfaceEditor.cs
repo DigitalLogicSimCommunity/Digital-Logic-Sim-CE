@@ -45,7 +45,7 @@ public class ChipInterfaceEditor : InteractionHandler {
 
   string currentEditorName;
   public ChipEditor CurrentEditor {
-    set { currentEditorName = value.chipName; }
+    set { currentEditorName = value.Data.name; }
   }
 
   ChipSignal highlightedSignal;
