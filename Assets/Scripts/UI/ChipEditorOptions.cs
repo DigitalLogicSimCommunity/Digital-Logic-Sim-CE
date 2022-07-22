@@ -30,7 +30,7 @@ public class ChipEditorOptions : MonoBehaviour {
         PlayerPrefs.GetFloat("MouseSensitivity", 0.1f));
     camMoveSpeedSlider.SetValueWithoutNotify(
         PlayerPrefs.GetFloat("CamMoveSpeed", 12f));
-    scaleSlider.SetValueWithoutNotify(editor.scale);
+    scaleSlider.SetValueWithoutNotify(editor.Data.scale);
     ScalingManager.UpdateScale();
   }
 

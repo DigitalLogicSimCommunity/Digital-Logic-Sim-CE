@@ -49,6 +49,6 @@ public class CanvasSampleOpenFileText : MonoBehaviour, IPointerDownHandler {
     private IEnumerator OutputRoutine(string url) {
         var loader = new UnityWebRequest(url);
         yield return loader.SendWebRequest();
-        output.text = ((DownloadHandlerTexture)loader.downloadHandler).text;
+        output.text = ((DownloadHandlerTexture)loader.downloadHandler).text;    
     }
 }
