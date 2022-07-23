@@ -2035,12 +2035,13 @@ MonoBehaviour:
   chipInteraction: {fileID: 4750937598426732714}
   pinAndWireInteraction: {fileID: 4750937600015594407}
   pinNameDisplayManager: {fileID: 8579933575223702811}
-  chipName: 
-  chipColour: {r: 0, g: 0, b: 0, a: 0}
-  chipNameColour: {r: 0, g: 0, b: 0, a: 0}
-  creationIndex: 0
-  chipFolder: 
-  scale: 0
+  Data:
+    name: 
+    creationIndex: 0
+    Colour: {r: 0, g: 0, b: 0, a: 0}
+    NameColour: {r: 0, g: 0, b: 0, a: 0}
+    folderName: 
+    scale: 0
 --- !u!1 &4750937599942273984
 GameObject:
   m_ObjectHideFlags: 0
