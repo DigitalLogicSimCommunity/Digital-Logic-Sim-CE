@@ -49,19 +49,16 @@ public class UIManager : MonoBehaviour
 
     public static Palette Palette => instance.palette;
 
+    public void OpenMenu(int index) => OpenMenu((MenuType)index);
     public void OpenMenu(MenuType menuType)
     {
         UIMenu newMenu = GetMenuByType(menuType);
         if (OpenedMenu && OpenedMenu != newMenu)
-        {
             CloseMenu();
-        }
         SetCurrentMenuState(newMenu, menuType);
 
         if (OpenedMenu.showBG)
-        {
             outsideMenuArea.SetActive(true);
-        }
 
 
         SetMenuPosition();
@@ -77,7 +74,6 @@ public class UIManager : MonoBehaviour
         currentMenuType = menuType;
     }
 
-    public void OpenMenu(int index) => OpenMenu((MenuType)index);
 
     public void CloseMenu()
     {
@@ -117,7 +113,7 @@ public class UIManager : MonoBehaviour
             ButtonText buttonText = obj.GetComponent<ButtonText>();
             if (buttonText != null)
             {
-                FindObjectOfType<EditChipMenu>().EditChip(buttonText.buttonText.text);
+                FindObjectOfType<EditChipMenu>().EditChipInit(buttonText.buttonText.text);
                 OpenedMenu.transform.position = new Vector3(obj.transform.position.x, OpenedMenu.transform.position.y, OpenedMenu.transform.position.z);
                 RectTransform rect = OpenedMenu.GetComponent<RectTransform>();
                 rect.anchoredPosition = new Vector2(Mathf.Clamp(rect.anchoredPosition.x, -800, 800), rect.anchoredPosition.y);

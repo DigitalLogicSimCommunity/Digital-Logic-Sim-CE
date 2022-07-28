@@ -54,10 +54,7 @@ public class Manager : MonoBehaviour
         }
     }
 
-    public static ChipEditor ActiveChipEditor
-    {
-        get { return instance.activeChipEditor; }
-    }
+    public static ChipEditor ActiveChipEditor => instance.activeChipEditor;
 
     public Chip GetChipPrefab(Chip chip)
     {
@@ -78,7 +75,7 @@ public class Manager : MonoBehaviour
         return null;
     }
 
-    public static Chip GetCustomChipByName(string name)
+    public static Chip GetChipByName(string name)
     {
         foreach (Chip chip in instance.spawnableChips)
         {
@@ -155,6 +152,9 @@ public class Manager : MonoBehaviour
         Chip customChip = package.GetComponent<Chip>();
         SetupPseudoInput(customChip);
 
+        if (customChip is CustomChip c)
+            c.Init();
+
         customChipCreated?.Invoke(customChip);
         currentChipCreationIndex++;
         spawnableChips.Add(customChip);
@@ -212,12 +212,12 @@ public class Manager : MonoBehaviour
         FindObjectOfType<ChipEditorOptions>().SetUIValues(activeChipEditor);
     }
 
-    public void SpawnChip(Chip chip)
+    public void ChipButtonHanderl(Chip chip)
     {
         if (chip is CustomChip custom)
             custom.ApplyWireModes();
 
-        activeChipEditor.chipInteraction.SpawnChip(chip);
+        activeChipEditor.chipInteraction.ChipButtonInteraction(chip);
     }
 
     public void LoadMainMenu()

@@ -162,8 +162,16 @@ public static class ChipSaver
         }
     }
 
-    public static void EditSavedChip(SavedChip savedChip,
-                                     ChipSaveData chipSaveData)
+    internal static void ChangeFolder(string Chipname, string FolderOption)
+    {
+
+        var ChipToEdit= SaveSystem.GetAllSavedChipsDic()[Chipname];
+        if (ChipToEdit.Data.folderName == FolderOption)   return;
+        ChipToEdit.Data.folderName = FolderOption;
+        SaveSystem.RewriteChip(Chipname, JsonUtility.ToJson(ChipToEdit, usePrettyPrint));
+    }
+
+    public static void EditSavedChip(SavedChip savedChip, ChipSaveData chipSaveData)
     { }
 
     public static bool IsSafeToDelete(string chipName)
@@ -263,11 +271,7 @@ public static class ChipSaver
             {
                 string saveString = JsonUtility.ToJson(savedChips[i], usePrettyPrint);
                 // Write to file
-                string savePath = SaveSystem.GetPathToSaveFile(savedChips[i].Data.name);
-                using (StreamWriter writer = new StreamWriter(savePath))
-                {
-                    writer.Write(saveString);
-                }
+                SaveSystem.RewriteChip(savedChips[i].Data.name, saveString);
             }
         }
         // Rename wire layer file

@@ -50,27 +50,22 @@ public static class SaveSystem
         return ChipLoader.GetAllSavedChips(GetChipSavePaths());
     }
 
+    public static IDictionary<string,SavedChip> GetAllSavedChipsDic()
+    {
+        // Load any saved chips but is Dic
+        return ChipLoader.GetAllSavedChipsDic(GetChipSavePaths());
+    }
+
     public static string GetPathToSaveFile(string saveFileName)
     {
-        return Path.Combine(CurrentSaveProfileDirectoryPath,
-                            saveFileName + fileExtension);
+        return Path.Combine(CurrentSaveProfileDirectoryPath, saveFileName + fileExtension);
     }
 
-    public static string GetPathToWireSaveFile(string saveFileName)
-    {
-        return Path.Combine(CurrentSaveProfileWireLayoutDirectoryPath,
-                            saveFileName + fileExtension);
-    }
+    public static string GetPathToWireSaveFile(string saveFileName) => Path.Combine(CurrentSaveProfileWireLayoutDirectoryPath,saveFileName + fileExtension);
 
-    static string CurrentSaveProfileDirectoryPath
-    {
-        get { return Path.Combine(SaveDataDirectoryPath, activeProjectName); }
-    }
+    static string CurrentSaveProfileDirectoryPath => Path.Combine(SaveDataDirectoryPath, activeProjectName);
 
-    static string CurrentSaveProfileWireLayoutDirectoryPath
-    {
-        get { return Path.Combine(CurrentSaveProfileDirectoryPath, "WireLayout"); }
-    }
+    static string CurrentSaveProfileWireLayoutDirectoryPath => Path.Combine(CurrentSaveProfileDirectoryPath, "WireLayout");
 
     public static string[] GetSaveNames()
     {
@@ -159,4 +154,10 @@ public static class SaveSystem
             writer.Write(content);
         }
     }
+
+    public static void RewriteChip(string chipName,string saveString)
+    {
+        WriteFile(GetPathToSaveFile(chipName), saveString);
+    }
+
 }

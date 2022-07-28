@@ -90,12 +90,7 @@ public class CreateMenu : MonoBehaviour
     {
         allChipNames = Manager.instance.AllChipNames();
         folderDropdown.ClearOptions();
-        folderDropdown.AddOptions(
-            ChipBarUI.instance.selectedFolderDropdown.options.GetRange(
-                2, ChipBarUI.instance.selectedFolderDropdown.options.Count - 3));
-        folderDropdown.value = ChipBarUI.selectedFolderIndex > 1
-                                   ? ChipBarUI.selectedFolderIndex - 2
-                                   : 0;
+        folderDropdown.AddOptions(ChipBarUI.instance.selectedFolderDropdown.options);
         doneButton.interactable = false;
         chipNameField.SetTextWithoutNotify("");
         SetSuggestedColour();

@@ -12,8 +12,10 @@ public class EditChipMenu : MonoBehaviour
     public Button viewButton;
     public Button exportButton;
     public ChipBarUI chipBarUI;
+    public TMP_Dropdown folderDropdown;
 
     private Chip currentChip;
+
     private string nameBeforeChanging;
 
     void Awake()
@@ -25,7 +27,7 @@ public class EditChipMenu : MonoBehaviour
         exportButton.onClick.AddListener(ExportChip);
     }
 
-    public void EditChip(string chipName)
+    public void EditChipInit(string chipName)
     {
 
         chipNameField.text = chipName;
@@ -34,9 +36,26 @@ public class EditChipMenu : MonoBehaviour
         chipNameField.interactable = ChipSaver.IsSafeToDelete(nameBeforeChanging);
         deleteButton.interactable = ChipSaver.IsSafeToDelete(nameBeforeChanging);
 
-        currentChip = Manager.GetCustomChipByName(chipName);
+        currentChip = Manager.GetChipByName(chipName);
         viewButton.interactable = true;
         exportButton.interactable = true;
+
+        folderDropdown.ClearOptions();
+        folderDropdown.AddOptions(ChipBarUI.instance.selectedFolderDropdown.options);
+
+
+        if (currentChip is CustomChip customChip)
+        {
+            for (int i = 0; i < folderDropdown.options.Count; i++)
+            {
+                if (customChip.folderName == folderDropdown.options[i].text)
+                {
+                    folderDropdown.value = i;
+                    break;
+                }
+            }
+        }
+
     }
 
     public void ChipNameFieldChanged(string value)
@@ -45,6 +64,7 @@ public class EditChipMenu : MonoBehaviour
         doneButton.interactable = IsValidChipName(formattedName.Trim());
         chipNameField.text = formattedName;
     }
+
 
     public bool IsValidRename(string chipName)
     {
@@ -104,6 +124,14 @@ public class EditChipMenu : MonoBehaviour
             // Chip has been renamed
             ChipSaver.Rename(nameBeforeChanging, chipNameField.text.Trim());
             EditChipBar();
+        }
+        if (currentChip is CustomChip customChip)
+        {
+            if (folderDropdown.options[folderDropdown.value].text != customChip.folderName) ;
+            {
+                ChipSaver.ChangeFolder(customChip.name, folderDropdown.options[folderDropdown.value].text);
+                EditChipBar();
+            }
         }
         currentChip = null;
     }
