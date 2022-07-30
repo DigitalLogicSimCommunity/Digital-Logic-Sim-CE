@@ -10,15 +10,21 @@ using System;
 
 public class SaveCompatibility : MonoBehaviour
 {
+    private const bool WriteEnable = true;
 
-    static bool DirtyBit = false;
-    public static string FixStr(string message, char c)
+    private static bool DirtyBit = false;
+
+    private static bool FolderDirtyBit = false;
+
+
+    public struct ChipDataComp
     {
-        // To remove double quotes (passed as 'c') of the chip name
-        StringBuilder aStr = new StringBuilder(message);
-        for (int i = 0; i < aStr.Length; i++)
-            if (aStr[i] == c) aStr.Remove(i, 1);
-        return aStr.ToString();
+        public string name;
+        public int creationIndex;
+        public Color Colour;
+        public Color NameColour;
+        public string folderName;
+        public float scale;
     }
 
     class OutputPin
@@ -43,96 +49,103 @@ public class SaveCompatibility : MonoBehaviour
         public int wireType { get; set; }
     }
 
+    #region SaveFile
     public static void FixSaveCompatibility(ref string chipSaveString)
     {
 
-        dynamic lol = JsonConvert.DeserializeObject<dynamic>(chipSaveString);
+        var lol = JsonConvert.DeserializeObject(chipSaveString) as JObject;
 
         if (!chipSaveString.Contains("wireType") || chipSaveString.Contains("outputPinNames") || !chipSaveString.Contains("outputPins"))
-            From025to037(lol);
+            From025to037(ref lol);
         if (!chipSaveString.Contains("Data") || !chipSaveString.Contains("ChipDependecies"))
-            From037to038(lol);
+            From037to038(ref lol);
+        if (chipSaveString.Contains("folderName") || !chipSaveString.Contains("FolderIndex"))
+            From038to039(ref lol);
 
 
         if (DirtyBit)
-            chipSaveString = JsonConvert.SerializeObject(lol);
-
-        WriteFile(lol, lol.Data.name);
+        {
+            chipSaveString = JsonConvert.SerializeObject(lol, Formatting.Indented);
+            WriteFile((lol.Property("Data").Value as JObject).Property("name").Value.ToString(), chipSaveString);
+        }
     }
 
-
-
-    private static void WriteFile(dynamic lol, dynamic Filename)
+    private static void WriteFile(string Chipname, string ChipContent)
     {
-        if (!DirtyBit) return;
-        string savePath = SaveSystem.GetPathToSaveFile(FixStr(JsonConvert.SerializeObject(Filename), (char)0x22));
-        string serialized = JsonConvert.SerializeObject(lol, Formatting.Indented);
-        SaveSystem.WriteFile(savePath, serialized);
+        if (!DirtyBit || !WriteEnable) return;
+        SaveSystem.WriteChip(Chipname, ChipContent);
         DirtyBit = false;
     }
 
-    private static void From025to037(dynamic lol)
+    private static void From025to037(ref JObject lol)
     {
-        for (int i = 0; i < lol.savedComponentChips.Count; i++)
+        var savedComponentChips = lol.Property("savedComponentChips").Value as JArray;
+        for (int i = 0; i < savedComponentChips.Count; i++)
         {
-
-            List<OutputPin> newValue = new List<OutputPin>();
-            List<InputPin> newValue2 = new List<InputPin>();
+            var CurrentComponent = savedComponentChips[i] as JObject;
+            List<OutputPin> newOutputPins = new List<OutputPin>();
+            List<InputPin> newinputPins = new List<InputPin>();
 
             // Replace all 'outputPinNames' : [string] in save with 'outputPins' :
             // [OutputPin]
-            for (int j = 0; j < lol.savedComponentChips[i].outputPinNames.Count;
-                 j++)
+            var outputPinNames = (CurrentComponent.Property("outputPinNames").Value as JArray);
+            for (int j = 0; j < outputPinNames.Count; j++)
             {
-                newValue.Add(
+                var OutPutPinNameValue = (CurrentComponent.Property("outputPinNames").Value as JArray)[j];
+                newOutputPins.Add(
                     new OutputPin
                     {
-                        name = lol.savedComponentChips[i].outputPinNames[j],
+                        name = OutPutPinNameValue.ToString(),
                         wireType = 0
                     });
             }
-            lol.savedComponentChips[i].Property("outputPinNames").Remove();
-            lol.savedComponentChips[i].outputPins = JsonConvert.DeserializeObject<dynamic>(JsonConvert.SerializeObject(newValue));
+            CurrentComponent.Property("outputPinNames").Remove();
+            CurrentComponent.Add("outputPins", JArray.FromObject(newOutputPins));
 
             // Add to all 'inputPins' dictionary the property 'wireType' with a value
             // of 0 (at version 0.25 buses did not exist so its imposible for the wire
             // to be of other type)
-            for (int j = 0; j < lol.savedComponentChips[i].inputPins.Count; j++)
+            var inputPins = CurrentComponent.Property("inputPins").Value as JArray;
+            for (int j = 0; j < inputPins.Count; j++)
             {
-                newValue2.Add(new InputPin
+                var InPutPin = inputPins[j] as JObject;
+                newinputPins.Add(new InputPin
                 {
-                    name = lol.savedComponentChips[i].inputPins[j].name,
-                    parentChipIndex =
-                      lol.savedComponentChips[i].inputPins[j].parentChipIndex,
-                    parentChipOutputIndex =
-                      lol.savedComponentChips[i].inputPins[j].parentChipOutputIndex,
-                    isCylic = lol.savedComponentChips[i].inputPins[j].isCylic,
+                    name = InPutPin.Property("name").Value.ToString(),
+                    parentChipIndex = InPutPin.Property("parentChipIndex").Value.ToObject<int>(),
+                    parentChipOutputIndex = InPutPin.Property("parentChipOutputIndex").Value.ToObject<int>(),
+                    isCylic = InPutPin.Property("isCylic").Value.ToObject<bool>(),
                     wireType = 0
 
                 });
             }
-            lol.savedComponentChips[i].inputPins =
-                JsonConvert.DeserializeObject<dynamic>(
-                    JsonConvert.SerializeObject(newValue2));
+            CurrentComponent.Property("inputPins").Remove();
+            CurrentComponent.Add("inputPins", JArray.FromObject(newinputPins));
         }
+        lol.Add("folderName", "User");
+        lol.Add("scale", 1);
         DirtyBit = true;
     }
 
-    public static void From037to038(dynamic lol)
+    public static void From037to038(ref JObject lol)
     {
-        if (lol.Data == null)
+        if (lol.Property("Data") == null)
         {
             //replace old sparse data chip with new datachip
-
-            lol.Data = JObject.FromObject(new ChipData()
+            var NewChipData = new ChipDataComp()
             {
-                name = lol.name,
-                creationIndex = lol.creationIndex,
-                Colour = ((JObject)lol.colour).ToObject<Color>(),
-                NameColour = ((JObject)lol.nameColour).ToObject<Color>(),
-                folderName = lol.folderName,
-                scale = lol.scale
-            }, JsonSerializer.Create(GenerateConverterForColor()));
+                name = lol.Property("name").Value.ToString(),
+                creationIndex = lol.Property("creationIndex").ToObject<int>(),
+                Colour = lol.Property("colour").Value.ToObject<Color>(),
+                NameColour = lol.Property("nameColour").Value.ToObject<Color>(),
+                folderName = lol.Property("folderName").Value.ToString(),
+                scale = lol.Property("scale").Value.ToObject<float>()
+            };
+
+
+            lol.Add("Data", JObject.FromObject(NewChipData, ColorConverter.GenerateSerializerConverter()));
+            //lol.Add("Data", JsonConvert.DeserializeObject<JObject>(JsonConvert.SerializeObject(NewChipData, ColorConverter.GenerateSettingsConverterForColor())));
+
             lol.Property("name").Remove();
             lol.Property("creationIndex").Remove();
             lol.Property("colour").Remove();
@@ -141,20 +154,78 @@ public class SaveCompatibility : MonoBehaviour
             lol.Property("scale").Remove();
         }
 
-        if (lol.ChipDependecies == null && lol.componentNameList != null)
+        if (lol.Property("ChipDependecies") == null && lol.Property("componentNameList") != null)
         {
-            lol.ChipDependecies = lol.componentNameList;
+            lol.Add("ChipDependecies", lol.Property("componentNameList").Value);
             lol.Property("componentNameList").Remove();
         }
 
         DirtyBit = true;
     }
 
-
-    private static JsonSerializerSettings GenerateConverterForColor()
+    public static void From038to039(ref JObject lol)
     {
-        var JsonConverteForColor = new JsonSerializerSettings();
-        JsonConverteForColor.Converters.Add(new ColorConverter());
-        return JsonConverteForColor;
+        var OldData = lol.Property("Data").Value as JObject;
+        var Colour = JsonConvert.DeserializeObject<JObject>(OldData.Property("Colour").Value.ToString());
+        var NameColour = JsonConvert.DeserializeObject<JObject>(OldData.Property("NameColour").Value.ToString());
+        var NewChipData = new ChipData()
+        {
+        name = OldData.Property("name").Value.ToString(),
+        creationIndex = OldData.Property("creationIndex").Value.ToObject<int>(),
+        Colour = Colour.ToObject<Color>(),
+        NameColour = NameColour.ToObject<Color>(),
+        FolderIndex = FolderSystem.ReverseIndex(OldData.Property("folderName").Value.ToString()),
+        scale = OldData.Property("scale").Value.ToObject<float>()
+    };
+
+
+    lol.Property("Data").Value = JObject.FromObject(NewChipData, ColorConverter.GenerateSerializerConverter());
+
+    DirtyBit = true;
+
     }
+    #endregion
+
+    #region FolderFile
+    public static void FixFolderCompatibility(ref string FolderFile)
+    {
+
+        var FolderJson = JsonConvert.DeserializeObject(FolderFile) as JObject;
+
+
+        if (FolderJson.Property("0") == null)
+            From038to039Folder(ref FolderJson);
+
+        if (FolderDirtyBit)
+        {
+            FolderFile = JsonConvert.SerializeObject(FolderJson);
+            WriteFileFolder(FolderFile);
+        }
+    }
+
+    private static void WriteFileFolder(string FoldersJsonStr)
+    {
+        if (!FolderDirtyBit && !WriteEnable) return;
+        SaveSystem.WriteFoldersFile(FoldersJsonStr);
+        DirtyBit = false;
+    }
+
+    private static void From038to039Folder(ref JObject folderJson)
+    {
+        JObject NewFolderFileTemp = new JObject();
+
+        foreach (var item in folderJson.Properties())
+        {
+            NewFolderFileTemp.Add(item.Value.ToString(), item.Name);
+        }
+        folderJson.RemoveAll();
+        foreach (var item in NewFolderFileTemp.Properties())
+        {
+            folderJson.Add(item.Name, item.Value);
+        }
+        FolderDirtyBit = true;
+
+    }
+    #endregion
+
 }

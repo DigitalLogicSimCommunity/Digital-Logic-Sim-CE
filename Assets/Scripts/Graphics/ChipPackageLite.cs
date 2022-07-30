@@ -29,7 +29,7 @@ public class ChipPackageLite : MonoBehaviour
         // Add and set up the custom chip component
         CustomChip chip = gameObject.AddComponent<CustomChip>();
         chip.chipName = chipEditor.Data.name;
-        chip.folderName = chipEditor.Data.folderName;
+        chip.FolderIndex = chipEditor.Data.FolderIndex;
 
         // Set input signals
         chip.inputSignals = new InputSignal[chipEditor.inputsEditor.signals.Count];

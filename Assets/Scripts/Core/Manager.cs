@@ -9,8 +9,8 @@ public class Manager : MonoBehaviour
 {
     public static ChipEditorMode chipEditorMode;
 
-    public event System.Action<Chip> customChipCreated;
-    public event System.Action<Chip> customChipUpdated;
+    public event Action<Chip> customChipCreated;
+    public event Action<Chip> customChipUpdated;
 
     public ChipEditor chipEditorPrefab;
     public ChipPackage chipPackagePrefab;
@@ -23,13 +23,17 @@ public class Manager : MonoBehaviour
     int currentChipCreationIndex;
     public static Manager instance;
 
-    void Awake() { instance = this; }
+    void Awake()
+    {
+        instance = this;
+        SaveSystem.Init();
+        FolderSystem.Init();
+    }
 
     void Start()
     {
         spawnableChips = new List<Chip>();
         activeChipEditor = FindObjectOfType<ChipEditor>();
-        SaveSystem.Init();
         SaveSystem.LoadAll(this);
     }
 
@@ -229,6 +233,7 @@ public class Manager : MonoBehaviour
         }
         else
         {
+            FolderSystem.Reset();
             UnityEngine.SceneManagement.SceneManager.LoadScene(0);
         }
     }

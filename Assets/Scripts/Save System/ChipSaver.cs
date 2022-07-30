@@ -39,8 +39,7 @@ public static class ChipSaver
         {
             writer.WriteLine(chipsToExport.Count);
 
-            foreach (KeyValuePair<int, string> chip in chipsToExport.OrderBy(
-                         x => x.Key))
+            foreach (KeyValuePair<int, string> chip in chipsToExport.OrderBy(x => x.Key))
             {
                 string chipSaveFile = SaveSystem.GetPathToSaveFile(chip.Value);
                 string chipWireSaveFile = SaveSystem.GetPathToWireSaveFile(chip.Value);
@@ -162,13 +161,13 @@ public static class ChipSaver
         }
     }
 
-    internal static void ChangeFolder(string Chipname, string FolderOption)
+    internal static void ChangeFolder(string Chipname, int FolderIndex)
     {
 
         var ChipToEdit= SaveSystem.GetAllSavedChipsDic()[Chipname];
-        if (ChipToEdit.Data.folderName == FolderOption)   return;
-        ChipToEdit.Data.folderName = FolderOption;
-        SaveSystem.RewriteChip(Chipname, JsonUtility.ToJson(ChipToEdit, usePrettyPrint));
+        if (ChipToEdit.Data.FolderIndex == FolderIndex)   return;
+        ChipToEdit.Data.FolderIndex = FolderIndex;
+        SaveSystem.WriteChip(Chipname, JsonUtility.ToJson(ChipToEdit, usePrettyPrint));
     }
 
     public static void EditSavedChip(SavedChip savedChip, ChipSaveData chipSaveData)
@@ -271,7 +270,7 @@ public static class ChipSaver
             {
                 string saveString = JsonUtility.ToJson(savedChips[i], usePrettyPrint);
                 // Write to file
-                SaveSystem.RewriteChip(savedChips[i].Data.name, saveString);
+                SaveSystem.WriteChip(savedChips[i].Data.name, saveString);
             }
         }
         // Rename wire layer file

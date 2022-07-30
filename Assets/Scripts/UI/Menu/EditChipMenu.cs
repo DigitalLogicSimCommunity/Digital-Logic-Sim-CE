@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine.UI;
 using System;
 using SFB;
+using System.Linq;
 
 public class EditChipMenu : MonoBehaviour
 {
@@ -13,10 +14,12 @@ public class EditChipMenu : MonoBehaviour
     public Button exportButton;
     public ChipBarUI chipBarUI;
     public TMP_Dropdown folderDropdown;
-
     private Chip currentChip;
 
     private string nameBeforeChanging;
+
+
+    string CurrentTextValue { get => folderDropdown.options[folderDropdown.value].text; }
 
     void Awake()
     {
@@ -41,14 +44,16 @@ public class EditChipMenu : MonoBehaviour
         exportButton.interactable = true;
 
         folderDropdown.ClearOptions();
-        folderDropdown.AddOptions(ChipBarUI.instance.selectedFolderDropdown.options);
+        var FolderOption = ChipBarUI.instance.FolderDropdown.options;
+        folderDropdown.AddOptions(FolderOption.GetRange(1, FolderOption.Count - 2));
 
 
         if (currentChip is CustomChip customChip)
         {
             for (int i = 0; i < folderDropdown.options.Count; i++)
             {
-                if (customChip.folderName == folderDropdown.options[i].text)
+                
+                if (FolderSystem.CompareValue(customChip.FolderIndex, folderDropdown.options[i].text))
                 {
                     folderDropdown.value = i;
                     break;
@@ -127,9 +132,11 @@ public class EditChipMenu : MonoBehaviour
         }
         if (currentChip is CustomChip customChip)
         {
-            if (folderDropdown.options[folderDropdown.value].text != customChip.folderName) ;
+
+            var index = FolderSystem.ReverseIndex(CurrentTextValue);
+            if (index != customChip.FolderIndex)
             {
-                ChipSaver.ChangeFolder(customChip.name, folderDropdown.options[folderDropdown.value].text);
+                ChipSaver.ChangeFolder(customChip.name, index);
                 EditChipBar();
             }
         }

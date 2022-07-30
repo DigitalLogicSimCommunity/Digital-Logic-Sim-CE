@@ -17,7 +17,7 @@ public class ChipEditor : MonoBehaviour
     {
         Data = new ChipData()
         {
-            folderName = "User",
+            FolderIndex = 0,
             scale = 1
         };
 

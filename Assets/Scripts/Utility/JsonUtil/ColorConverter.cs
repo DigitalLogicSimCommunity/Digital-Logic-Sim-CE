@@ -18,5 +18,19 @@ class ColorConverter : JsonConverter<Color>
         var s = Regex.Unescape(JsonUtility.ToJson(value));
         writer.WriteRawValue(s);
     }
+
+    public static JsonSerializer GenerateSerializerConverter()
+    {
+        var JsonConverteForColor = new JsonSerializerSettings();
+        JsonConverteForColor.Converters.Add(new ColorConverter());
+        return JsonSerializer.Create(JsonConverteForColor);
+    }
+
+    public static JsonSerializerSettings GenerateSettingsConverter()
+    {
+        var JsonConverteForColor = new JsonSerializerSettings();
+        JsonConverteForColor.Converters.Add(new ColorConverter());
+        return JsonConverteForColor;
+    }
 }
 

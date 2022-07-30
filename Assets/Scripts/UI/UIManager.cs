@@ -11,7 +11,8 @@ public enum MenuType
     LoggingMenu = 2,
     NewFolderMenu = 3,
     SubmitMenu = 4,
-    ClockMenu = 5
+    ClockMenu = 5,
+    RenameFolderMenu = 6
 }
 ;
 

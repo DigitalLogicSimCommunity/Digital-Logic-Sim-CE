@@ -10,7 +10,7 @@ public class CustomChip : Chip
 
     public Pin pseudoInput;
 
-    public string folderName = "User";
+    public int FolderIndex = 0;
 
     [UnityEngine.HideInInspector]
     public Pin[] unconnectedInputs;
