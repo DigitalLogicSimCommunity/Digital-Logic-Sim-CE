@@ -19,7 +19,7 @@ public class EditChipMenu : MonoBehaviour
     private string nameBeforeChanging;
 
 
-    string CurrentTextValue { get => folderDropdown.options[folderDropdown.value].text; }
+    string CurrentFolderText { get => folderDropdown.options[folderDropdown.value].text; }
 
     void Awake()
     {
@@ -36,8 +36,9 @@ public class EditChipMenu : MonoBehaviour
         chipNameField.text = chipName;
         nameBeforeChanging = chipName;
         doneButton.interactable = true;
-        chipNameField.interactable = ChipSaver.IsSafeToDelete(nameBeforeChanging);
-        deleteButton.interactable = ChipSaver.IsSafeToDelete(nameBeforeChanging);
+        var IsSafeToDelate = ChipSaver.IsSafeToDelete(nameBeforeChanging);
+        chipNameField.interactable = IsSafeToDelate;
+        deleteButton.interactable = IsSafeToDelate;
 
         currentChip = Manager.GetChipByName(chipName);
         viewButton.interactable = true;
@@ -52,7 +53,7 @@ public class EditChipMenu : MonoBehaviour
         {
             for (int i = 0; i < folderDropdown.options.Count; i++)
             {
-                
+
                 if (FolderSystem.CompareValue(customChip.FolderIndex, folderDropdown.options[i].text))
                 {
                     folderDropdown.value = i;
@@ -117,9 +118,8 @@ public class EditChipMenu : MonoBehaviour
 
     public void EditChipBar()
     {
-        Manager.instance.spawnableChips.Clear();
-        SaveSystem.LoadAll(Manager.instance);
-        chipBarUI.ReloadBar();
+        Manager.instance.SpawnableCustomChips.Clear();
+        SaveSystem.LoadAllChips(Manager.instance);
     }
 
     public void FinishCreation()
@@ -133,11 +133,12 @@ public class EditChipMenu : MonoBehaviour
         if (currentChip is CustomChip customChip)
         {
 
-            var index = FolderSystem.ReverseIndex(CurrentTextValue);
+            var index = FolderSystem.ReverseIndex(CurrentFolderText);
             if (index != customChip.FolderIndex)
             {
                 ChipSaver.ChangeFolder(customChip.name, index);
-                EditChipBar();
+                Manager.instance.ChangeFolderToChip(customChip.name, index);
+                chipBarUI.ReloadChipButton();
             }
         }
         currentChip = null;

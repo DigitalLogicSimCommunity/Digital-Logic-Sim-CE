@@ -14,8 +14,9 @@ public static class SaveSystem
     private static string FoldersFilePath => Path.Combine(CurrentSaveProfileDirectoryPath, CustomFoldersFileName + ".json");
     static string CurrentSaveProfileDirectoryPath => Path.Combine(SaveDataDirectoryPath, activeProjectName);
 
+    public static string SaveDataDirectoryPath => Path.Combine(Application.persistentDataPath, "SaveData");
     static string CurrentSaveProfileWireLayoutDirectoryPath => Path.Combine(CurrentSaveProfileDirectoryPath, "WireLayout");
-    static string HDDSaveFilePath=>Path.Combine(CurrentSaveProfileDirectoryPath, "HDDContents.json");
+    static string HDDSaveFilePath => Path.Combine(CurrentSaveProfileDirectoryPath, "HDDContents.json");
     public static string GetPathToSaveFile(string saveFileName) => Path.Combine(CurrentSaveProfileDirectoryPath, saveFileName + fileExtension);
 
     public static string GetPathToWireSaveFile(string saveFileName) => Path.Combine(CurrentSaveProfileWireLayoutDirectoryPath, saveFileName + fileExtension);
@@ -50,7 +51,7 @@ public static class SaveSystem
         // fileExtension);
     }
 
-    public static void LoadAll(Manager manager)
+    public static void LoadAllChips(Manager manager)
     {
         // Load any saved chips
         ChipLoader.LoadAllChips(GetChipSavePaths(), manager);
@@ -84,14 +85,6 @@ public static class SaveSystem
         return savedProjectPaths;
     }
 
-    public static string SaveDataDirectoryPath
-    {
-        get
-        {
-            const string saveFolderName = "SaveData";
-            return Path.Combine(Application.persistentDataPath, saveFolderName);
-        }
-    }
 
     public static Dictionary<string, List<int>> LoadHDDContents()
     {
@@ -104,7 +97,7 @@ public static class SaveSystem
         return new Dictionary<string, List<int>> { };
     }
 
-    
+
 
     public static void SaveHDDContents(Dictionary<string, List<int>> contents)
     {

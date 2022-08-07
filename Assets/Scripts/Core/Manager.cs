@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public enum ChipEditorMode { Create, Update }
@@ -16,7 +17,7 @@ public class Manager : MonoBehaviour
     public ChipPackage chipPackagePrefab;
     public Wire wirePrefab;
     public Chip[] builtinChips;
-    public List<Chip> spawnableChips;
+    public List<Chip> SpawnableCustomChips;
     public UIManager UIManager;
 
     ChipEditor activeChipEditor;
@@ -32,9 +33,9 @@ public class Manager : MonoBehaviour
 
     void Start()
     {
-        spawnableChips = new List<Chip>();
+        SpawnableCustomChips = new List<Chip>();
         activeChipEditor = FindObjectOfType<ChipEditor>();
-        SaveSystem.LoadAll(this);
+        SaveSystem.LoadAllChips(this);
     }
 
     void Update()
@@ -69,7 +70,7 @@ public class Manager : MonoBehaviour
                 return prefab;
             }
         }
-        foreach (Chip prefab in spawnableChips)
+        foreach (Chip prefab in SpawnableCustomChips)
         {
             if (chip.chipName == prefab.chipName)
             {
@@ -81,7 +82,7 @@ public class Manager : MonoBehaviour
 
     public static Chip GetChipByName(string name)
     {
-        foreach (Chip chip in instance.spawnableChips)
+        foreach (Chip chip in instance.SpawnableCustomChips)
         {
             if (name == chip.chipName)
             {
@@ -108,7 +109,7 @@ public class Manager : MonoBehaviour
     public void ViewChip(Chip chip)
     {
         ChipSaveData chipSaveData = ChipLoader.GetChipSaveData(
-            chip, builtinChips, spawnableChips, wirePrefab, activeChipEditor);
+            chip, builtinChips, SpawnableCustomChips, wirePrefab, activeChipEditor);
         LoadNewEditor();
         chipEditorMode = ChipEditorMode.Update;
         UIManager.SetEditorMode(chipEditorMode);
@@ -153,7 +154,7 @@ public class Manager : MonoBehaviour
         package.PackageCustomChip(activeChipEditor);
         package.gameObject.SetActive(false);
 
-        Chip customChip = package.GetComponent<Chip>();
+        var customChip = package.GetComponent<Chip>();
         SetupPseudoInput(customChip);
 
         if (customChip is CustomChip c)
@@ -161,8 +162,14 @@ public class Manager : MonoBehaviour
 
         customChipCreated?.Invoke(customChip);
         currentChipCreationIndex++;
-        spawnableChips.Add(customChip);
+        SpawnableCustomChips.Add(customChip);
         return customChip;
+    }
+
+    public void ChangeFolderToChip(string ChipName, int index)
+    {
+        if (SpawnableCustomChips.Where(x => string.Equals(x.name, ChipName)).First() is CustomChip customChip)
+            customChip.FolderIndex = index;
     }
 
     Chip TryPackageAndReplaceChip(string original)
@@ -179,10 +186,10 @@ public class Manager : MonoBehaviour
 
         SetupPseudoInput(customChip);
 
-        int index = spawnableChips.FindIndex(c => c.chipName == original);
+        int index = SpawnableCustomChips.FindIndex(c => c.chipName == original);
         if (index >= 0)
         {
-            spawnableChips[index] = customChip;
+            SpawnableCustomChips[index] = customChip;
             customChipUpdated?.Invoke(customChip);
         }
 
@@ -250,7 +257,7 @@ public class Manager : MonoBehaviour
         }
         if (custom)
         {
-            foreach (Chip chip in spawnableChips)
+            foreach (Chip chip in SpawnableCustomChips)
             {
                 allChipNames.Add(chip.chipName);
             }

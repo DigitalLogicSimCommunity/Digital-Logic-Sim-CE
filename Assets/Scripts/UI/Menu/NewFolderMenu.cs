@@ -9,7 +9,6 @@ public class NewFolderMenu : MonoBehaviour
     ChipBarUI chipBarUI;
     public TMP_InputField newFolderNameField;
     public Button SubmitNewFolder;
-    string validChars ="abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789()[]";
 
     private void Start()
     {

@@ -17,7 +17,7 @@ public class DropDownFolderInteragible : MonoBehaviour
     public void RightClickHandler()
     {
 
-        FindObjectOfType<RenameFolderMenu>().name = gameObject.name.Split(":")[1].Trim();
+        FindObjectOfType<EditFolderMenu>().name = gameObject.name.Split(":")[1].Trim();
 
     }
 

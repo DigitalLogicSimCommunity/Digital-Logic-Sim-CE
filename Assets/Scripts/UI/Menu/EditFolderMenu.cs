@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class RenameFolderMenu : MonoBehaviour
+public class EditFolderMenu : MonoBehaviour
 {
     ChipBarUI chipBarUI;
     public TMP_InputField RenamingFolderField;
@@ -24,21 +24,29 @@ public class RenameFolderMenu : MonoBehaviour
         OKRenameFolder.interactable = false;
 
         FolderSystem.RenameFolder(FolderName, newFolderName);
-        EditChipBar();
-    }
-
-    public void EditChipBar()
-    {
-        Manager.instance.spawnableChips.Clear();
-        SaveSystem.LoadAll(Manager.instance);
         chipBarUI.NotifyFolderNameChanged();
     }
 
+    public void SubmitDeleteFolder()
+    {
+        UIManager.NewSubmitMenu(header: "Delete Folder",
+                        text: "Are you sure you want to delete the folder '" +
+                            FolderName +
+                            "'?\nIt will be lost forever!",
+                        onSubmit: DeleteFolder);
 
-    public void InitMenu(string name) // call from editor
+    }
+
+    public void DeleteFolder()
+    {
+        FolderSystem.DeleteFolder(FolderName);
+        chipBarUI.NotifyRemovedFolder(FolderName);
+    }
+
+    public void InitMenu(string name) // call from Editor
     {
         FolderName = name;
-        RenamingTextLabel.text = $"{name}";
+        RenamingTextLabel.text = name;
         RenamingFolderField.Select();
     }
 

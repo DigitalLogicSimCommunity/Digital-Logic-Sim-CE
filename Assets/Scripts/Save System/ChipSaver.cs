@@ -176,18 +176,12 @@ public static class ChipSaver
     public static bool IsSafeToDelete(string chipName)
     {
         if (Manager.instance.AllChipNames(true, false).Contains(chipName))
-        {
             return false;
-        }
 
         SavedChip[] savedChips = SaveSystem.GetAllSavedChips();
         for (int i = 0; i < savedChips.Length; i++)
-        {
             if (savedChips[i].ChipDependecies.Contains(chipName))
-            {
                 return false;
-            }
-        }
         return true;
     }
 

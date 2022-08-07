@@ -5,35 +5,64 @@ using UnityEngine;
 
 public class FolderSystem
 {
+    private static bool Inizialized = false;
+    public static IEnumerable<KeyValuePair<int, string>> Enum => Folders.AsEnumerable();
+
+    public static Dictionary<int, string> DefaultFolder
+    {
+        get => new Dictionary<int, string>()
+        {
+            { 0, "Comp" },
+            { 1, "Gate" },
+            { 2, "Misc"}
+        };
+    }
+
     private static Dictionary<int, string> Folders;
+
 
     public static void Init()
     {
-        Folders = FolderLoader.DefaultFolderIndex;
-        LoadFolders();
-    }
+        Folders = new Dictionary<int, string>(DefaultFolder);
 
+        foreach (var kv in SaveSystem.LoadCustomFolders())
+            Folders.TryAdd(kv.Key, kv.Value);
+
+        Inizialized = true;
+    }
     public static void Reset()
     {
         Folders = null;
+        Inizialized = false;
     }
-    public static void LoadFolders()
-    {
-        foreach (var kv in SaveSystem.LoadCustomFolders())
-            Folders.TryAdd(kv.Key, kv.Value);
-    }
-    public static int ReverseIndex(string DicValue) => Folders.FirstOrDefault(x => x.Value == DicValue).Key;
+    public static int ReverseIndex(string DicValue) => Inizialized ? Folders.FirstOrDefault(x => x.Value == DicValue).Key : -1;
 
-    public static bool ContainsIndex(int i) => Folders.ContainsKey(i);
+    public static bool ContainsIndex(int i) => Inizialized ? Folders.ContainsKey(i) : false;
 
     public static void AddFolder(string newFolderName)
     {
+        if (!Inizialized) return;
+
         Folders[Folders.Count] = newFolderName;
         SaveSystem.SaveCustomFolders(Folders);
     }
 
+    internal static void DeleteFolder(string folderName)
+    {
+        if (!Inizialized) return;
+
+        DeleteFolder(ReverseIndex(folderName));
+    }
+    public static void DeleteFolder(int Index)
+    {
+        if (!Inizialized) return;
+        Folders.Remove(Index);
+    }
+
     public static bool FolderNameAvailable(string name)
     {
+        if (!Inizialized) return false;
+
         foreach (string f in Folders.Values)
         {
             if (string.Equals(name.ToUpper(), f.ToUpper()))
@@ -44,15 +73,14 @@ public class FolderSystem
 
 
 
-    public static IEnumerable<KeyValuePair<int, string>> Enum()
-    {
-        return Folders.AsEnumerable();
-    }
 
-    public static bool CompareValue(int index, string value) => string.Equals(Folders[index], value);
+
+    public static bool CompareValue(int index, string value) => Inizialized && ContainsIndex(index) && string.Equals(Folders[index], value);
 
     public static void RenameFolder(string OldFolderName, string NewFolderName)
     {
+        if (!Inizialized) return;
+
         if (!Folders.ContainsValue(OldFolderName)
             || string.Equals(OldFolderName, NewFolderName))
             return;
@@ -62,4 +90,5 @@ public class FolderSystem
 
         SaveSystem.SaveCustomFolders(Folders);
     }
+
 }

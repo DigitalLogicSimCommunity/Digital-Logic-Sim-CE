@@ -399,7 +399,7 @@ GameObject:
   - component: {fileID: 34101518}
   - component: {fileID: 34101517}
   m_Layer: 5
-  m_Name: Cancel Button
+  m_Name: Delete Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -423,8 +423,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 103.91576, y: -25}
-  m_SizeDelta: {x: 190.32, y: 50}
+  m_AnchoredPosition: {x: 88.455, y: -25}
+  m_SizeDelta: {x: 154.1, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &34101517
 MonoBehaviour:
@@ -482,22 +482,10 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1119884937}
-        m_TargetAssemblyTypeName: TMPro.TMP_InputField, Unity.TextMeshPro
-        m_MethodName: SetTextWithoutNotify
-        m_Mode: 5
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 286131276}
-        m_TargetAssemblyTypeName: UnityEngine.UI.Selectable, UnityEngine.UI
-        m_MethodName: set_interactable
-        m_Mode: 6
+      - m_Target: {fileID: 917051045}
+        m_TargetAssemblyTypeName: EditFolderMenu, Assembly-CSharp
+        m_MethodName: SubmitDeleteFolder
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -3987,8 +3975,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 247.16577, y: -25}
-  m_SizeDelta: {x: 81.157, y: 50}
+  m_AnchoredPosition: {x: 231.705, y: -25}
+  m_SizeDelta: {x: 106.78, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &286131276
 MonoBehaviour:
@@ -7631,7 +7619,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Rename Folder
+  m_text: Edit Folder
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -15338,7 +15326,7 @@ GameObject:
   - component: {fileID: 917051044}
   - component: {fileID: 917051045}
   m_Layer: 0
-  m_Name: Rename Folder
+  m_Name: Edit Folder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16500,9 +16488,9 @@ Camera:
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
-    y: 0
+    y: 0.00038391352
     width: 1
-    height: 1
+    height: 0.9992322
   near clip plane: 0.3
   far clip plane: 1500
   field of view: 60
@@ -25059,7 +25047,7 @@ GameObject:
   - component: {fileID: 1576721657}
   - component: {fileID: 1576721658}
   m_Layer: 5
-  m_Name: Rename Folder Menu
+  m_Name: Edit Folder Menu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28489,7 +28477,7 @@ MonoBehaviour:
   - {fileID: 6632021948943085525, guid: e7e9803706278f642855ed313fa69546, type: 3}
   - {fileID: 286808261455957341, guid: 184fc6762f746804aa23328309645795, type: 3}
   - {fileID: -6260489656382857768, guid: 99de4470dbba3194e9450daa3e1073ad, type: 3}
-  spawnableChips: []
+  SpawnableCustomChips: []
   UIManager: {fileID: 1579521357}
 --- !u!4 &1830893909
 Transform:
@@ -30896,7 +30884,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Cancel
+  m_text: Delete
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

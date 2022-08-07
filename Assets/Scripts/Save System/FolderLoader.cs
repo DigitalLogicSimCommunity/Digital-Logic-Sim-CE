@@ -4,14 +4,6 @@ using System.IO;
 
 public static class FolderLoader
 {
-    private static Dictionary<int, string> DefaultFolder = new Dictionary<int, string>()
-    {  
-            { 0, "Comp" },
-            { 1, "Gate" },
-            { 2, "Misc"}
-    };
-
-    public static Dictionary<int, string> DefaultFolderIndex { get => new Dictionary<int, string>(DefaultFolder); }
 
     public static Dictionary<int, string> LoadCustomFolders(string path)
     {
@@ -25,7 +17,7 @@ public static class FolderLoader
         return new Dictionary<int, string>();
     }
 
-    public static void SaveCustomFolders(string path, Dictionary<int, string> folders)
+    public static void SaveCustomFolders(string path, IDictionary<int, string> folders)
     {
         string jsonString = JsonConvert.SerializeObject(folders, Formatting.Indented);
         SaveSystem.WriteFile(path, jsonString);
@@ -35,7 +27,7 @@ public static class FolderLoader
     {
         if (File.Exists(path)) return;
 
-        SaveCustomFolders(path, DefaultFolder);
+        SaveCustomFolders(path, FolderSystem.DefaultFolder);
 
     }
 }

@@ -34,7 +34,7 @@ public class ImportExport : MonoBehaviour {
   }
 
   void EditChipBar() {
-    chipBar.ReloadBar();
-    SaveSystem.LoadAll(Manager.instance);
+    chipBar.ReloadChipButton();
+    SaveSystem.LoadAllChips(Manager.instance);
   }
 }

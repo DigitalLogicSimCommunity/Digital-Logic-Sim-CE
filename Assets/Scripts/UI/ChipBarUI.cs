@@ -58,7 +58,7 @@ public class ChipBarUI : MonoBehaviour
         FolderDropdown.value = 1;
     }
 
-    public void ReloadBar()
+    public void ReloadChipButton()
     {
 
         foreach (var button in customButton)
@@ -69,13 +69,19 @@ public class ChipBarUI : MonoBehaviour
 
         customButton.Clear();
 
-        for (int i = 0; i < manager.builtinChips.Length; i++)
-            AddChipButton(manager.builtinChips[i]);
+        foreach (var BuiltInChip in manager.builtinChips)
+            AddChipButton(BuiltInChip);
+
+        foreach (var Customchip in manager.SpawnableCustomChips)
+            AddChipButton(Customchip);
+
+
+
         Canvas.ForceUpdateCanvases();
     }
 
 
-    public void ReloadFolder()
+    private void ReloadFolder()
     {
         foreach (var Holder in chipButtonHolders)
             DestroyImmediate(Holder.gameObject);
@@ -83,15 +89,29 @@ public class ChipBarUI : MonoBehaviour
 
         FolderDropdown.options.Clear();
 
-        foreach (var kv in FolderSystem.Enum())
+        foreach (var kv in FolderSystem.Enum)
             AddFolderView(kv.Value, kv.Key > 2 ? UserSprite : BuiltInSprite);
 
-        ReloadBar();
+        ReloadChipButton();
+
     }
+
+    public void NotifyRemovedFolder(string FolderName)
+    {
+        var DeletedWhileOnFolder = string.Equals(FolderDropdown.options[FolderDropdown.value].text, FolderName);
+
+        ReloadFolder();
+        if (DeletedWhileOnFolder)
+            FolderDropdown.value = 0;
+
+        FolderDropdown.onValueChanged?.Invoke(FolderDropdown.value);
+
+    }
+
     public void NotifyFolderNameChanged()
     {
         ReloadFolder();
-        FolderDropdown.onValueChanged?.Invoke(FolderDropdown.value) ;
+        FolderDropdown.onValueChanged?.Invoke(FolderDropdown.value);
         Laberl.text = FolderDropdown.options[FolderDropdown.value].text;
     }
 
@@ -126,8 +146,14 @@ public class ChipBarUI : MonoBehaviour
                 break;
             default:
                 int index = 0;
-                if (chip is CustomChip customChip && FolderSystem.ContainsIndex(customChip.FolderIndex))
-                    index = customChip.FolderIndex;
+                if (chip is CustomChip customChip)
+                {
+                    if (FolderSystem.ContainsIndex(customChip.FolderIndex))
+                        index = customChip.FolderIndex;
+                    else
+                        customChip.FolderIndex = index;
+                }
+
                 holder = chipButtonHolders[index].transform;
                 break;
         }
@@ -180,9 +206,8 @@ public class ChipBarUI : MonoBehaviour
         selectedFolderIndex = FolderDropdown.value;
 
         for (int i = 0; i < chipButtonHolders.Count; i++)
-        {
             chipButtonHolders[i].gameObject.SetActive(i == selectedFolderIndex);
-        }
+
         scrollRect.content = chipButtonHolders[selectedFolderIndex];
         UpdateBarPos();
     }
@@ -196,7 +221,6 @@ public class ChipBarUI : MonoBehaviour
         FolderDropdown.options.Add(newFolderOption);
         NewChipButtonHolder(folderName);
     }
-
 
     void NewChipButtonHolder(string name)
     {
