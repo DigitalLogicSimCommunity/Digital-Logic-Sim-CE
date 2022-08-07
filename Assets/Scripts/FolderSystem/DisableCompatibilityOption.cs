@@ -7,13 +7,13 @@ public class DisableCompatibilityOption : MonoBehaviour
 {
     void Start()
     {
-        var a = ChipBarUI.instance.chipButtonHolders;
-        if (a != null && a.Count > 0)
+        var ChipButtonHolder = ChipBarUI.instance.chipButtonHolders;
+        if (ChipButtonHolder != null && ChipButtonHolder.Count > 0)
         {
-            var chipButtonHolders = a[0];
+            var chipButtonHolders = ChipButtonHolder[0];
             var CompatibilityOption = transform.GetChild(1).GetComponent<Toggle>();
             if (CompatibilityOption != null)
-                CompatibilityOption.interactable = chipButtonHolders.childCount != 0;
+                CompatibilityOption.interactable = chipButtonHolders.Holder.childCount != 0;
         }
     }
 }

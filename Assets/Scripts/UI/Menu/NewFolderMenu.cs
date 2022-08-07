@@ -22,8 +22,7 @@ public class NewFolderMenu : MonoBehaviour
         newFolderNameField.SetTextWithoutNotify("");
         SubmitNewFolder.interactable = false;
 
-        FolderSystem.AddFolder(newFolderName);
-        chipBarUI.AddFolderView(newFolderName, chipBarUI.UserSprite);
+        chipBarUI.AddFolderView(FolderSystem.AddFolder(newFolderName), chipBarUI.UserSprite);
 
     }
 

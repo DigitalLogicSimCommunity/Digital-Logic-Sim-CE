@@ -264,4 +264,10 @@ public class Manager : MonoBehaviour
         }
         return allChipNames;
     }
+
+    public void ChengeFolderToChip(string name, int index)
+    {
+        ChangeFolderToChip(name, index);
+        ChipSaver.ChangeFolder(name, index);
+    }
 }

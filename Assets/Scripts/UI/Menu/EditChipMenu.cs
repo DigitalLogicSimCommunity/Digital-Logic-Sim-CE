@@ -136,8 +136,7 @@ public class EditChipMenu : MonoBehaviour
             var index = FolderSystem.ReverseIndex(CurrentFolderText);
             if (index != customChip.FolderIndex)
             {
-                ChipSaver.ChangeFolder(customChip.name, index);
-                Manager.instance.ChangeFolderToChip(customChip.name, index);
+                Manager.instance.ChengeFolderToChip(customChip.name, index);
                 chipBarUI.ReloadChipButton();
             }
         }

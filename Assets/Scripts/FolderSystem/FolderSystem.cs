@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+public enum DefaultKays { Comp = 0, Gate = 1, Misc = 2 }
 public class FolderSystem
 {
     private static bool Inizialized = false;
@@ -12,9 +13,9 @@ public class FolderSystem
     {
         get => new Dictionary<int, string>()
         {
-            { 0, "Comp" },
-            { 1, "Gate" },
-            { 2, "Misc"}
+            { (int)DefaultKays.Comp , "Comp" },
+            { (int)DefaultKays.Gate , "Gate" },
+            { (int)DefaultKays.Misc , "Misc"}
         };
     }
 
@@ -37,17 +38,23 @@ public class FolderSystem
     }
     public static int ReverseIndex(string DicValue) => Inizialized ? Folders.FirstOrDefault(x => x.Value == DicValue).Key : -1;
 
-    public static bool ContainsIndex(int i) => Inizialized ? Folders.ContainsKey(i) : false;
-
-    public static void AddFolder(string newFolderName)
+    public static bool ContainsIndex(int i) => Inizialized && Folders.ContainsKey(i);
+    public static string GetFolderName(int i)
     {
-        if (!Inizialized) return;
+        if (!ContainsIndex(i)) return "";
+        return Folders[i];
+    }
+
+    public static int AddFolder(string newFolderName)
+    {
+        if (!Inizialized) return -1;
 
         Folders[Folders.Count] = newFolderName;
         SaveSystem.SaveCustomFolders(Folders);
+        return Folders.Count-1;
     }
 
-    internal static void DeleteFolder(string folderName)
+    public static void DeleteFolder(string folderName)
     {
         if (!Inizialized) return;
 
@@ -90,5 +97,4 @@ public class FolderSystem
 
         SaveSystem.SaveCustomFolders(Folders);
     }
-
 }
