@@ -77,17 +77,16 @@ public static class ChipLoader
         DLSLogger.Log($"Load time: {sw.ElapsedMilliseconds}ms");
 
         // the simulation will never create Cyclic path so simple ricorsive descending graph explore shuld be fine
-        void ResolveDependecy(SavedChip chip)
+        async void ResolveDependecy(SavedChip chip)
         {
             foreach (var dependancy in chip.ChipDependecies)
             {
                 if (string.Equals(dependancy, "SIGNAL IN") || string.Equals(dependancy, "SIGNAL OUT")) continue;
                 if (!loadedChips.ContainsKey(dependancy))
-                { ResolveDependecy(ChipsToLoadDic[dependancy]); i++; }
+                { ResolveDependecy(ChipsToLoadDic[dependancy]); await Task.Yield(); i++; }
             }
             Chip loadedChip = manager.LoadChip(LoadChip(chip, loadedChips, manager.wirePrefab));
-            if (loadedChip != null)
-                loadedChips.Add(loadedChip.chipName, loadedChip);
+            loadedChips?.Add(loadedChip.chipName, loadedChip);
         }
 
     }
@@ -314,11 +313,11 @@ public static class ChipLoader
         SortChipsByOrderOfCreation(ref savedChips);
         // Maintain dictionary of loaded chips (initially just the built-in chips)
         Dictionary<string, Chip> loadedChips = new Dictionary<string, Chip>();
-        for (int i = 0; i < builtinChips.Length; i++)
+        foreach (Chip builtinChip in builtinChips)
         {
-            Chip builtinChip = builtinChips[i];
             loadedChips.Add(builtinChip.chipName, builtinChip);
         }
+
         foreach (Chip loadedChip in spawnableChips)
         {
             if (loadedChips.ContainsKey(loadedChip.chipName))

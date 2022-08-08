@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine.UI;
 using System;
 using SFB;
+using System.Linq;
 
 public class EditChipMenu : MonoBehaviour
 {
@@ -12,9 +13,13 @@ public class EditChipMenu : MonoBehaviour
     public Button viewButton;
     public Button exportButton;
     public ChipBarUI chipBarUI;
-
+    public TMP_Dropdown folderDropdown;
     private Chip currentChip;
+
     private string nameBeforeChanging;
+
+
+    string CurrentFolderText { get => folderDropdown.options[folderDropdown.value].text; }
 
     void Awake()
     {
@@ -25,18 +30,38 @@ public class EditChipMenu : MonoBehaviour
         exportButton.onClick.AddListener(ExportChip);
     }
 
-    public void EditChip(string chipName)
+    public void EditChipInit(string chipName)
     {
 
         chipNameField.text = chipName;
         nameBeforeChanging = chipName;
         doneButton.interactable = true;
-        chipNameField.interactable = ChipSaver.IsSafeToDelete(nameBeforeChanging);
-        deleteButton.interactable = ChipSaver.IsSafeToDelete(nameBeforeChanging);
+        var IsSafeToDelate = ChipSaver.IsSafeToDelete(nameBeforeChanging);
+        chipNameField.interactable = IsSafeToDelate;
+        deleteButton.interactable = IsSafeToDelate;
 
-        currentChip = Manager.GetCustomChipByName(chipName);
+        currentChip = Manager.GetChipByName(chipName);
         viewButton.interactable = true;
         exportButton.interactable = true;
+
+        folderDropdown.ClearOptions();
+        var FolderOption = ChipBarUI.instance.FolderDropdown.options;
+        folderDropdown.AddOptions(FolderOption.GetRange(1, FolderOption.Count - 2));
+
+
+        if (currentChip is CustomChip customChip)
+        {
+            for (int i = 0; i < folderDropdown.options.Count; i++)
+            {
+
+                if (FolderSystem.CompareValue(customChip.FolderIndex, folderDropdown.options[i].text))
+                {
+                    folderDropdown.value = i;
+                    break;
+                }
+            }
+        }
+
     }
 
     public void ChipNameFieldChanged(string value)
@@ -45,6 +70,7 @@ public class EditChipMenu : MonoBehaviour
         doneButton.interactable = IsValidChipName(formattedName.Trim());
         chipNameField.text = formattedName;
     }
+
 
     public bool IsValidRename(string chipName)
     {
@@ -92,9 +118,8 @@ public class EditChipMenu : MonoBehaviour
 
     public void EditChipBar()
     {
-        Manager.instance.spawnableChips.Clear();
-        SaveSystem.LoadAll(Manager.instance);
-        chipBarUI.ReloadBar();
+        Manager.instance.SpawnableCustomChips.Clear();
+        SaveSystem.LoadAllChips(Manager.instance);
     }
 
     public void FinishCreation()
@@ -104,6 +129,16 @@ public class EditChipMenu : MonoBehaviour
             // Chip has been renamed
             ChipSaver.Rename(nameBeforeChanging, chipNameField.text.Trim());
             EditChipBar();
+        }
+        if (currentChip is CustomChip customChip)
+        {
+
+            var index = FolderSystem.ReverseIndex(CurrentFolderText);
+            if (index != customChip.FolderIndex)
+            {
+                Manager.instance.ChengeFolderToChip(customChip.name, index);
+                chipBarUI.ReloadChipButton();
+            }
         }
         currentChip = null;
     }

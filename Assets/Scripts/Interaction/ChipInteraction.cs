@@ -158,7 +158,7 @@ public class ChipInteraction : InteractionHandler
         return chipsToPaste;
     }
 
-    public void SpawnChip(Chip chipPrefab)
+    public void ChipButtonInteraction(Chip chip)
     {
         RequestFocus();
         if (HasFocus)
@@ -171,14 +171,13 @@ public class ChipInteraction : InteractionHandler
                 {
                     selectedChips.Clear();
                 }
-                var newChip = Instantiate(chipPrefab, parent: chipHolder);
+                var newChip = Instantiate(chip, parent: chipHolder);
                 newChip.gameObject.SetActive(true);
                 newChip.GetComponent<ChipPackage>().SetSizeAndSpacing(newChip);
                 selectedChips.Add(newChip);
                 newChipsToPlace.Add(newChip);
             }
-            else if (Input.GetMouseButtonDown(1) &&
-                       ChipBarUI.selectedFolderIndex > 1)
+            else if (Input.GetMouseButtonDown(1) && chip.Editable)
             {
                 UIManager.instance.OpenMenu(MenuType.EditChipMenu);
             }

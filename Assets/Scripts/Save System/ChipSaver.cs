@@ -39,8 +39,7 @@ public static class ChipSaver
         {
             writer.WriteLine(chipsToExport.Count);
 
-            foreach (KeyValuePair<int, string> chip in chipsToExport.OrderBy(
-                         x => x.Key))
+            foreach (KeyValuePair<int, string> chip in chipsToExport.OrderBy(x => x.Key))
             {
                 string chipSaveFile = SaveSystem.GetPathToSaveFile(chip.Value);
                 string chipWireSaveFile = SaveSystem.GetPathToWireSaveFile(chip.Value);
@@ -162,25 +161,27 @@ public static class ChipSaver
         }
     }
 
-    public static void EditSavedChip(SavedChip savedChip,
-                                     ChipSaveData chipSaveData)
+    internal static void ChangeFolder(string Chipname, int FolderIndex)
+    {
+
+        var ChipToEdit= SaveSystem.GetAllSavedChipsDic()[Chipname];
+        if (ChipToEdit.Data.FolderIndex == FolderIndex)   return;
+        ChipToEdit.Data.FolderIndex = FolderIndex;
+        SaveSystem.WriteChip(Chipname, JsonUtility.ToJson(ChipToEdit, usePrettyPrint));
+    }
+
+    public static void EditSavedChip(SavedChip savedChip, ChipSaveData chipSaveData)
     { }
 
     public static bool IsSafeToDelete(string chipName)
     {
         if (Manager.instance.AllChipNames(true, false).Contains(chipName))
-        {
             return false;
-        }
 
         SavedChip[] savedChips = SaveSystem.GetAllSavedChips();
         for (int i = 0; i < savedChips.Length; i++)
-        {
             if (savedChips[i].ChipDependecies.Contains(chipName))
-            {
                 return false;
-            }
-        }
         return true;
     }
 
@@ -263,11 +264,7 @@ public static class ChipSaver
             {
                 string saveString = JsonUtility.ToJson(savedChips[i], usePrettyPrint);
                 // Write to file
-                string savePath = SaveSystem.GetPathToSaveFile(savedChips[i].Data.name);
-                using (StreamWriter writer = new StreamWriter(savePath))
-                {
-                    writer.Write(saveString);
-                }
+                SaveSystem.WriteChip(savedChips[i].Data.name, saveString);
             }
         }
         // Rename wire layer file

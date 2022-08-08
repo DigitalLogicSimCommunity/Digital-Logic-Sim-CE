@@ -5,8 +5,7 @@ using UnityEngine;
 public class ChipPackage : MonoBehaviour
 {
 
-    public enum ChipType { User, Basic, Advanced }
-    ;
+    public enum ChipType { Combapibility, Gate, Miscellaneous, Custom};
 
     public ChipType chipType;
     public TMPro.TextMeshPro nameText;
@@ -20,9 +19,9 @@ public class ChipPackage : MonoBehaviour
 
     void Awake()
     {
-        if (chipType != ChipType.User)
+        BuiltinChip builtinChip = GetComponent<BuiltinChip>();
+        if (builtinChip != null)
         {
-            BuiltinChip builtinChip = GetComponent<BuiltinChip>();
             SetSizeAndSpacing(GetComponent<Chip>());
             SetColour(builtinChip.packageColour);
         }
@@ -40,8 +39,8 @@ public class ChipPackage : MonoBehaviour
         // Add and set up the custom chip component
         CustomChip chip = gameObject.AddComponent<CustomChip>();
         chip.chipName = chipName;
-        chip.folderName = chipEditor.Data.folderName;
-
+        chip.FolderIndex = chipEditor.Data.FolderIndex;
+        chipType = ChipType.Custom;
         // Set input signals
         chip.inputSignals = new InputSignal[chipEditor.inputsEditor.signals.Count];
         for (int i = 0; i < chip.inputSignals.Length; i++)

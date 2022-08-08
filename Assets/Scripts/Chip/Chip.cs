@@ -5,10 +5,11 @@ using UnityEngine;
 public class Chip : MonoBehaviour
 {
 
+
     public string chipName = "Untitled";
     public Pin[] inputPins;
     public Pin[] outputPins;
-
+    public bool Editable = false;
     // Number of input signals received (on current simulation step)
     int numInputSignalsReceived;
     int lastSimulatedFrame;

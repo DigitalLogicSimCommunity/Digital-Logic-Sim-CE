@@ -9,11 +9,13 @@ public class UpdateButton : MonoBehaviour
 
     public Button updateButton;
 
-    public void Start() {
+    public void Start()
+    {
         updateButton.onClick.AddListener(ChipUpdatePressed);
     }
 
-    void ChipUpdatePressed() {
+    void ChipUpdatePressed()
+    {
         onChipUpdatePressed?.Invoke();
     }
 }
