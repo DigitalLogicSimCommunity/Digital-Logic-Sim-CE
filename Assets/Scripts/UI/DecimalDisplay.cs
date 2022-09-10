@@ -16,7 +16,7 @@ public class DecimalDisplay : MonoBehaviour
         displayGroups = new List<SignalGroup>();
 
         signalEditor = GetComponent<ChipInterfaceEditor>();
-        signalEditor.onChipsAddedOrDeleted += RebuildGroups;
+        signalEditor.OnChipsAddedOrDeleted += RebuildGroups;
     }
 
     void Update()
@@ -79,13 +79,9 @@ public class DecimalDisplay : MonoBehaviour
                 {
                     int signalState = signals[signals.Length - 1 - i].currentState;
                     if (useTwosComplement && i == signals.Length - 1)
-                    {
                         decimalValue |= -(signalState << i);
-                    }
                     else
-                    {
                         decimalValue |= signalState << i;
-                    }
                 }
                 text.text = decimalValue + "";
             }

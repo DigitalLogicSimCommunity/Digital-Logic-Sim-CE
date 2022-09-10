@@ -101,9 +101,7 @@ public class EditChipMenu : MonoBehaviour
     public void SubmitDeleteChip()
     {
         UIManager.NewSubmitMenu(header: "Delete Chip",
-                                text: "Are you sure you want to delete the chip '" +
-                                    currentChip.chipName +
-                                    "'?\nIt will be lost forever!",
+                                text: $"Are you sure you want to delete the chip '{currentChip.chipName}'? \nIt will be lost forever!",
                                 onSubmit: DeleteChip);
     }
 
@@ -112,7 +110,7 @@ public class EditChipMenu : MonoBehaviour
         ChipSaver.Delete(nameBeforeChanging);
         FindObjectOfType<ChipInteraction>().DeleteChip(currentChip);
         EditChipBar();
-        DLSLogger.Log("Successfully deleted chip '" + currentChip.chipName + "'");
+        DLSLogger.Log($"Successfully deleted chip '{currentChip.chipName}'");
         currentChip = null;
     }
 

@@ -9,7 +9,8 @@ public class ChipEditor : MonoBehaviour
     public ChipInterfaceEditor outputsEditor;
     public ChipInteraction chipInteraction;
     public PinAndWireInteraction pinAndWireInteraction;
-    public PinNameDisplayManager pinNameDisplayManager;
+
+    public PinNameDisplayManager pinNameDisplayManager ;
 
     public ChipData Data;
 
@@ -21,13 +22,6 @@ public class ChipEditor : MonoBehaviour
             scale = 1
         };
 
-        InteractionHandler[] allHandlers = { inputsEditor, outputsEditor,
-                                         chipInteraction,
-                                         pinAndWireInteraction };
-        foreach (var handler in allHandlers)
-        {
-            handler.InitAllHandlers(allHandlers);
-        }
 
         pinAndWireInteraction.Init(chipInteraction, inputsEditor, outputsEditor);
         pinAndWireInteraction.onConnectionChanged += OnChipNetworkModified;

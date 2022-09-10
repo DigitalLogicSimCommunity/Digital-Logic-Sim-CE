@@ -17,6 +17,9 @@ public class ChipPropertiesMenu : MonoBehaviour
 
     ChipInterfaceEditor CurrentInterface;
 
+    private bool Opened = false;
+
+
     private void Awake()
     {
         propertiesUI = (RectTransform)transform.GetChild(0);
@@ -33,35 +36,10 @@ public class ChipPropertiesMenu : MonoBehaviour
         propertiesUI.gameObject.SetActive(b);
     }
 
-    public void EnableUI(bool isGroup)
+
+    public void EnableUI(ChipInterfaceEditor chipInterfaceEditor, string signalName, bool isGroup, bool useTwosComplement, string currentEditorName, string signalToDragName, int wireType)
     {
         SetActive(true);
-        propertiesUI.sizeDelta = new Vector2(propertiesUI.sizeDelta.x,
-                                     (isGroup) ? propertiesHeightMinMax.y
-                                               : propertiesHeightMinMax.x);
-
-    }
-    public void DisableUI()
-    {
-        SetActive(false);
-        SaveProperty();
-        ResetC();
-    }
-
-    private void ResetC ()
-    {
-        nameField.text = "";
-        CurrentInterface = null;
-    }
-
-    public void SetPosition(Vector3 centre, ChipInterfaceEditor.EditorType editorType)
-    {
-        float propertiesUIX = ScalingManager.propertiesUIX * (editorType == ChipInterfaceEditor.EditorType.Input ? 1 : -1);
-        propertiesUI.transform.position = new Vector3(centre.x + propertiesUIX, centre.y, propertiesUI.transform.position.z);
-    }
-    
-    internal void InitOnPin(ChipInterfaceEditor chipInterfaceEditor,string signalName, bool isGroup, bool useTwosComplement ,string currentEditorName, string signalToDragName,int wireType)
-    {
         nameField.text = signalName;
         nameField.Select();
         nameField.caretPosition = nameField.text.Length;
@@ -71,17 +49,43 @@ public class ChipPropertiesMenu : MonoBehaviour
         deleteButton.interactable = ChipSaver.IsSignalSafeToDelete(currentEditorName, signalToDragName);
         modeDropdown.SetValueWithoutNotify(wireType);
         CurrentInterface = chipInterfaceEditor;
+
+        var SizeDelta = new Vector2(propertiesUI.sizeDelta.x, (isGroup) ? propertiesHeightMinMax.y : propertiesHeightMinMax.x);
+        propertiesUI.sizeDelta = SizeDelta;
+
+        Opened = true;
     }
+    public void DisableUI()
+    {
+        if (!Opened) return;
+        SetActive(false);
+        SaveProperty();
+        ResetC();
+    }
+
+    private void ResetC()
+    {
+        nameField.text = "";
+        CurrentInterface = null;
+        Opened = false;
+    }
+
+    public void SetPosition(Vector3 centre, ChipInterfaceEditor.EditorType editorType)
+    {
+        float propertiesUIX = ScalingManager.propertiesUIX * (editorType == ChipInterfaceEditor.EditorType.Input ? 1 : -1);
+        propertiesUI.transform.position = new Vector3(centre.x + propertiesUIX, centre.y, propertiesUI.transform.position.z);
+    }
+
 
     void SaveProperty()
     {
-        if(CurrentInterface!=null)
-        CurrentInterface.UpdateGroupProperty(nameField.text, twosComplementToggle.isOn);
+        if (CurrentInterface != null)
+            CurrentInterface.UpdateGroupProperty(nameField.text, twosComplementToggle.isOn);
     }
 
     void Delete()
     {
-        CurrentInterface.DeleteSelected();
+        CurrentInterface.DeleteComand();
     }
     void OnValueDropDownChange(int mode)
     {

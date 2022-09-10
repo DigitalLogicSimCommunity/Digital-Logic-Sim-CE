@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using UnityEngine;
 
-public class ChipInteraction : InteractionHandler
+public class ChipInteraction : Interactable
 {
 
     public enum State
@@ -57,8 +57,6 @@ public class ChipInteraction : InteractionHandler
         {
             case State.None:
                 HandleSelection();
-                if (!UIManager.instance.IsAnyMenuOpen)
-                    HandleDeletion();
                 break;
             case State.PlacingNewChips:
                 HandleNewChipPlacement();
@@ -152,8 +150,7 @@ public class ChipInteraction : InteractionHandler
 
     public void ChipButtonInteraction(Chip chip)
     {
-        RequestFocus();
-        if (HasFocus)
+        if (RequestFocus())
         {
             if (Input.GetMouseButtonDown(0))
             {
@@ -185,8 +182,7 @@ public class ChipInteraction : InteractionHandler
         // box.
         if (Input.GetMouseButtonDown(0) && !InputHelper.MouseOverUIObject())
         {
-            RequestFocus();
-            if (HasFocus)
+            if (RequestFocus())
             {
                 selectionBoxStartPos = mousePos;
                 GameObject objectUnderMouse =
@@ -224,21 +220,7 @@ public class ChipInteraction : InteractionHandler
         }
     }
 
-    void HandleDeletion()
-    {
-        // Delete any selected chips
-        if (InputHelper.AnyOfTheseKeysDown(KeyCode.Backspace, KeyCode.Delete) || Input.GetMouseButton(2))
-        {
-            for (int i = selectedChips.Count - 1; i >= 0; i--)
-            {
-                DeleteChip(selectedChips[i]);
-                selectedChips.RemoveAt(i);
-            }
-            newChipsToPlace.Clear();
-            newChipsToPaste.Clear();
-            chipsToPaste.Clear();
-        }
-    }
+
 
     public void DeleteChip(Chip chip)
     {
@@ -357,7 +339,7 @@ public class ChipInteraction : InteractionHandler
     void HandleNewChipPlacement()
     {
         // Cancel placement if esc or right mouse down
-        if (InputHelper.AnyOfTheseKeysDown(KeyCode.Escape, KeyCode.Backspace,KeyCode.Delete) || Input.GetMouseButtonDown(1))
+        if (InputHelper.AnyOfTheseKeysDown(KeyCode.Escape, KeyCode.Backspace, KeyCode.Delete) || Input.GetMouseButtonDown(1))
         {
             CancelPlacement(newChipsToPlace.ToArray());
             newChipsToPlace.Clear();
@@ -515,12 +497,29 @@ public class ChipInteraction : InteractionHandler
                                               chip.transform.position.y, depth);
     }
 
-    protected override bool CanReleaseFocus() => 
+    public override bool CanReleaseFocus() =>
         currentState != State.PlacingNewChips && currentState != State.MovingOldChips;
 
-    protected override void FocusLost()
+    public override void FocusLostHandler()
     {
         currentState = State.None;
         selectedChips.Clear();
+    }
+
+    public override void DeleteComand()
+    {
+        if (!UIManager.instance.IsAnyMenuOpen)
+            HandleDeletion();
+    }
+    void HandleDeletion()
+    {
+        // Delete any selected chips
+        foreach (var SelectedChip in selectedChips)
+            DeleteChip(SelectedChip);
+
+        selectedChips.Clear();
+        newChipsToPlace.Clear();
+        newChipsToPaste.Clear();
+        chipsToPaste.Clear();
     }
 }

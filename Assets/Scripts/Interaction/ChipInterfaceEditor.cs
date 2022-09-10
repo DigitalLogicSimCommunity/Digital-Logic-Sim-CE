@@ -4,13 +4,13 @@ using System.Linq;
 using UnityEngine;
 
 // Allows player to add/remove/move/rename inputs or outputs of a chip.
-public class ChipInterfaceEditor : InteractionHandler
+public class ChipInterfaceEditor : Interactable
 {
 
     const int maxGroupSize = 16;
 
-    public event System.Action<Chip> onDeleteChip;
-    public event System.Action onChipsAddedOrDeleted;
+    public event System.Action<Chip> OnDeleteChip;
+    public event System.Action OnChipsAddedOrDeleted;
 
     public enum EditorType { Input, Output }
     public enum HandleState { Default, Highlighted, Selected }
@@ -18,7 +18,7 @@ public class ChipInterfaceEditor : InteractionHandler
 
     public List<ChipSignal> signals { get; private set; }
 
-    public EditorType editorType ;
+    public EditorType editorType;
 
     [Header("References")]
     public Transform chipContainer;
@@ -28,7 +28,7 @@ public class ChipInterfaceEditor : InteractionHandler
 
     public Transform signalHolder;
     public Transform barGraphic;
-    public ChipInterfaceEditor otherEditor ;
+    public ChipInterfaceEditor otherEditor;
 
     [Header("Appearance")]
     public Color handleCol;
@@ -42,7 +42,7 @@ public class ChipInterfaceEditor : InteractionHandler
 
     const float handleSizeX = 0.15f;
 
-    string currentEditorName ;
+    string currentEditorName;
     public ChipEditor CurrentEditor
     {
         set => currentEditorName = value.Data.name;
@@ -70,6 +70,8 @@ public class ChipInterfaceEditor : InteractionHandler
     int currentGroupID;
     Dictionary<int, ChipSignal[]> groupsByID;
 
+    private bool IsGroup => currentGroupSize > 1;
+
     void Awake()
     {
         signals = new List<ChipSignal>();
@@ -79,9 +81,9 @@ public class ChipInterfaceEditor : InteractionHandler
 
         inputBounds = GetComponent<BoxCollider2D>();
         MeshShapeCreator.CreateQuadMesh(ref quadMesh);
-        handleMat = CreateUnlitMaterial(handleCol);
-        highlightedHandleMat = CreateUnlitMaterial(highlightedHandleCol);
-        selectedHandleMat = CreateUnlitMaterial(selectedHandleCol);
+        handleMat = MaterialUtility.CreateUnlitMaterial(handleCol);
+        highlightedHandleMat = MaterialUtility.CreateUnlitMaterial(highlightedHandleCol);
+        selectedHandleMat = MaterialUtility.CreateUnlitMaterial(selectedHandleCol);
 
         previewSignals = new ChipSignal[maxGroupSize];
         for (int i = 0; i < maxGroupSize; i++)
@@ -93,26 +95,38 @@ public class ChipInterfaceEditor : InteractionHandler
             previewSignal.transform.SetParent(transform, true);
             previewSignals[i] = previewSignal;
         }
-        PropertiesMenu.DisableUI();
 
         FindObjectOfType<CreateGroup>().onGroupSizeSettingPressed += SetGroupSize;
 
     }
 
+    public void Start()
+    {
+        PropertiesMenu.DisableUI();
+    }
+
     void Update()
     {
         if (Input.GetMouseButtonDown(0) && !InputHelper.MouseOverUIObject())
-        {
             ReleaseFocus();
-            PropertiesMenu.DisableUI();
-            ClearSelectedSignals();
-        }
     }
+
+    public override void FocusLostHandler()
+    {
+
+        highlightedSignal = null;
+        PropertiesMenu.DisableUI();
+        ClearSelectedSignals();
+
+        HidePreviews();
+        //currentGroupSize = 1;
+    }
+
 
     // Event handler when changed input or output pin wire type
     public void ModeChanged(int mode)
     {
-        if (selectedSignals.Count == 0)
+        if (IsSomethingSelected)
             return;
 
         // Change output pin wire mode
@@ -144,15 +158,13 @@ public class ChipInterfaceEditor : InteractionHandler
             UpdateColours();
             HandleInput();
         }
-        else
+        else if (HasFocus)
         {
-            if (HasFocus)
-            {
-                ReleaseFocus();
-                HidePreviews();
-            }
+            ReleaseFocusNotHandled();
+            HidePreviews();
         }
         DrawSignalHandles();
+
     }
 
     void SetGroupSize(int groupSize) => currentGroupSize = groupSize;
@@ -178,40 +190,35 @@ public class ChipInterfaceEditor : InteractionHandler
         Vector2 mousePos = InputHelper.MouseWorldPos;
 
         mouseInInputBounds = inputBounds.OverlapPoint(mousePos);
-        if (mouseInInputBounds)
-        {
+
+
+
+        highlightedSignal = GetSignalUnderMouse();
+
+        if (mouseInInputBounds && highlightedSignal != null && Input.GetMouseButtonDown(0))
             RequestFocus();
+        else if (!IsSomethingSelected)
+        {
+            ReleaseFocusNotHandled();
+            isDragging = false;
         }
 
         if (HasFocus)
         {
-            otherEditor.ReleaseFocus();
             otherEditor.ClearSelectedSignals();
 
-            highlightedSignal = GetSignalUnderMouse();
-
-            // If a signal is highlighted (mouse is over its handle), then select it
-            // on mouse press
-            if (highlightedSignal)
-            {
-                if (Input.GetMouseButtonDown(0))
-                {
-                    SelectSignal(highlightedSignal);
-                }
-            }
+            if (Input.GetMouseButtonDown(0))
+                SelectSignal(highlightedSignal);
 
             // If a signal is selected, handle movement/renaming/deletion
-            if (selectedSignals.Count > 0)
+            if (IsSomethingSelected)
             {
                 if (isDragging)
                 {
-                    float handleNewY =
-                        (mousePos.y + (dragHandleStartY - dragMouseStartY));
+                    float handleNewY = mousePos.y + (dragHandleStartY - dragMouseStartY);
                     bool cancel = Input.GetKeyDown(KeyCode.Escape);
-                    if (cancel)
-                    {
-                        handleNewY = dragHandleStartY;
-                    }
+
+                    if (cancel) handleNewY = dragHandleStartY;
 
                     for (int i = 0; i < selectedSignals.Count; i++)
                     {
@@ -219,49 +226,42 @@ public class ChipInterfaceEditor : InteractionHandler
                         selectedSignals[i].transform.SetYPos(y);
                     }
 
-                    if (Input.GetMouseButtonUp(0))
-                    {
-                        isDragging = false;
-                    }
+                    if (Input.GetMouseButtonUp(0)) isDragging = false;
+
 
                     // Cancel drag and deselect
-                    if (cancel)
-                    {
-                        FocusLost();
-                    }
+                    if (cancel) FocusLostHandler();
                 }
 
-                UpdateUIProperties();
+                UpdatePropertyUIPosition();
 
                 // Finished with selected signal, so deselect it
-                if (Input.GetKeyDown(KeyCode.Return))
-                {
-                    FocusLost();
-                }
+                if (Input.GetKeyDown(KeyCode.Return)) FocusLostHandler();
+
             }
 
-            HidePreviews();
-            if (highlightedSignal == null && !isDragging)
+        }
+        HidePreviews();
+        if (highlightedSignal == null && !isDragging)
+        {
+            if (mouseInInputBounds && !InputHelper.MouseOverUIObject())
             {
-                if (mouseInInputBounds && !InputHelper.MouseOverUIObject())
+
+                if (InputHelper.AnyOfTheseKeysDown(KeyCode.Plus, KeyCode.KeypadPlus,
+                                                   KeyCode.Equals))
                 {
-
-                    if (InputHelper.AnyOfTheseKeysDown(KeyCode.Plus, KeyCode.KeypadPlus,
-                                                       KeyCode.Equals))
-                    {
-                        currentGroupSize =
-                            Mathf.Clamp(currentGroupSize + 1, 1, maxGroupSize);
-                    }
-                    else if (InputHelper.AnyOfTheseKeysDown(KeyCode.Minus,
-                                                              KeyCode.KeypadMinus,
-                                                              KeyCode.Underscore))
-                    {
-                        currentGroupSize =
-                            Mathf.Clamp(currentGroupSize - 1, 1, maxGroupSize);
-                    }
-
-                    HandleSpawning();
+                    currentGroupSize =
+                        Mathf.Clamp(currentGroupSize + 1, 1, maxGroupSize);
                 }
+                else if (InputHelper.AnyOfTheseKeysDown(KeyCode.Minus,
+                                                          KeyCode.KeypadMinus,
+                                                          KeyCode.Underscore))
+                {
+                    currentGroupSize =
+                        Mathf.Clamp(currentGroupSize - 1, 1, maxGroupSize);
+                }
+
+                HandleSpawning();
             }
         }
     }
@@ -324,18 +324,16 @@ public class ChipInterfaceEditor : InteractionHandler
         // Spawn on mouse down
         if (Input.GetMouseButtonDown(0))
         {
-            bool isGroup = currentGroupSize > 1;
             ChipSignal[] spawnedSignals = new ChipSignal[currentGroupSize];
 
             for (int i = 0; i < currentGroupSize; i++)
             {
                 float posY = CalcY(InputHelper.MouseWorldPos.y, currentGroupSize, i);
-                Vector3 spawnPos = new Vector3(containerX, posY,chipContainer.position.z + forwardDepth);
+                Vector3 spawnPos = new Vector3(containerX, posY, chipContainer.position.z + forwardDepth);
 
-                ChipSignal spawnedSignal = Instantiate(
-                    signalPrefab, spawnPos, Quaternion.identity, signalHolder);
+                ChipSignal spawnedSignal = Instantiate(signalPrefab, spawnPos, Quaternion.identity, signalHolder);
                 spawnedSignal.GetComponent<IOScaler>().UpdateScale();
-                if (isGroup)
+                if (IsGroup)
                 {
                     spawnedSignal.GroupID = currentGroupID;
                     spawnedSignal.displayGroupDecimalValue = true;
@@ -346,7 +344,7 @@ public class ChipInterfaceEditor : InteractionHandler
                 spawnedSignals[i] = spawnedSignal;
             }
 
-            if (isGroup)
+            if (IsGroup)
             {
                 groupsByID.Add(currentGroupID, spawnedSignals);
                 // Reset group size after spawning
@@ -357,7 +355,7 @@ public class ChipInterfaceEditor : InteractionHandler
                 currentGroupID++;
             }
             SelectSignal(signals[signals.Count - 1]);
-            onChipsAddedOrDeleted?.Invoke();
+            OnChipsAddedOrDeleted?.Invoke();
         }
         // Draw handle and signal previews
         else
@@ -365,7 +363,7 @@ public class ChipInterfaceEditor : InteractionHandler
             for (int i = 0; i < currentGroupSize; i++)
             {
                 float posY = CalcY(InputHelper.MouseWorldPos.y, currentGroupSize, i);
-                Vector3 spawnPos = new Vector3(containerX, posY,chipContainer.position.z + forwardDepth);
+                Vector3 spawnPos = new Vector3(containerX, posY, chipContainer.position.z + forwardDepth);
                 DrawHandle(posY, HandleState.Highlighted);
                 if (showPreviewSignal)
                 {
@@ -377,71 +375,56 @@ public class ChipInterfaceEditor : InteractionHandler
         }
     }
 
+
+
     void HidePreviews()
     {
-        for (int i = 0; i < previewSignals.Length; i++)
-        {
-            previewSignals[i].gameObject.SetActive(false);
-        }
+        foreach (ChipSignal PrevSig in previewSignals)
+            PrevSig.gameObject.SetActive(false);
     }
 
     float BoundsTop => transform.position.y + (transform.localScale.y / 2);
 
     float BoundsBottom => transform.position.y - transform.localScale.y / 2f;
 
+    public bool IsSomethingSelected => selectedSignals.Count > 0;
+
+    public override bool CanReleaseFocus() => !isDragging && !mouseInInputBounds;
 
 
-    protected override bool CanReleaseFocus() => !isDragging && !mouseInInputBounds;
 
-    protected override void FocusLost()
+    void UpdatePropertyUIPosition()
     {
-        highlightedSignal = null;
-        PropertiesMenu.DisableUI();
-        ClearSelectedSignals();
-
-        HidePreviews();
-        currentGroupSize = 1;
-    }
-
-    void UpdateUIProperties()
-    {
-        if (selectedSignals.Count > 0)
+        if (IsSomethingSelected)
         {
-            Vector3 centre = (selectedSignals[0].transform.position +
-                 selectedSignals[selectedSignals.Count - 1].transform.position) / 2;
+            Vector3 centre =
+                (selectedSignals[0].transform.position + selectedSignals[selectedSignals.Count - 1].transform.position) / 2;
 
-            PropertiesMenu.SetPosition(centre,editorType);
-
-            // Update signal properties
-            //UpdateGroupProperty();
+            PropertiesMenu.SetPosition(centre, editorType);
         }
     }
 
     public void UpdateGroupProperty(string NewName, bool twosComplementToggle)
     {
         // Update signal properties
-        for (int i = 0; i < selectedSignals.Count; i++)
+        foreach (ChipSignal Signal in selectedSignals)
         {
-            selectedSignals[i].UpdateSignalName(NewName);
-            selectedSignals[i].useTwosComplement = twosComplementToggle;
+            Signal.UpdateSignalName(NewName);
+            Signal.useTwosComplement = twosComplementToggle;
         }
     }
 
     void DrawSignalHandles()
     {
-        for (int i = 0; i < signals.Count; i++)
+        foreach (ChipSignal singnal in signals)
         {
             HandleState handleState = HandleState.Default;
-            if (signals[i] == highlightedSignal)
-            {
+            if (singnal == highlightedSignal)
                 handleState = HandleState.Highlighted;
-            }
-            if (selectedSignals.Contains(signals[i]))
-            {
+            if (selectedSignals.Contains(singnal))
                 handleState = HandleState.Selected;
-            }
 
-            DrawHandle(signals[i].transform.position.y, handleState);
+            DrawHandle(singnal.transform.position.y, handleState);
         }
     }
 
@@ -483,34 +466,12 @@ public class ChipInterfaceEditor : InteractionHandler
     // Select signal (starts dragging, shows rename field)
     void SelectSignal(ChipSignal signalToDrag)
     {
+        if (signalToDrag == null) return;
         // Dragging
-        ClearSelectedSignals();
-
-        for (int i = 0; i < signals.Count; i++)
-        {
-            if (signals[i] == signalToDrag ||
-                ChipSignal.InSameGroup(signals[i], signalToDrag))
-            {
-                selectedSignals.Add(signals[i]);
-            }
-        }
-        bool isGroup = selectedSignals.Count > 1;
+        SelectAllSignalsInTheSameGroup(signalToDrag);
 
         isDragging = true;
 
-        var wireType = Pin.WireType.Simple;
-        if (selectedSignals[0] is InputSignal)
-        {
-            var signal = selectedSignals[0];
-            var pin = signal.outputPins[0];
-            wireType = pin.wireType;
-        }
-        if (selectedSignals[0] is OutputSignal)
-        {
-            var signal = selectedSignals[0];
-            var pin = signal.inputPins[0];
-            wireType = pin.wireType;
-        }
 
         dragMouseStartY = InputHelper.MouseWorldPos.y;
         if (selectedSignals.Count % 2 == 0)
@@ -523,43 +484,28 @@ public class ChipInterfaceEditor : InteractionHandler
         }
         else
         {
-            dragHandleStartY =
-                selectedSignals[selectedSignals.Count / 2].transform.position.y;
+            dragHandleStartY = selectedSignals[selectedSignals.Count / 2].transform.position.y;
         }
 
-        PropertiesMenu.EnableUI(isGroup);
-        PropertiesMenu.InitOnPin(this, selectedSignals[0].signalName, isGroup, selectedSignals[0].useTwosComplement,
-                                   currentEditorName, signalToDrag.signalName, (int)wireType);
-        //UpdateUIProperties();
+        PropertiesMenu.EnableUI(this, selectedSignals[0].signalName, IsGroup, selectedSignals[0].useTwosComplement,
+                                   currentEditorName, signalToDrag.signalName, (int)selectedSignals[0].wireType);
+        RequestFocus();
 
-        //modeDropdown.SetValueWithoutNotify((int)wireType);
-        UpdateUIProperties();
+        UpdatePropertyUIPosition();
     }
 
-    public void DeleteSelected()
+    private void SelectAllSignalsInTheSameGroup(ChipSignal signalToDrag)
     {
-        for (int i = selectedSignals.Count - 1; i >= 0; i--)
+        ClearSelectedSignals();
+
+        foreach (ChipSignal sig in signals)
         {
-            ChipSignal signalToDelete = selectedSignals[i];
-            if (groupsByID.ContainsKey(signalToDelete.GroupID))
-            {
-                groupsByID.Remove(signalToDelete.GroupID);
-            }
-            onDeleteChip?.Invoke(signalToDelete);
-            signals.Remove(signalToDelete);
-            foreach (Pin pin in signalToDelete.inputPins)
-            {
-                visiblePins.Remove(pin);
-            }
-            foreach (Pin pin in signalToDelete.outputPins)
-            {
-                visiblePins.Remove(pin);
-            }
-            Destroy(signalToDelete.gameObject);
+            if (sig == signalToDrag || ChipSignal.InSameGroup(sig, signalToDrag))
+                selectedSignals.Add(sig);
         }
-        onChipsAddedOrDeleted?.Invoke();
-        FocusLost();
     }
+
+
 
     void DrawHandle(float y, HandleState handleState = HandleState.Default)
     {
@@ -580,18 +526,11 @@ public class ChipInterfaceEditor : InteractionHandler
         }
 
         Vector3 scale = new Vector3(handleSizeX, ScalingManager.handleSizeY, 1);
-        Vector3 pos3D =
-            new Vector3(transform.position.x, y, transform.position.z + renderZ);
+        Vector3 pos3D = new Vector3(transform.position.x, y, transform.position.z + renderZ);
         Matrix4x4 handleMatrix = Matrix4x4.TRS(pos3D, Quaternion.identity, scale);
         Graphics.DrawMesh(quadMesh, handleMatrix, currentHandleMat, 0);
     }
 
-    Material CreateUnlitMaterial(Color col)
-    {
-        var mat = new Material(Shader.Find("Unlit/Color"));
-        mat.color = col;
-        return mat;
-    }
 
     void UpdateColours()
     {
@@ -629,6 +568,34 @@ public class ChipInterfaceEditor : InteractionHandler
                 group[i].transform.SetYPos(y);
             }
         }
-        UpdateUIProperties();
+        UpdatePropertyUIPosition();
+    }
+
+
+
+    public override void DeleteComand()
+    {
+        if(!Input.GetKeyDown(KeyCode.Backspace))
+        DeleteSelected();
+    }
+    private void DeleteSelected()
+    {
+        foreach (ChipSignal selectedSignal in selectedSignals)
+        {
+            if (groupsByID.ContainsKey(selectedSignal.GroupID))
+                groupsByID.Remove(selectedSignal.GroupID);
+
+            OnDeleteChip?.Invoke(selectedSignal);
+            signals.Remove(selectedSignal);
+
+            foreach (Pin pin in selectedSignal.inputPins)
+                visiblePins.Remove(pin);
+            foreach (Pin pin in selectedSignal.outputPins)
+                visiblePins.Remove(pin);
+
+            Destroy(selectedSignal.gameObject);
+        }
+        OnChipsAddedOrDeleted?.Invoke();
+        ReleaseFocus();
     }
 }
