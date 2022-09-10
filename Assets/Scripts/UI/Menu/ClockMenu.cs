@@ -8,7 +8,6 @@ using UnityEngine.UI;
 
 public class ClockMenu : MonoBehaviour
 {
-    private CultureInfo CulturalInfo;
     private Clock CurrentEditingClock;
     public TMP_InputField HzInputField;
     public Button doneButton;

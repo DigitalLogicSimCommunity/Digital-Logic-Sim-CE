@@ -21,16 +21,10 @@ public static class InputHelper
         }
     }
 
-    public static Vector2 MouseWorldPos
-    {
-        get { return MainCamera.ScreenToWorldPoint(Input.mousePosition); }
-    }
+    public static Vector2 MouseWorldPos => MainCamera.ScreenToWorldPoint(Input.mousePosition);
 
-    public static bool MouseOverUIObject()
-    {
-        return UnityEngine.EventSystems.EventSystem.current
-            .IsPointerOverGameObject();
-    }
+    public static bool MouseOverUIObject() =>
+        EventSystem.current.IsPointerOverGameObject();
 
     public static GameObject GetObjectUnderMouse2D(LayerMask mask)
     {
@@ -39,9 +33,7 @@ public static class InputHelper
             new Ray(new Vector3(mouse.x, mouse.y, -100), Vector3.forward),
             float.MaxValue, mask);
         if (hit.collider)
-        {
             return hit.collider.gameObject;
-        }
         return null;
     }
 

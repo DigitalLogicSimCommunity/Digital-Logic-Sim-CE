@@ -12,9 +12,8 @@ public enum MenuType
     NewFolderMenu = 3,
     SubmitMenu = 4,
     ClockMenu = 5,
-    RenameFolderMenu = 6
-}
-;
+    RenameFolderMenu = 6,
+};
 
 public class UIManager : MonoBehaviour
 {

@@ -126,27 +126,19 @@ public class ChipInteraction : InteractionHandler
         }
     }
 
-    public List<Chip> SelectedChips
-    {
-        get { return selectedChips; }
-    }
+    public List<Chip> SelectedChips => selectedChips;
 
     public List<Chip> PasteChips(List<KeyValuePair<Chip, Vector3>> clipboard)
     {
-        Vector3 mouseWorldPos = new Vector3(InputHelper.MouseWorldPos.x,
-                                            InputHelper.MouseWorldPos.y, 0);
         currentState = State.PasteNewChips;
         if (newChipsToPaste.Count == 0)
-        {
             selectedChips.Clear();
-        }
         // newChipsToPaste.Clear();
         // chipsToPaste.Clear();
 
         foreach (KeyValuePair<Chip, Vector3> clipboardItem in clipboard)
         {
-            var newChip = Instantiate(clipboardItem.Key, clipboardItem.Value,
-                                      Quaternion.identity);
+            var newChip = Instantiate(clipboardItem.Key, clipboardItem.Value, Quaternion.identity);
             newChip.transform.SetParent(chipHolder);
             newChip.gameObject.SetActive(true);
             newChip.GetComponent<ChipPackage>().SetSizeAndSpacing(newChip);
@@ -365,9 +357,7 @@ public class ChipInteraction : InteractionHandler
     void HandleNewChipPlacement()
     {
         // Cancel placement if esc or right mouse down
-        if (InputHelper.AnyOfTheseKeysDown(KeyCode.Escape, KeyCode.Backspace,
-                                           KeyCode.Delete) ||
-            Input.GetMouseButtonDown(1))
+        if (InputHelper.AnyOfTheseKeysDown(KeyCode.Escape, KeyCode.Backspace,KeyCode.Delete) || Input.GetMouseButtonDown(1))
         {
             CancelPlacement(newChipsToPlace.ToArray());
             newChipsToPlace.Clear();
@@ -525,11 +515,8 @@ public class ChipInteraction : InteractionHandler
                                               chip.transform.position.y, depth);
     }
 
-    protected override bool CanReleaseFocus()
-    {
-        return currentState != State.PlacingNewChips &&
-               currentState != State.MovingOldChips;
-    }
+    protected override bool CanReleaseFocus() => 
+        currentState != State.PlacingNewChips && currentState != State.MovingOldChips;
 
     protected override void FocusLost()
     {
