@@ -108,16 +108,19 @@ public class EditChipMenu : MonoBehaviour
     public void DeleteChip()
     {
         ChipSaver.Delete(nameBeforeChanging);
+        Manager.instance.DeleteChip(nameBeforeChanging);
         FindObjectOfType<ChipInteraction>().DeleteChip(currentChip);
-        EditChipBar();
+
+        ReloadChipBar();
+
+
         DLSLogger.Log($"Successfully deleted chip '{currentChip.chipName}'");
         currentChip = null;
     }
 
-    public void EditChipBar()
+    public void ReloadChipBar()
     {
-        Manager.instance.SpawnableCustomChips.Clear();
-        SaveSystem.LoadAllChips(Manager.instance);
+        ChipBarUI.instance.ReloadChipButton();
     }
 
     public void FinishCreation()
@@ -125,8 +128,11 @@ public class EditChipMenu : MonoBehaviour
         if (chipNameField.text != nameBeforeChanging)
         {
             // Chip has been renamed
-            ChipSaver.Rename(nameBeforeChanging, chipNameField.text.Trim());
-            EditChipBar();
+            var NameAfterChanging = chipNameField.text.Trim();
+            ChipSaver.Rename(nameBeforeChanging, NameAfterChanging);
+            Manager.instance.RenameChip(nameBeforeChanging, NameAfterChanging);
+
+            ReloadChipBar();
         }
         if (currentChip is CustomChip customChip)
         {

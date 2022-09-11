@@ -21,7 +21,7 @@ public class UIManager : MonoBehaviour
 
     [Header("References")]
     public GameObject createButton;
-    public GameObject updateButton;
+    public GameObject updateButton ;
     public List<UIMenu> menus;
     public GameObject outsideMenuArea;
 

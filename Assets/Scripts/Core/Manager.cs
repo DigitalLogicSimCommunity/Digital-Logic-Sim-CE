@@ -131,6 +131,14 @@ public class Manager : MonoBehaviour
         LoadNewEditor();
     }
 
+    internal void DeleteChip(string nameBeforeChanging)
+    {
+        SpawnableCustomChips = SpawnableCustomChips.Where(x => !string.Equals(x.chipName, nameBeforeChanging)).ToList();
+    }
+    internal void RenameChip(string nameBeforeChanging, string nameAfterChanging)
+    {
+        SpawnableCustomChips.Where(x => string.Equals(x.chipName, nameBeforeChanging)).First().chipName =nameAfterChanging;
+    }
     void SetupPseudoInput(Chip customChip)
     {
         // TODO: Implement this
@@ -148,43 +156,29 @@ public class Manager : MonoBehaviour
         //  }
     }
 
-    Chip PackageChip()
-    {
-        ChipPackage package = Instantiate(chipPackagePrefab, parent: transform);
-        package.PackageCustomChip(activeChipEditor);
-        package.gameObject.SetActive(false);
 
-        var customChip = package.GetComponent<Chip>();
-        SetupPseudoInput(customChip);
-
-        if (customChip is CustomChip c)
-            c.Init();
-
-        customChipCreated?.Invoke(customChip);
-        currentChipCreationIndex++;
-        SpawnableCustomChips.Add(customChip);
-        return customChip;
-    }
 
     public void ChangeFolderToChip(string ChipName, int index)
     {
         if (SpawnableCustomChips.Where(x => string.Equals(x.name, ChipName)).First() is CustomChip customChip)
             customChip.FolderIndex = index;
     }
+    Chip PackageChip()
+    {
+        Chip customChip = GeneratePackageAndChip();
 
+        customChipCreated?.Invoke(customChip);
+        currentChipCreationIndex++;
+        SpawnableCustomChips.Add(customChip);
+        return customChip;
+    }
     Chip TryPackageAndReplaceChip(string original)
     {
         ChipPackage oldPackage = Array.Find(
             GetComponentsInChildren<ChipPackage>(true), cp => cp.name == original);
         if (oldPackage != null) { Destroy(oldPackage.gameObject); }
 
-        ChipPackage package = Instantiate(chipPackagePrefab, parent: transform);
-        package.PackageCustomChip(activeChipEditor);
-        package.gameObject.SetActive(false);
-
-        Chip customChip = package.GetComponent<Chip>();
-
-        SetupPseudoInput(customChip);
+        Chip customChip = GeneratePackageAndChip();
 
         int index = SpawnableCustomChips.FindIndex(c => c.chipName == original);
         if (index >= 0)
@@ -192,6 +186,23 @@ public class Manager : MonoBehaviour
             SpawnableCustomChips[index] = customChip;
             customChipUpdated?.Invoke(customChip);
         }
+
+
+
+        return customChip;
+    }
+
+    private Chip GeneratePackageAndChip()
+    {
+        ChipPackage package = Instantiate(chipPackagePrefab, transform);
+
+        package.PackageCustomChip(activeChipEditor);
+        package.gameObject.SetActive(false);
+
+        var customChip = package.GetComponent<Chip>();
+        SetupPseudoInput(customChip);
+        if (customChip is CustomChip c)
+            c.Init();
 
         return customChip;
     }
@@ -249,19 +260,12 @@ public class Manager : MonoBehaviour
     {
         List<string> allChipNames = new List<string>();
         if (builtin)
-        {
             foreach (Chip chip in builtinChips)
-            {
                 allChipNames.Add(chip.chipName);
-            }
-        }
         if (custom)
-        {
             foreach (Chip chip in SpawnableCustomChips)
-            {
                 allChipNames.Add(chip.chipName);
-            }
-        }
+        
         return allChipNames;
     }
 

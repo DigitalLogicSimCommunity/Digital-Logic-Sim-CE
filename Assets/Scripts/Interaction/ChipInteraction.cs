@@ -224,19 +224,14 @@ public class ChipInteraction : Interactable
 
     public void DeleteChip(Chip chip)
     {
-        if (onDeleteChip != null)
-        {
-            onDeleteChip.Invoke(chip);
-        }
+        onDeleteChip?.Invoke(chip);
         allChips.Remove(chip);
+
         foreach (Pin pin in chip.inputPins)
-        {
             visiblePins.Remove(pin);
-        }
         foreach (Pin pin in chip.outputPins)
-        {
             visiblePins.Remove(pin);
-        }
+
         Destroy(chip.gameObject);
     }
 

@@ -103,17 +103,13 @@ public static class ChipSaver
 
         // Write to file
         string savePath = SaveSystem.GetPathToSaveFile(chipEditor.Data.name);
-        using (StreamWriter writer = new StreamWriter(savePath))
-        {
-            writer.Write(saveString);
-        }
+        SaveSystem.WriteFile(savePath, saveString);
+
 
         string wireLayoutSavePath =
             SaveSystem.GetPathToWireSaveFile(chipEditor.Data.name);
-        using (StreamWriter writer = new StreamWriter(wireLayoutSavePath))
-        {
-            writer.Write(wiringSaveString);
-        }
+        SaveSystem.WriteFile(wireLayoutSavePath, wiringSaveString);
+
 
         // Update parent chips using this chip
         string currentChipName = chipEditor.Data.name;
@@ -149,14 +145,7 @@ public static class ChipSaver
                 }
 
                 // Write to file
-                string parentSaveString =
-                    JsonUtility.ToJson(savedChips[i], usePrettyPrint);
-                string parentSavePath =
-                    SaveSystem.GetPathToSaveFile(savedChips[i].Data.name);
-                using (StreamWriter writer = new StreamWriter(parentSavePath))
-                {
-                    writer.Write(parentSaveString);
-                }
+                SaveSystem.WriteChip(savedChips[i].Data.name, JsonUtility.ToJson(savedChips[i], usePrettyPrint));
             }
         }
     }
@@ -164,8 +153,8 @@ public static class ChipSaver
     internal static void ChangeFolder(string Chipname, int FolderIndex)
     {
 
-        var ChipToEdit= SaveSystem.GetAllSavedChipsDic()[Chipname];
-        if (ChipToEdit.Data.FolderIndex == FolderIndex)   return;
+        var ChipToEdit = SaveSystem.GetAllSavedChipsDic()[Chipname];
+        if (ChipToEdit.Data.FolderIndex == FolderIndex) return;
         ChipToEdit.Data.FolderIndex = FolderIndex;
         SaveSystem.WriteChip(Chipname, JsonUtility.ToJson(ChipToEdit, usePrettyPrint));
     }
