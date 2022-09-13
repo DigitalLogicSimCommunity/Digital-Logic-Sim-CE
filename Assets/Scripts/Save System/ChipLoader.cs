@@ -103,6 +103,8 @@ public static class ChipLoader
         loadedChipData.componentChips = new Chip[numComponents];
         loadedChipData.Data = chipToLoad.Data;
 
+        List<Chip> TempLoaded = new List<Chip>();
+
         // Spawn component chips (the chips used to create this chip)
         // These will have been loaded already, and stored in the
         // previouslyLoadedChips dictionary
@@ -110,18 +112,22 @@ public static class ChipLoader
         {
             SavedComponentChip componentToLoad = chipToLoad.savedComponentChips[i];
             string componentName = componentToLoad.chipName;
-            Vector2 pos =
-                new Vector2((float)componentToLoad.posX, (float)componentToLoad.posY);
+            Vector2 pos = new Vector2((float)componentToLoad.posX, (float)componentToLoad.posY);
 
             if (!previouslyLoadedChips.ContainsKey(componentName))
             {
                 DLSLogger.LogError("Failed to load sub component: " + componentName +
                                    " While loading " + chipToLoad.Data.name);
+                foreach (var loadedItem in TempLoaded)
+                    MonoBehaviour.Destroy(loadedItem.gameObject);
+                TempLoaded.Clear();
+
                 return null;
             }
 
             Chip loadedComponentChip = GameObject.Instantiate(
                 previouslyLoadedChips[componentName], pos, Quaternion.identity);
+            TempLoaded.Add(loadedComponentChip);
             loadedChipData.componentChips[i] = loadedComponentChip;
 
             // Load input pin names
@@ -300,12 +306,8 @@ public static class ChipLoader
         SavedChip chipToTryLoad;
         SavedChip[] savedChips = SaveSystem.GetAllSavedChips();
 
-        using (StreamReader reader =
-                   new StreamReader(SaveSystem.GetPathToSaveFile(chip.name)))
-        {
-            string chipSaveString = reader.ReadToEnd();
-            chipToTryLoad = JsonUtility.FromJson<SavedChip>(chipSaveString);
-        }
+        string chipSaveString = SaveSystem.ReadFile(SaveSystem.GetPathToSaveFile(chip.name));
+        chipToTryLoad = JsonUtility.FromJson<SavedChip>(chipSaveString);
 
         if (chipToTryLoad == null)
             return null;
