@@ -10,11 +10,13 @@ using System;
 
 public class SaveCompatibility : MonoBehaviour
 {
-    private const bool WriteEnable = true;
+    private const bool WRITEENABLE = true;
 
     private static bool DirtyBit = false;
 
     private static bool FolderDirtyBit = false;
+
+    public delegate void CompDelegate(ref JObject SaveFile);
 
 
     public struct ChipDataComp
@@ -56,12 +58,11 @@ public class SaveCompatibility : MonoBehaviour
         var lol = JsonConvert.DeserializeObject(chipSaveString) as JObject;
 
         if (!chipSaveString.Contains("wireType") || chipSaveString.Contains("outputPinNames") || !chipSaveString.Contains("outputPins"))
-            From025to037(ref lol);
+            CheckedCompatibility(From025to037, ref lol, "25", "37");
         if (!chipSaveString.Contains("Data") || !chipSaveString.Contains("ChipDependecies"))
-            From037to038(ref lol);
+            CheckedCompatibility(From037to038, ref lol, "37", "38");
         if (chipSaveString.Contains("folderName") || !chipSaveString.Contains("FolderIndex"))
-            From038to039(ref lol);
-
+            CheckedCompatibility(From038to039, ref lol, "38", "39");
 
         if (DirtyBit)
         {
@@ -70,9 +71,32 @@ public class SaveCompatibility : MonoBehaviour
         }
     }
 
+    private static void CheckedCompatibility(CompDelegate CompDel, ref JObject lol, string vfrom, string Vto)
+    {
+        try
+        {
+            CompDel(ref lol);
+        }
+        catch
+        {
+            string name = "";
+            var Name = lol.Property("name");
+
+            if (Name != null)
+                name = Name.Value.ToString();
+            else
+            {
+                var DataName = (lol.Property("Data").Value as JObject).Property("name");
+                if (DataName != null)
+                    name = DataName.Value.ToString();
+            }
+            DLSLogger.LogError($" failed to ensure compatibility of {name}", $"{vfrom} to {Vto} ");
+        }
+    }
+
     private static void WriteFile(string Chipname, string ChipContent)
     {
-        if (!DirtyBit || !WriteEnable) return;
+        if (!DirtyBit || !WRITEENABLE) return;
         SaveSystem.WriteChip(Chipname, ChipContent);
         DirtyBit = false;
     }
@@ -80,9 +104,9 @@ public class SaveCompatibility : MonoBehaviour
     private static void From025to037(ref JObject lol)
     {
         var savedComponentChips = lol.Property("savedComponentChips").Value as JArray;
-        for (int i = 0; i < savedComponentChips.Count; i++)
+        foreach (JToken SavedCompChip in savedComponentChips)
         {
-            var CurrentComponent = savedComponentChips[i] as JObject;
+            var CurrentComponent = SavedCompChip as JObject;
             List<OutputPin> newOutputPins = new List<OutputPin>();
             List<InputPin> newinputPins = new List<InputPin>();
 
@@ -166,24 +190,31 @@ public class SaveCompatibility : MonoBehaviour
     public static void From038to039(ref JObject lol)
     {
         var OldData = lol.Property("Data").Value as JObject;
+
         var Colour = JsonConvert.DeserializeObject<JObject>(OldData.Property("Colour").Value.ToString());
         var NameColour = JsonConvert.DeserializeObject<JObject>(OldData.Property("NameColour").Value.ToString());
+        int folder = OldData.Property("folderName") == null ? -1 : FolderSystem.ReverseIndex(OldData.Property("folderName").Value.ToString());
+        float scale = OldData.Property("scale") == null ? 1 : OldData.Property("scale").Value.ToObject<float>();
+
         var NewChipData = new ChipData()
         {
-        name = OldData.Property("name").Value.ToString(),
-        creationIndex = OldData.Property("creationIndex").Value.ToObject<int>(),
-        Colour = Colour.ToObject<Color>(),
-        NameColour = NameColour.ToObject<Color>(),
-        FolderIndex = FolderSystem.ReverseIndex(OldData.Property("folderName").Value.ToString()),
-        scale = OldData.Property("scale").Value.ToObject<float>()
-    };
+            name = OldData.Property("name").Value.ToString(),
+            creationIndex = OldData.Property("creationIndex").Value.ToObject<int>(),
+            Colour = Colour.ToObject<Color>(),
+            NameColour = NameColour.ToObject<Color>(),
+            FolderIndex = folder,
+            scale = scale
+        };
 
 
-    lol.Property("Data").Value = JObject.FromObject(NewChipData, ColorConverter.GenerateSerializerConverter());
 
-    DirtyBit = true;
+
+        lol.Property("Data").Value = JObject.FromObject(NewChipData, ColorConverter.GenerateSerializerConverter());
+
+        DirtyBit = true;
 
     }
+
     #endregion
 
     #region FolderFile
@@ -205,7 +236,7 @@ public class SaveCompatibility : MonoBehaviour
 
     private static void WriteFileFolder(string FoldersJsonStr)
     {
-        if (!FolderDirtyBit && !WriteEnable) return;
+        if (!FolderDirtyBit && !WRITEENABLE) return;
         SaveSystem.WriteFoldersFile(FoldersJsonStr);
         DirtyBit = false;
     }
