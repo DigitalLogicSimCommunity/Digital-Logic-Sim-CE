@@ -19,12 +19,6 @@ public class ClockMenu : MonoBehaviour
 
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
     public void FinishedEdit(string str)
     {
         var HzStr = Regex.Match(str, @"^\d+([\.,]\d+)?").Value;

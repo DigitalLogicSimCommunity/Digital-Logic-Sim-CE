@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
@@ -12,7 +14,7 @@ public enum MenuType
     NewFolderMenu = 3,
     SubmitMenu = 4,
     ClockMenu = 5,
-    RenameFolderMenu = 6,
+    EditFolderMenu = 6,
 };
 
 public class UIManager : MonoBehaviour
@@ -22,25 +24,35 @@ public class UIManager : MonoBehaviour
     [Header("References")]
     public GameObject createButton;
     public GameObject updateButton ;
-    public List<UIMenu> menus;
     public GameObject outsideMenuArea;
+
+    public MenuDictionary Menus;
 
     public Palette palette;
     public bool IsAnyMenuOpen => OpenedMenu != null;
-    UIMenu OpenedMenu;
     MenuType currentMenuType = MenuType.None;
+    
+    UIMenu OpenedMenu;
+
+    ClockMenu ClockMenu;
+    EditChipMenu editChipMenu;
+
     void Awake()
     {
         instance = this;
-        foreach (UIMenu menu in menus)
-            menu.Close();
+        foreach (var menu in Menus)
+            menu.Value.Close();
         outsideMenuArea.SetActive(false);
+
+        ClockMenu = FindObjectOfType<ClockMenu>(true);
+        editChipMenu = FindObjectOfType<EditChipMenu>(true);
+
     }
 
     public static void NewSubmitMenu(string header, string text,
                                      UnityAction onSubmit)
     {
-        SubmitMenu submitMenu = instance.GetMenuByType(MenuType.SubmitMenu).GetComponent<SubmitMenu>();
+        SubmitMenu submitMenu = instance.Menus[MenuType.SubmitMenu].GetComponent<SubmitMenu>();
         submitMenu.SetHeaderText(header);
         submitMenu.SetContentText(text);
         submitMenu.SetOnSubmitAction(onSubmit);
@@ -49,10 +61,10 @@ public class UIManager : MonoBehaviour
 
     public static Palette Palette => instance.palette;
 
-    public void OpenMenu(int index) => OpenMenu((MenuType)index);
+    public void OpenCreateChipMenu() => OpenMenu(MenuType.CreateChipMenu);
     public void OpenMenu(MenuType menuType)
     {
-        UIMenu newMenu = GetMenuByType(menuType);
+        UIMenu newMenu = Menus[menuType];
         if (OpenedMenu && OpenedMenu != newMenu)
             CloseMenu();
         SetCurrentMenuState(newMenu, menuType);
@@ -60,21 +72,11 @@ public class UIManager : MonoBehaviour
         if (OpenedMenu.showBG)
             outsideMenuArea.SetActive(true);
 
-
         SetMenuPosition();
         OpenedMenu.Open();
 
-        FindObjectOfType<ChipInteraction>(true).gameObject.SetActive(false);
-        FindObjectOfType<PinAndWireInteraction>(true).gameObject.SetActive(false);
+        SetActiveInteraction(false);
     }
-
-    private void SetCurrentMenuState(UIMenu newMenu, MenuType menuType)
-    {
-        OpenedMenu = newMenu;
-        currentMenuType = menuType;
-    }
-
-
     public void CloseMenu()
     {
         if (OpenedMenu)
@@ -83,8 +85,13 @@ public class UIManager : MonoBehaviour
             SetCurrentMenuState(null, MenuType.None);
         }
         outsideMenuArea.SetActive(false);
-        FindObjectOfType<ChipInteraction>(true).gameObject.SetActive(true);
-        FindObjectOfType<PinAndWireInteraction>(true).gameObject.SetActive(true);
+        SetActiveInteraction(true);
+    }
+
+    private void SetActiveInteraction(bool IsActive)
+    {
+        FindObjectOfType<ChipInteraction>(true).gameObject.SetActive(IsActive);
+        FindObjectOfType<PinAndWireInteraction>(true).gameObject.SetActive(IsActive);
     }
 
     public void SetEditorMode(ChipEditorMode newMode)
@@ -92,17 +99,17 @@ public class UIManager : MonoBehaviour
         createButton.SetActive(newMode == ChipEditorMode.Create);
         updateButton.SetActive(newMode == ChipEditorMode.Update);
     }
-
+    private void SetCurrentMenuState(UIMenu newMenu, MenuType menuType)
+    {
+        OpenedMenu = newMenu;
+        currentMenuType = menuType;
+    }
     void SetMenuPosition()
     {
         if (currentMenuType == MenuType.EditChipMenu)
-        {
             SetChipEditMenuPosition();
-        }
         if (currentMenuType == MenuType.ClockMenu)
-        {
             SetClockMenuPosition();
-        }
     }
 
     void SetChipEditMenuPosition()
@@ -113,7 +120,7 @@ public class UIManager : MonoBehaviour
             ButtonText buttonText = obj.GetComponent<ButtonText>();
             if (buttonText != null)
             {
-                FindObjectOfType<EditChipMenu>().EditChipInit(buttonText.buttonText.text);
+                editChipMenu.EditChipInit(buttonText.buttonText.text);
                 OpenedMenu.transform.position = new Vector3(obj.transform.position.x, OpenedMenu.transform.position.y, OpenedMenu.transform.position.z);
                 RectTransform rect = OpenedMenu.GetComponent<RectTransform>();
                 rect.anchoredPosition = new Vector2(Mathf.Clamp(rect.anchoredPosition.x, -800, 800), rect.anchoredPosition.y);
@@ -127,29 +134,15 @@ public class UIManager : MonoBehaviour
         var Clock = InputHelper.GetObjectUnderMouse2D(1 << LayerMask.NameToLayer("Chip")).GetComponent<Clock>();
         if (Clock != null)
         {
-            FindObjectOfType<ClockMenu>().SetClockToEdit(Clock);
-            OpenedMenu.transform.position = new Vector3(Clock.transform.position.x, Clock.transform.position.y, OpenedMenu.transform.position.z);
-            RectTransform rect = OpenedMenu.GetComponent<RectTransform>();
-            rect.anchoredPosition = new Vector2(Mathf.Clamp(rect.anchoredPosition.x, -800, 800), 350);
+            ClockMenu.SetClockToEdit(Clock);
+            OpenedMenu.transform.position = new Vector3(Clock.transform.position.x, Clock.transform.position.y-2, OpenedMenu.transform.position.z);
         }
     }
 
 
     public void OnClickOutsideMenu()
     {
-        if (OpenedMenu.onClickBG != null)
-        {
+        if (OpenedMenu != null && OpenedMenu.onClickBG != null)
             OpenedMenu.onClickBG.Invoke();
-        }
-    }
-
-    public UIMenu GetMenuByIndex(int index)
-    {
-        return index + 1 > menus.Count ? null : menus[index];
-    }
-
-    public UIMenu GetMenuByType(MenuType menuType)
-    {
-        return menus[(int)menuType];
     }
 }

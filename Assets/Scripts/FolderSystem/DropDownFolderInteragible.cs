@@ -21,7 +21,7 @@ public class DropDownFolderInteragible : MonoBehaviour
             string FolderName = name.Split(":")[1].Trim();
             if (FolderSystem.ReverseIndex(FolderName) > 2)
             {
-                UIManager.instance.OpenMenu(MenuType.RenameFolderMenu);
+                UIManager.instance.OpenMenu(MenuType.EditFolderMenu);
                 OnRightClick?.Invoke(FolderName);
             }
         }

@@ -30,7 +30,7 @@ public class CreateMenu : MonoBehaviour
 
     void Update()
     {
-        if (UIManager.instance.GetMenuByType(MenuType.CreateChipMenu).isActive)
+        if (UIManager.instance.Menus[MenuType.CreateChipMenu].isActive)
         {
             // Force name input field to remain focused
             if (!chipNameField.isFocused)

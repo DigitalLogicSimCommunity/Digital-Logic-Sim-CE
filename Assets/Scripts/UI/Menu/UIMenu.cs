@@ -20,4 +20,5 @@ public class UIMenu : MonoBehaviour
         isActive = false;
         gameObject.SetActive(isActive);
     }
+
 }
