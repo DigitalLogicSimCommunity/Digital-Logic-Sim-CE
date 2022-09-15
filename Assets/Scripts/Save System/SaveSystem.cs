@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
+using UnityEditor.PackageManager;
 
 public static class SaveSystem
 {
@@ -124,7 +125,6 @@ public static class SaveSystem
             return reader.ReadToEnd();
         }
     }
-
     public static void WriteFile(string path, string content)
     {
         using (StreamWriter writer = new StreamWriter(path))
@@ -133,14 +133,14 @@ public static class SaveSystem
         }
     }
 
-    public static void WriteChip(string chipName, string saveString)
-    {
-        WriteFile(GetPathToSaveFile(chipName), saveString);
-    }
-    public static void WriteFoldersFile(string FolderFileStr)
-    {
-        WriteFile(FoldersFilePath, FolderFileStr);
-    }
+
+    public static SavedChip ReadChip(string chipName) => JsonUtility.FromJson<SavedChip>(ReadFile(GetPathToSaveFile(chipName)));
+    public static SavedWireLayout ReadWire(string wireFile) => JsonUtility.FromJson<SavedWireLayout>(ReadFile(GetPathToWireSaveFile(wireFile)));
+
+
+    public static void WriteChip(string chipName, string saveString) => WriteFile(GetPathToSaveFile(chipName), saveString);
+    public static void WriteWire(string chipName, string saveContent) => WriteFile(GetPathToWireSaveFile(chipName), saveContent);
+    public static void WriteFoldersFile(string FolderFileStr) => WriteFile(FoldersFilePath, FolderFileStr);
 
 }
 

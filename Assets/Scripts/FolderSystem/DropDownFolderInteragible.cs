@@ -8,17 +8,10 @@ public class DropDownFolderInteragible : MonoBehaviour
 {
 
     public UnityEvent<string> OnRightClick;
-   
-    private void Start()
-    {
-        //gameObject.GetComponent<Toggle>().OnPointerClick(RightClickHandler);
-    }
 
     public void RightClickHandler()
     {
-
         FindObjectOfType<EditFolderMenu>().name = gameObject.name.Split(":")[1].Trim();
-
     }
 
     private void OnMouseOver()

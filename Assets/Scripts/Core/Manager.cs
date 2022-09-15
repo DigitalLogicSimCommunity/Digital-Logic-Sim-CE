@@ -108,8 +108,7 @@ public class Manager : MonoBehaviour
 
     public void ViewChip(Chip chip)
     {
-        ChipSaveData chipSaveData = ChipLoader.GetChipSaveData(
-            chip, builtinChips, SpawnableCustomChips, wirePrefab, activeChipEditor);
+        ChipSaveData chipSaveData = ChipLoader.GetChipSaveData(chip, wirePrefab, activeChipEditor);
         LoadNewEditor();
         chipEditorMode = ChipEditorMode.Update;
         UIManager.SetEditorMode(chipEditorMode);
@@ -137,7 +136,7 @@ public class Manager : MonoBehaviour
     }
     internal void RenameChip(string nameBeforeChanging, string nameAfterChanging)
     {
-        SpawnableCustomChips.Where(x => string.Equals(x.chipName, nameBeforeChanging)).First().chipName =nameAfterChanging;
+        SpawnableCustomChips.Where(x => string.Equals(x.chipName, nameBeforeChanging)).First().chipName = nameAfterChanging;
     }
     void SetupPseudoInput(Chip customChip)
     {
@@ -158,11 +157,7 @@ public class Manager : MonoBehaviour
 
 
 
-    public void ChangeFolderToChip(string ChipName, int index)
-    {
-        if (SpawnableCustomChips.Where(x => string.Equals(x.name, ChipName)).First() is CustomChip customChip)
-            customChip.FolderIndex = index;
-    }
+
     Chip PackageChip()
     {
         Chip customChip = GeneratePackageAndChip();
@@ -231,7 +226,7 @@ public class Manager : MonoBehaviour
 
         Simulation.instance.ResetSimulation();
         ScalingManager.scale = 1;
-        FindObjectOfType<ChipEditorOptions>().SetUIValues(activeChipEditor);
+        ChipEditorOptions.instance.SetUIValues(activeChipEditor);
     }
 
     public void ChipButtonHanderl(Chip chip)
@@ -265,13 +260,25 @@ public class Manager : MonoBehaviour
         if (custom)
             foreach (Chip chip in SpawnableCustomChips)
                 allChipNames.Add(chip.chipName);
-        
+
         return allChipNames;
     }
-
-    public void ChengeFolderToChip(string name, int index)
+    public Dictionary<string, Chip> AllSpawnableChipDic()
     {
-        ChangeFolderToChip(name, index);
-        ChipSaver.ChangeFolder(name, index);
+        Dictionary<string, Chip> allChipDic = new Dictionary<string, Chip>();
+
+        foreach (Chip chip in builtinChips)
+            allChipDic.Add(chip.chipName, chip);
+        foreach (Chip chip in SpawnableCustomChips)
+            allChipDic.Add(chip.chipName, chip);
+        return allChipDic;
     }
+
+    public void ChangeFolderToChip(string ChipName, int index)
+    {
+        if (SpawnableCustomChips.Where(x => string.Equals(x.name, ChipName)).First() is CustomChip customChip)
+            customChip.FolderIndex = index;
+        ChipSaver.ChangeFolder(ChipName, index);
+    }
+
 }

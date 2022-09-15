@@ -30,13 +30,10 @@ public class SavedChip
                                 .ToArray();
 
         // Create serializable chips
-        savedComponentChips =
-            new SavedComponentChip[chipSaveData.componentChips.Length];
+        savedComponentChips = new SavedComponentChip[chipSaveData.componentChips.Length];
+
         for (int i = 0; i < chipSaveData.componentChips.Length; i++)
-        {
-            savedComponentChips[i] = new SavedComponentChip(
-                chipSaveData, chipSaveData.componentChips[i]);
-        }
+            savedComponentChips[i] = new SavedComponentChip(chipSaveData, chipSaveData.componentChips[i]);
     }
 
     public void ValidateDefaultData()

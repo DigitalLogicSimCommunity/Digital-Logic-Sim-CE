@@ -5,7 +5,7 @@ using UnityEngine;
 public class ChipPackage : MonoBehaviour
 {
 
-    public enum ChipType { Combapibility, Gate, Miscellaneous, Custom};
+    public enum ChipType { Combapibility, Gate, Miscellaneous, Custom };
 
     public ChipType chipType;
     public TMPro.TextMeshPro nameText;
@@ -44,17 +44,12 @@ public class ChipPackage : MonoBehaviour
         // Set input signals
         chip.inputSignals = new InputSignal[chipEditor.inputsEditor.signals.Count];
         for (int i = 0; i < chip.inputSignals.Length; i++)
-        {
             chip.inputSignals[i] = (InputSignal)chipEditor.inputsEditor.signals[i];
-        }
 
         // Set output signals
-        chip.outputSignals =
-            new OutputSignal[chipEditor.outputsEditor.signals.Count];
+        chip.outputSignals = new OutputSignal[chipEditor.outputsEditor.signals.Count];
         for (int i = 0; i < chip.outputSignals.Length; i++)
-        {
             chip.outputSignals[i] = (OutputSignal)chipEditor.outputsEditor.signals[i];
-        }
 
         // Create pins and set set package size
         SpawnPins(chip);
@@ -64,7 +59,7 @@ public class ChipPackage : MonoBehaviour
         Transform implementationHolder = chipEditor.chipImplementationHolder;
 
         implementationHolder.parent = transform;
-        implementationHolder.localPosition = Vector3.zero;
+        //implementationHolder.localPosition = Vector3.zero;
         implementationHolder.gameObject.SetActive(false);
     }
 

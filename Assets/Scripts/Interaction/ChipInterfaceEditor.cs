@@ -13,7 +13,7 @@ public class ChipInterfaceEditor : Interactable
     public event System.Action OnChipsAddedOrDeleted;
 
     public enum EditorType { Input, Output }
-    public enum HandleState { Default, Highlighted, Selected }
+    public enum HandleState { Default, Highlighted, Selected, SelectedAndFocused }
     const float forwardDepth = -0.1f;
 
     public List<ChipSignal> signals { get; private set; }
@@ -34,6 +34,7 @@ public class ChipInterfaceEditor : Interactable
     public Color handleCol;
     public Color highlightedHandleCol;
     public Color selectedHandleCol;
+    public Color selectedAndFocusedHandleCol;
 
     public bool showPreviewSignal;
 
@@ -58,6 +59,7 @@ public class ChipInterfaceEditor : Interactable
     Material handleMat;
     Material highlightedHandleMat;
     Material selectedHandleMat;
+    Material selectedAndhighlightedHandle;
     bool mouseInInputBounds;
 
     // Dragging
@@ -84,6 +86,7 @@ public class ChipInterfaceEditor : Interactable
         handleMat = MaterialUtility.CreateUnlitMaterial(handleCol);
         highlightedHandleMat = MaterialUtility.CreateUnlitMaterial(highlightedHandleCol);
         selectedHandleMat = MaterialUtility.CreateUnlitMaterial(selectedHandleCol);
+        selectedAndhighlightedHandle = MaterialUtility.CreateUnlitMaterial(selectedAndFocusedHandleCol);
 
         previewSignals = new ChipSignal[maxGroupSize];
         for (int i = 0; i < maxGroupSize; i++)
@@ -155,7 +158,6 @@ public class ChipInterfaceEditor : Interactable
     {
         if (!InputHelper.MouseOverUIObject())
         {
-            UpdateColours();
             HandleInput();
         }
         else if (HasFocus)
@@ -172,16 +174,18 @@ public class ChipInterfaceEditor : Interactable
     public void LoadSignal(InputSignal signal)
     {
         signal.transform.parent = signalHolder;
-        signal.signalName = signal.outputPins[0].pinName;
         signals.Add(signal);
+
+        signal.signalName = signal.outputPins[0].pinName;
         visiblePins.Add(signal.outputPins[0]);
     }
 
     public void LoadSignal(OutputSignal signal)
     {
         signal.transform.parent = signalHolder;
-        signal.signalName = signal.inputPins[0].pinName;
         signals.Add(signal);
+
+        signal.signalName = signal.inputPins[0].pinName;
         visiblePins.Add(signal.inputPins[0]);
     }
 
@@ -419,10 +423,11 @@ public class ChipInterfaceEditor : Interactable
         foreach (ChipSignal singnal in signals)
         {
             HandleState handleState = HandleState.Default;
-            if (singnal == highlightedSignal)
-                handleState = HandleState.Highlighted;
+
             if (selectedSignals.Contains(singnal))
-                handleState = HandleState.Selected;
+                handleState = HasFocus ? HandleState.SelectedAndFocused : HandleState.Selected;
+            else if(singnal == highlightedSignal)
+                handleState = HandleState.Highlighted;
 
             DrawHandle(singnal.transform.position.y, handleState);
         }
@@ -520,6 +525,10 @@ public class ChipInterfaceEditor : Interactable
                 currentHandleMat = selectedHandleMat;
                 renderZ = forwardDepth * 2;
                 break;
+            case HandleState.SelectedAndFocused:
+                currentHandleMat = selectedAndhighlightedHandle;
+                renderZ = forwardDepth * 2;
+                break;
             default:
                 currentHandleMat = handleMat;
                 break;
@@ -532,11 +541,12 @@ public class ChipInterfaceEditor : Interactable
     }
 
 
-    void UpdateColours()
+    public void UpdateColours()
     {
         handleMat.color = handleCol;
         highlightedHandleMat.color = highlightedHandleCol;
         selectedHandleMat.color = selectedHandleCol;
+        selectedAndhighlightedHandle.color = selectedAndFocusedHandleCol;
     }
 
     public void UpdateScale()
@@ -575,8 +585,8 @@ public class ChipInterfaceEditor : Interactable
 
     public override void DeleteComand()
     {
-        if(!Input.GetKeyDown(KeyCode.Backspace))
-        DeleteSelected();
+        if (!Input.GetKeyDown(KeyCode.Backspace))
+            DeleteSelected();
     }
     private void DeleteSelected()
     {

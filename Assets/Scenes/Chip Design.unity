@@ -11967,7 +11967,6 @@ MonoBehaviour:
   deleteButton: {fileID: 1424067826}
   viewButton: {fileID: 1263799671}
   exportButton: {fileID: 1824830145}
-  chipBarUI: {fileID: 56665579}
   folderDropdown: {fileID: 1821210915}
 --- !u!1 &734147850
 GameObject:
@@ -16426,9 +16425,9 @@ Camera:
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
-    y: 0.03558886
+    y: 0.023502082
     width: 1
-    height: 0.9288223
+    height: 0.95299584
   near clip plane: 0.3
   far clip plane: 1500
   field of view: 60

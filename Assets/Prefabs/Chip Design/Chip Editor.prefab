@@ -1966,6 +1966,7 @@ MonoBehaviour:
   handleCol: {r: 0.22745098, g: 0.22745098, b: 0.22745098, a: 0}
   highlightedHandleCol: {r: 0.496, g: 0.496, b: 0.496, a: 0}
   selectedHandleCol: {r: 0.1982467, g: 0.3265027, b: 0.4245283, a: 1}
+  selectedAndFocusedHandleCol: {r: 0.8000001, g: 0.32156864, b: 0.29803923, a: 0}
   showPreviewSignal: 1
   visiblePins: []
 --- !u!61 &4750937598926047526
@@ -2306,6 +2307,7 @@ MonoBehaviour:
   handleCol: {r: 0.22745098, g: 0.22745098, b: 0.22745098, a: 0}
   highlightedHandleCol: {r: 0.496, g: 0.496, b: 0.496, a: 0}
   selectedHandleCol: {r: 0.1982467, g: 0.3265027, b: 0.4245283, a: 1}
+  selectedAndFocusedHandleCol: {r: 0.8000001, g: 0.32156864, b: 0.29803923, a: 0}
   showPreviewSignal: 1
   visiblePins: []
 --- !u!114 &2647783974511930239

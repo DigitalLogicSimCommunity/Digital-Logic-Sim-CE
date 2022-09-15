@@ -79,9 +79,6 @@ public class FolderSystem
     }
 
 
-
-
-
     public static bool CompareValue(int index, string value) => Inizialized && ContainsIndex(index) && string.Equals(Folders[index], value);
 
     public static void RenameFolder(string OldFolderName, string NewFolderName)

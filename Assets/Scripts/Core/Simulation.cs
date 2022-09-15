@@ -104,16 +104,12 @@ public class Simulation : MonoBehaviour
         RefreshChipEditorReference();
 
         var allWires = chipEditor.pinAndWireInteraction.allWires;
-        for (int i = 0; i < allWires.Count; i++)
-        {
-            // Tell all wires the simulation is inactive makes them all inactive (gray
-            // colored)
-            allWires[i].tellWireSimIsOff();
-        }
+        // Tell all wires the simulation is inactive makes them all inactive (gray
+        // colored)
+        foreach (Wire wire in allWires)
+            wire.tellWireSimIsOff();
         foreach (Pin pin in chipEditor.pinAndWireInteraction.AllVisiblePins())
-        {
             pin.tellPinSimIsOff();
-        }
 
         // If sim is not active all output signals are set with a temporal value of
         // 0 (group signed/unsigned displayed value) and get gray colored (turned
@@ -126,33 +122,27 @@ public class Simulation : MonoBehaviour
         StepSimulation();
 
         foreach (Pin pin in chipEditor.pinAndWireInteraction.AllVisiblePins())
-        {
             pin.tellPinSimIsOn();
-        }
 
         var allWires = chipEditor.pinAndWireInteraction.allWires;
-        for (int i = 0; i < allWires.Count; i++)
-        {
-            // Tell all wires the simulation is active makes them all active (dynamic
-            // colored based on the circuits logic)
-            allWires[i].tellWireSimIsOn();
-        }
+
+        // Tell all wires the simulation is active makes them all active (dynamic
+        // colored based on the circuits logic)
+        foreach (Wire wire in allWires)
+            wire.tellWireSimIsOn();
     }
 
     private void InitChips()
     {
         var allChips = chipEditor.chipInteraction.allChips;
-        for (int i = 0; i < allChips.Count; i++)
-        {
-            allChips[i].InitSimulationFrame();
-        }
+
+        foreach (Chip chip in allChips)
+            chip.InitSimulationFrame();
     }
 
     void RefreshChipEditorReference()
     {
         if (chipEditor == null)
-        {
             chipEditor = Manager.ActiveChipEditor;
-        }
     }
 }

@@ -94,21 +94,14 @@ public static class ChipSaver
         ChipSaveData chipSaveData = new ChipSaveData(chipEditor);
 
         // Generate new chip save string
-        var compositeChip = new SavedChip(chipSaveData);
-        string saveString = JsonUtility.ToJson(compositeChip, usePrettyPrint);
+        string saveString = JsonUtility.ToJson(new SavedChip(chipSaveData), usePrettyPrint);
 
         // Generate save string for wire layout
-        var wiringSystem = new SavedWireLayout(chipSaveData);
-        string wiringSaveString = JsonUtility.ToJson(wiringSystem, usePrettyPrint);
+        string wiringSaveString = JsonUtility.ToJson(new SavedWireLayout(chipSaveData), usePrettyPrint);
 
         // Write to file
-        string savePath = SaveSystem.GetPathToSaveFile(chipEditor.Data.name);
-        SaveSystem.WriteFile(savePath, saveString);
-
-
-        string wireLayoutSavePath =
-            SaveSystem.GetPathToWireSaveFile(chipEditor.Data.name);
-        SaveSystem.WriteFile(wireLayoutSavePath, wiringSaveString);
+        SaveSystem.WriteChip(chipEditor.Data.name, saveString);
+        SaveSystem.WriteWire(chipEditor.Data.name, wiringSaveString);
 
 
         // Update parent chips using this chip
@@ -121,8 +114,7 @@ public static class ChipSaver
                 int currentChipIndex =
                     Array.FindIndex(savedChips[i].savedComponentChips,
                                     c => c.chipName == currentChipName);
-                SavedComponentChip updatedComponentChip =
-                    new SavedComponentChip(chipSaveData, chip);
+                SavedComponentChip updatedComponentChip = new SavedComponentChip(chipSaveData, chip);
                 SavedComponentChip oldComponentChip =
                     savedChips[i].savedComponentChips[currentChipIndex];
 
@@ -136,8 +128,10 @@ public static class ChipSaver
                         {
                             updatedComponentChip.inputPins[j].parentChipIndex =
                                 oldComponentChip.inputPins[k].parentChipIndex;
+
                             updatedComponentChip.inputPins[j].parentChipOutputIndex =
                                 oldComponentChip.inputPins[k].parentChipOutputIndex;
+
                             updatedComponentChip.inputPins[j].isCylic =
                                 oldComponentChip.inputPins[k].isCylic;
                         }
@@ -168,8 +162,8 @@ public static class ChipSaver
             return false;
 
         SavedChip[] savedChips = SaveSystem.GetAllSavedChips();
-        for (int i = 0; i < savedChips.Length; i++)
-            if (savedChips[i].ChipDependecies.Contains(chipName))
+        foreach (SavedChip savedChip in savedChips)
+            if (savedChip.ChipDependecies.Contains(chipName))
                 return false;
         return true;
     }
@@ -190,17 +184,13 @@ public static class ChipSaver
                     currentChip.outputPins, name => name.name == signalName);
 
                 if (Array.Find(currentChip.inputPins,
-                               pin => pin.name == signalName &&
-                                      pin.parentChipIndex >= 0) != null)
+                               pin => pin.name == signalName && pin.parentChipIndex >= 0) != null)
                 {
                     return false;
                 }
                 else if (currentSignalIndex >= 0 &&
-                         parentChip.savedComponentChips.Any(
-                             scc => scc.inputPins.Any(
-                                 pin => pin.parentChipIndex == currentChipIndex &&
-                                        pin.parentChipOutputIndex ==
-                                            currentSignalIndex)))
+                         parentChip.savedComponentChips.Any(scc => scc.inputPins.Any(pin => pin.parentChipIndex == currentChipIndex
+                             && pin.parentChipOutputIndex == currentSignalIndex)))
                 {
                     return false;
                 }

@@ -7,7 +7,6 @@ public static class FolderLoader
 
     public static Dictionary<int, string> LoadCustomFolders(string path)
     {
-
         if (File.Exists(path))
         {
             string FoldersJson = SaveSystem.ReadFile(path);

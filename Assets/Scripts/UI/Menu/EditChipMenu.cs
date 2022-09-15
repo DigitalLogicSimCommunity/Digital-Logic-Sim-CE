@@ -12,7 +12,6 @@ public class EditChipMenu : MonoBehaviour
     public Button deleteButton;
     public Button viewButton;
     public Button exportButton;
-    public ChipBarUI chipBarUI;
     public TMP_Dropdown folderDropdown;
     private Chip currentChip;
 
@@ -140,8 +139,8 @@ public class EditChipMenu : MonoBehaviour
             var index = FolderSystem.ReverseIndex(CurrentFolderText);
             if (index != customChip.FolderIndex)
             {
-                Manager.instance.ChengeFolderToChip(customChip.name, index);
-                chipBarUI.ReloadChipButton();
+                Manager.instance.ChangeFolderToChip(customChip.name, index);
+                ReloadChipBar();
             }
         }
         currentChip = null;
