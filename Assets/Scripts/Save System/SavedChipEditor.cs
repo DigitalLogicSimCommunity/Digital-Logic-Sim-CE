@@ -38,12 +38,11 @@ public class SavedChipEditor : MonoBehaviour {
 			FindObjectOfType<PinAndWireInteraction> ().LoadWire (loadedWire);
 			//player.AddWire (loadedWire);
 
-			if (childPin.chip is Bus) {
+			if (childPin.chip is Bus) 
 				childPin.transform.position = savedWire.anchorPoints[savedWire.anchorPoints.Length - 1];
-			}
-			if (parentPin.chip is Bus) {
+
+			if (parentPin.chip is Bus) 
 				parentPin.transform.position = savedWire.anchorPoints[0];
-			}
 			wireIndex++;
 		}
 

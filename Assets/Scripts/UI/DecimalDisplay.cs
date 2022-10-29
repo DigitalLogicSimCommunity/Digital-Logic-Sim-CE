@@ -26,10 +26,8 @@ public class DecimalDisplay : MonoBehaviour
 
     void UpdateDisplay()
     {
-        for (int i = 0; i < displayGroups.Count; i++)
-        {
-            displayGroups[i].UpdateDisplay(signalEditor);
-        }
+        foreach (SignalGroup signalGroup in displayGroups)
+            signalGroup.UpdateDisplay(signalEditor);
     }
 
     void RebuildGroups()

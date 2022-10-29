@@ -202,7 +202,7 @@ public static class ChipLoader
         return loadedChipData;
     }
 
-    static ChipSaveData LoadChipWithWires(SavedChip chipToLoad,Wire wirePrefab, ChipEditor chipEditor)
+    static ChipSaveData LoadChipWithWires(SavedChip chipToLoad, Wire wirePrefab, ChipEditor chipEditor)
     {
         var previouslyLoadedChips = Manager.instance.AllSpawnableChipDic();
         ChipSaveData loadedChipData = new ChipSaveData();
@@ -294,13 +294,20 @@ public static class ChipLoader
         //     * the wire connections are done inside ChipEditor.LoadFromSaveData
         //     instead of ChipLoader.LoadChipWithWires
 
-        SavedChip chipToTryLoad = SaveSystem.ReadChip(chip.name);
+        SavedChip chipToTryLoad = SaveSystem.ReadChip(chip.chipName);
 
         if (chipToTryLoad == null)
             return null;
 
         ChipSaveData loadedChipData = LoadChipWithWires(chipToTryLoad, wirePrefab, chipEditor);
         SavedWireLayout wireLayout = SaveSystem.ReadWire(loadedChipData.Data.name);
+
+        //Work Around solution. it just Work but maybe is worth to change the entire way to save WireLayout (idk i don't think so)
+        for (int i = 0; i < loadedChipData.wires.Length; i++)
+        {
+            Wire wire = loadedChipData.wires[i];
+            wire.endPin.pinName = wire.endPin.pinName+i;
+        }    
 
         // Set wires anchor points
         foreach (SavedWire wire in wireLayout.serializableWires)
@@ -329,15 +336,9 @@ public static class ChipLoader
                                  .outputPins[wire.childChipInputIndex]
                                  .pinName;
             }
-            //
-
-            int wireIndex = Array.FindIndex(loadedChipData.wires,
-                                            w => w.startPin.pinName == startPinName &&
-                                                 w.endPin.pinName == endPinName);
+            int wireIndex = Array.FindIndex(loadedChipData.wires, w => w.startPin.pinName == startPinName && w.endPin.pinName == endPinName);
             if (wireIndex >= 0)
-            {
                 loadedChipData.wires[wireIndex].SetAnchorPoints(wire.anchorPoints);
-            }
         }
 
         return loadedChipData;

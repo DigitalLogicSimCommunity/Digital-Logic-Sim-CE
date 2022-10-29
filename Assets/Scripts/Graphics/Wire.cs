@@ -197,8 +197,7 @@ public class Wire : MonoBehaviour
         mat.color = editCol;
     }
 
-    public void ConnectToFirstPinViaWire(Pin startPin, Wire parentWire,
-                                         Vector2 inputPoint)
+    public void ConnectToFirstPinViaWire(Pin startPin, Wire parentWire, Vector2 inputPoint)
     {
         lineRenderer = GetComponent<LineRenderer>();
         mat = simpleMat;
@@ -255,14 +254,10 @@ public class Wire : MonoBehaviour
         UpdateCollider();
 
         if (endPin.pinType == Pin.PinType.ChipOutput)
-        {
             SwapStartEndPoints();
-        }
 
         if (Simulation.instance.active)
-        {
             tellWireSimIsOn();
-        }
     }
 
     void SwapStartEndPoints()
@@ -312,9 +307,8 @@ public class Wire : MonoBehaviour
             lineRenderer.SetPosition(i, new Vector3(localPos.x, localPos.y, -0.01f));
 
             if (i > 0)
-            {
                 length += (lastLocalPos - localPos).magnitude;
-            }
+
             lastLocalPos = localPos;
         }
     }
@@ -349,35 +343,39 @@ public class Wire : MonoBehaviour
 
         for (int i = 1; i < anchorPoints.Count - 1; i++)
         {
-            Vector2 targetPoint = anchorPoints[i];
-            Vector2 targetDir = (anchorPoints[i] - anchorPoints[i - 1]).normalized;
-            float dstToTarget = (anchorPoints[i] - anchorPoints[i - 1]).magnitude;
-            float dstToCurveStart =
-                Mathf.Max(dstToTarget - curveSize, dstToTarget / 2);
+            Vector2 StartPoint = anchorPoints[i - 1];
+            Vector2 TargetPoint = anchorPoints[i];
+            Vector2 NextPoint = anchorPoints[i + 1];
 
-            Vector2 nextTarget = anchorPoints[i + 1];
-            Vector2 nextTargetDir =
-                (anchorPoints[i + 1] - anchorPoints[i]).normalized;
-            float nextLineLength = (anchorPoints[i + 1] - anchorPoints[i]).magnitude;
+            //calculate Start Curve point
+            Vector2 StartToTarget = TargetPoint - StartPoint;
+            Vector2 targetDir = StartToTarget.normalized;
+            float dstToTarget = StartToTarget.magnitude;
 
-            Vector2 curveStartPoint =
-                anchorPoints[i - 1] + targetDir * dstToCurveStart;
-            Vector2 curveEndPoint =
-                targetPoint +
-                nextTargetDir * Mathf.Min(curveSize, nextLineLength / 2);
+            float dstToCurveStart = Mathf.Max(dstToTarget - curveSize, dstToTarget / 2);
 
-            // Bezier
+            Vector2 curveStartPoint = StartPoint + targetDir * dstToCurveStart;
+
+
+            //calulate end Curve point
+            Vector2 TargetToNext = NextPoint - TargetPoint;
+            Vector2 nextTargetDir = TargetToNext.normalized;
+            float dstToNext = TargetToNext.magnitude;
+
+            float dstToCurveEnd = Mathf.Min(curveSize, dstToNext / 2);
+
+            Vector2 curveEndPoint = TargetPoint + nextTargetDir * dstToCurveEnd;
+
+            // Bezier curve
             for (int j = 0; j < resolution; j++)
             {
                 float t = j / (resolution - 1f);
-                Vector2 a = Vector2.Lerp(curveStartPoint, targetPoint, t);
-                Vector2 b = Vector2.Lerp(targetPoint, curveEndPoint, t);
+                Vector2 a = Vector2.Lerp(curveStartPoint, TargetPoint, t);
+                Vector2 b = Vector2.Lerp(TargetPoint, curveEndPoint, t);
                 Vector2 p = Vector2.Lerp(a, b, t);
 
                 if ((p - drawPoints[drawPoints.Count - 1]).sqrMagnitude > 0.001f)
-                {
                     drawPoints.Add(p);
-                }
             }
         }
         drawPoints.Add(anchorPoints[anchorPoints.Count - 1]);

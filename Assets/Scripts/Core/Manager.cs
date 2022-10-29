@@ -102,14 +102,14 @@ public class Manager : MonoBehaviour
         if (loadedChip is CustomChip custom)
             custom.ApplyWireModes();
 
-        LoadNewEditor();
+        ClearEditor();
         return loadedChip;
     }
 
     public void ViewChip(Chip chip)
     {
         ChipSaveData chipSaveData = ChipLoader.GetChipSaveData(chip, wirePrefab, activeChipEditor);
-        LoadNewEditor();
+        ClearEditor();
         chipEditorMode = ChipEditorMode.Update;
         UIManager.SetEditorMode(chipEditorMode);
         activeChipEditor.LoadFromSaveData(chipSaveData);
@@ -119,7 +119,7 @@ public class Manager : MonoBehaviour
     {
         ChipSaver.Save(activeChipEditor);
         PackageChip();
-        LoadNewEditor();
+        ClearEditor();
     }
 
     public void UpdateChip()
@@ -127,7 +127,7 @@ public class Manager : MonoBehaviour
         Chip updatedChip = TryPackageAndReplaceChip(activeChipEditor.Data.name);
         ChipSaver.Update(activeChipEditor, updatedChip);
         chipEditorMode = ChipEditorMode.Create;
-        LoadNewEditor();
+        ClearEditor();
     }
 
     internal void DeleteChip(string nameBeforeChanging)
@@ -206,10 +206,10 @@ public class Manager : MonoBehaviour
     {
         chipEditorMode = ChipEditorMode.Create;
         UIManager.SetEditorMode(chipEditorMode);
-        LoadNewEditor();
+        ClearEditor();
     }
 
-    void LoadNewEditor()
+    void ClearEditor()
     {
         if (activeChipEditor)
         {
@@ -242,7 +242,7 @@ public class Manager : MonoBehaviour
         if (chipEditorMode == ChipEditorMode.Update)
         {
             chipEditorMode = ChipEditorMode.Create;
-            LoadNewEditor();
+            ClearEditor();
         }
         else
         {

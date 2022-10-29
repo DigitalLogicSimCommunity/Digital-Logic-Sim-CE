@@ -28,9 +28,7 @@ public class PinNameDisplayManager : MonoBehaviour
     public void UpdateTextSize(float fontSize)
     {
         foreach (PinNameDisplay display in pinNameDisplays)
-        {
             display.nameUI.fontSize = fontSize;
-        }
     }
 
     void LateUpdate()

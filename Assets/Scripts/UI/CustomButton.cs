@@ -24,9 +24,8 @@ public class CustomButton : Button, IPointerDownHandler
     public void ClearEvents()
     {
         foreach (System.Action a in events)
-        {
             onPointerDown -= a;
-        }
+
         events.Clear();
     }
 }
