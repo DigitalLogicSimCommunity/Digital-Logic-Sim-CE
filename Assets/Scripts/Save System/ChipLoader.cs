@@ -341,6 +341,12 @@ public static class ChipLoader
                 loadedChipData.wires[wireIndex].SetAnchorPoints(wire.anchorPoints);
         }
 
+        for (int i = 0; i < loadedChipData.wires.Length; i++)
+        {
+            Wire wire = loadedChipData.wires[i];
+            wire.endPin.pinName = wire.endPin.pinName.Remove(wire.endPin.pinName.Length - 1);
+        }
+
         return loadedChipData;
     }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -23,19 +24,21 @@ public class UIManager : MonoBehaviour
 
     [Header("References")]
     public GameObject createButton;
-    public GameObject updateButton ;
+    public GameObject updateButton;
     public GameObject outsideMenuArea;
+    public TMP_Text ChipName;
 
     public MenuDictionary Menus;
 
     public Palette palette;
     public bool IsAnyMenuOpen => OpenedMenu != null;
     MenuType currentMenuType = MenuType.None;
-    
+
     UIMenu OpenedMenu;
 
     ClockMenu ClockMenu;
     EditChipMenu editChipMenu;
+
 
     void Awake()
     {
@@ -94,11 +97,14 @@ public class UIManager : MonoBehaviour
         FindObjectOfType<PinAndWireInteraction>(true).gameObject.SetActive(IsActive);
     }
 
-    public void SetEditorMode(ChipEditorMode newMode)
+    public void SetEditorMode(ChipEditorMode newMode, string s = null)
     {
         createButton.SetActive(newMode == ChipEditorMode.Create);
         updateButton.SetActive(newMode == ChipEditorMode.Update);
+        ChipName.text = newMode == ChipEditorMode.Update && s != null ? s : "";
+
     }
+
     private void SetCurrentMenuState(UIMenu newMenu, MenuType menuType)
     {
         OpenedMenu = newMenu;
@@ -135,7 +141,7 @@ public class UIManager : MonoBehaviour
         if (Clock != null)
         {
             ClockMenu.SetClockToEdit(Clock);
-            OpenedMenu.transform.position = new Vector3(Clock.transform.position.x, Clock.transform.position.y-2, OpenedMenu.transform.position.z);
+            OpenedMenu.transform.position = new Vector3(Clock.transform.position.x, Clock.transform.position.y - 2, OpenedMenu.transform.position.z);
         }
     }
 

@@ -111,7 +111,7 @@ public class Manager : MonoBehaviour
         ChipSaveData chipSaveData = ChipLoader.GetChipSaveData(chip, wirePrefab, activeChipEditor);
         ClearEditor();
         chipEditorMode = ChipEditorMode.Update;
-        UIManager.SetEditorMode(chipEditorMode);
+        UIManager.SetEditorMode(chipEditorMode,chipSaveData.Data.name);
         activeChipEditor.LoadFromSaveData(chipSaveData);
     }
 
@@ -214,7 +214,7 @@ public class Manager : MonoBehaviour
         if (activeChipEditor)
         {
             Destroy(activeChipEditor.gameObject);
-            UIManager.SetEditorMode(chipEditorMode);
+            UIManager.SetEditorMode(chipEditorMode,UIManager.ChipName.text);
         }
         activeChipEditor =
             Instantiate(chipEditorPrefab, Vector3.zero, Quaternion.identity);
