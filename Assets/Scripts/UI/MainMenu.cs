@@ -27,6 +27,13 @@ public class MainMenu : MonoBehaviour {
     UnityEngine.SceneManagement.SceneManager.LoadScene(1);
   }
 
+  [System.Obsolete("UI/MainMenu::SetVSyncRatio is deprecated," +
+                   " please use Graphics/TargetFrameRate::SetVSyncRatio instead.")] 
+  public void SetVSyncRatio(System.Int32 value)
+  {
+    // This is implemented directly on Graphics/TargetFrameRate.cs
+  }
+
   public void SetResolution16x9(int width) {
     Screen.SetResolution(width, Mathf.RoundToInt(width * (9 / 16f)),
                          Screen.fullScreenMode);
