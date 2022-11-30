@@ -13,7 +13,7 @@ This version includes a lot of new features including:
 - Improved UI
 - VSync
 
-To downlodad this version head to the [latest release](https://github.com/DigitalLogicSimCommunity/Digital-Logic-Sim-CE/releases/latest), download, unzip and play!
+To download this version head to the [latest release](https://github.com/DigitalLogicSimCommunity/Digital-Logic-Sim-CE/releases/latest), download, unzip and play!
 
 This is based on the original Digital Logic Sim by SebLague at [https://github.com/SebLague/Digital-Logic-Sim](https://github.com/SebLague/Digital-Logic-Sim)
 
