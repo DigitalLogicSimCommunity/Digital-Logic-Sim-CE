@@ -9,50 +9,23 @@ using UnityEngine;
 // CanReleaseFocus(). If yes: • FocusLost() will be called on that system. •
 // Requesting system will have HasFocus set to true.
 
-public abstract class InteractionHandler : MonoBehaviour {
+public abstract class Interactable : MonoBehaviour
+{
+    // Does this system currently have focus?
+    public bool HasFocus { get; set; } = false;
 
-  InteractionHandler[] allHandlers;
-  bool hasFocus;
 
-  public void InitAllHandlers(InteractionHandler[] allHandlers) {
-    this.allHandlers = allHandlers;
-  }
+    public abstract void OrderedUpdate();
 
-  public abstract void OrderedUpdate();
+    public abstract void DeleteComand();
 
-  // Handle losing focus
-  protected virtual void FocusLost() {}
 
-  // Is this interaction handler willing to relinquish focus right now?
-  protected virtual bool CanReleaseFocus() { return true; }
 
-  protected virtual void ReleaseFocus() { hasFocus = false; }
 
-  // Request to have focus from whichever handler has focus at the moment.
-  // If succesful, HasFocus will be set to true.
-  protected virtual void RequestFocus() {
-    if (!hasFocus) {
-      bool noHandlersHaveFocus = true;
-      foreach (var otherHandler in allHandlers) {
-        if (otherHandler.hasFocus) {
-          noHandlersHaveFocus = false;
-          if (otherHandler.CanReleaseFocus()) {
-            otherHandler.hasFocus = false;
-            otherHandler.FocusLost();
-            hasFocus = true;
-            break;
-          }
-        }
-      }
+    public virtual void FocusLostHandler() { }
+    public virtual bool CanReleaseFocus() => true;
 
-      if (noHandlersHaveFocus) {
-        hasFocus = true;
-      }
-    }
-  }
-
-  // Does this system currently have focus?
-  protected bool HasFocus {
-    get { return hasFocus; }
-  }
+    protected bool RequestFocus() => InteractionManager.Instance.RequestFocus(this);
+    protected void ReleaseFocusNotHandled() => InteractionManager.Instance.ReleaseFocus(this);
+    protected void ReleaseFocus() { InteractionManager.Instance.ReleaseFocus(this);FocusLostHandler(); }
 }

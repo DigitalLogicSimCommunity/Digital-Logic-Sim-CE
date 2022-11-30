@@ -5,8 +5,7 @@ using UnityEngine;
 public class ChipPackage : MonoBehaviour
 {
 
-    public enum ChipType { User, Basic, Advanced }
-    ;
+    public enum ChipType { Combapibility, Gate, Miscellaneous, Custom };
 
     public ChipType chipType;
     public TMPro.TextMeshPro nameText;
@@ -20,9 +19,9 @@ public class ChipPackage : MonoBehaviour
 
     void Awake()
     {
-        if (chipType != ChipType.User)
+        BuiltinChip builtinChip = GetComponent<BuiltinChip>();
+        if (builtinChip != null)
         {
-            BuiltinChip builtinChip = GetComponent<BuiltinChip>();
             SetSizeAndSpacing(GetComponent<Chip>());
             SetColour(builtinChip.packageColour);
         }
@@ -40,22 +39,17 @@ public class ChipPackage : MonoBehaviour
         // Add and set up the custom chip component
         CustomChip chip = gameObject.AddComponent<CustomChip>();
         chip.chipName = chipName;
-        chip.folderName = chipEditor.Data.folderName;
-
+        chip.FolderIndex = chipEditor.Data.FolderIndex;
+        chipType = ChipType.Custom;
         // Set input signals
         chip.inputSignals = new InputSignal[chipEditor.inputsEditor.signals.Count];
         for (int i = 0; i < chip.inputSignals.Length; i++)
-        {
             chip.inputSignals[i] = (InputSignal)chipEditor.inputsEditor.signals[i];
-        }
 
         // Set output signals
-        chip.outputSignals =
-            new OutputSignal[chipEditor.outputsEditor.signals.Count];
+        chip.outputSignals = new OutputSignal[chipEditor.outputsEditor.signals.Count];
         for (int i = 0; i < chip.outputSignals.Length; i++)
-        {
             chip.outputSignals[i] = (OutputSignal)chipEditor.outputsEditor.signals[i];
-        }
 
         // Create pins and set set package size
         SpawnPins(chip);
@@ -65,7 +59,7 @@ public class ChipPackage : MonoBehaviour
         Transform implementationHolder = chipEditor.chipImplementationHolder;
 
         implementationHolder.parent = transform;
-        implementationHolder.localPosition = Vector3.zero;
+        //implementationHolder.localPosition = Vector3.zero;
         implementationHolder.gameObject.SetActive(false);
     }
 

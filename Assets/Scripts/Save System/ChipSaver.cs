@@ -39,8 +39,7 @@ public static class ChipSaver
         {
             writer.WriteLine(chipsToExport.Count);
 
-            foreach (KeyValuePair<int, string> chip in chipsToExport.OrderBy(
-                         x => x.Key))
+            foreach (KeyValuePair<int, string> chip in chipsToExport.OrderBy(x => x.Key))
             {
                 string chipSaveFile = SaveSystem.GetPathToSaveFile(chip.Value);
                 string chipWireSaveFile = SaveSystem.GetPathToWireSaveFile(chip.Value);
@@ -95,26 +94,15 @@ public static class ChipSaver
         ChipSaveData chipSaveData = new ChipSaveData(chipEditor);
 
         // Generate new chip save string
-        var compositeChip = new SavedChip(chipSaveData);
-        string saveString = JsonUtility.ToJson(compositeChip, usePrettyPrint);
+        string saveString = JsonUtility.ToJson(new SavedChip(chipSaveData), usePrettyPrint);
 
         // Generate save string for wire layout
-        var wiringSystem = new SavedWireLayout(chipSaveData);
-        string wiringSaveString = JsonUtility.ToJson(wiringSystem, usePrettyPrint);
+        string wiringSaveString = JsonUtility.ToJson(new SavedWireLayout(chipSaveData), usePrettyPrint);
 
         // Write to file
-        string savePath = SaveSystem.GetPathToSaveFile(chipEditor.Data.name);
-        using (StreamWriter writer = new StreamWriter(savePath))
-        {
-            writer.Write(saveString);
-        }
+        SaveSystem.WriteChip(chipEditor.Data.name, saveString);
+        SaveSystem.WriteWire(chipEditor.Data.name, wiringSaveString);
 
-        string wireLayoutSavePath =
-            SaveSystem.GetPathToWireSaveFile(chipEditor.Data.name);
-        using (StreamWriter writer = new StreamWriter(wireLayoutSavePath))
-        {
-            writer.Write(wiringSaveString);
-        }
 
         // Update parent chips using this chip
         string currentChipName = chipEditor.Data.name;
@@ -126,8 +114,7 @@ public static class ChipSaver
                 int currentChipIndex =
                     Array.FindIndex(savedChips[i].savedComponentChips,
                                     c => c.chipName == currentChipName);
-                SavedComponentChip updatedComponentChip =
-                    new SavedComponentChip(chipSaveData, chip);
+                SavedComponentChip updatedComponentChip = new SavedComponentChip(chipSaveData, chip);
                 SavedComponentChip oldComponentChip =
                     savedChips[i].savedComponentChips[currentChipIndex];
 
@@ -141,8 +128,10 @@ public static class ChipSaver
                         {
                             updatedComponentChip.inputPins[j].parentChipIndex =
                                 oldComponentChip.inputPins[k].parentChipIndex;
+
                             updatedComponentChip.inputPins[j].parentChipOutputIndex =
                                 oldComponentChip.inputPins[k].parentChipOutputIndex;
+
                             updatedComponentChip.inputPins[j].isCylic =
                                 oldComponentChip.inputPins[k].isCylic;
                         }
@@ -150,37 +139,32 @@ public static class ChipSaver
                 }
 
                 // Write to file
-                string parentSaveString =
-                    JsonUtility.ToJson(savedChips[i], usePrettyPrint);
-                string parentSavePath =
-                    SaveSystem.GetPathToSaveFile(savedChips[i].Data.name);
-                using (StreamWriter writer = new StreamWriter(parentSavePath))
-                {
-                    writer.Write(parentSaveString);
-                }
+                SaveSystem.WriteChip(savedChips[i].Data.name, JsonUtility.ToJson(savedChips[i], usePrettyPrint));
             }
         }
     }
 
-    public static void EditSavedChip(SavedChip savedChip,
-                                     ChipSaveData chipSaveData)
+    internal static void ChangeFolder(string Chipname, int FolderIndex)
+    {
+
+        var ChipToEdit = SaveSystem.GetAllSavedChipsDic()[Chipname];
+        if (ChipToEdit.Data.FolderIndex == FolderIndex) return;
+        ChipToEdit.Data.FolderIndex = FolderIndex;
+        SaveSystem.WriteChip(Chipname, JsonUtility.ToJson(ChipToEdit, usePrettyPrint));
+    }
+
+    public static void EditSavedChip(SavedChip savedChip, ChipSaveData chipSaveData)
     { }
 
     public static bool IsSafeToDelete(string chipName)
     {
         if (Manager.instance.AllChipNames(true, false).Contains(chipName))
-        {
             return false;
-        }
 
         SavedChip[] savedChips = SaveSystem.GetAllSavedChips();
-        for (int i = 0; i < savedChips.Length; i++)
-        {
-            if (savedChips[i].ChipDependecies.Contains(chipName))
-            {
+        foreach (SavedChip savedChip in savedChips)
+            if (savedChip.ChipDependecies.Contains(chipName))
                 return false;
-            }
-        }
         return true;
     }
 
@@ -200,17 +184,13 @@ public static class ChipSaver
                     currentChip.outputPins, name => name.name == signalName);
 
                 if (Array.Find(currentChip.inputPins,
-                               pin => pin.name == signalName &&
-                                      pin.parentChipIndex >= 0) != null)
+                               pin => pin.name == signalName && pin.parentChipIndex >= 0) != null)
                 {
                     return false;
                 }
                 else if (currentSignalIndex >= 0 &&
-                         parentChip.savedComponentChips.Any(
-                             scc => scc.inputPins.Any(
-                                 pin => pin.parentChipIndex == currentChipIndex &&
-                                        pin.parentChipOutputIndex ==
-                                            currentSignalIndex)))
+                         parentChip.savedComponentChips.Any(scc => scc.inputPins.Any(pin => pin.parentChipIndex == currentChipIndex
+                             && pin.parentChipOutputIndex == currentSignalIndex)))
                 {
                     return false;
                 }
@@ -263,11 +243,7 @@ public static class ChipSaver
             {
                 string saveString = JsonUtility.ToJson(savedChips[i], usePrettyPrint);
                 // Write to file
-                string savePath = SaveSystem.GetPathToSaveFile(savedChips[i].Data.name);
-                using (StreamWriter writer = new StreamWriter(savePath))
-                {
-                    writer.Write(saveString);
-                }
+                SaveSystem.WriteChip(savedChips[i].Data.name, saveString);
             }
         }
         // Rename wire layer file

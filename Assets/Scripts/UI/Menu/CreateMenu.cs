@@ -30,7 +30,7 @@ public class CreateMenu : MonoBehaviour
 
     void Update()
     {
-        if (UIManager.instance.GetMenuByType(MenuType.CreateChipMenu).isActive)
+        if (UIManager.instance.Menus[MenuType.CreateChipMenu].isActive)
         {
             // Force name input field to remain focused
             if (!chipNameField.isFocused)
@@ -45,8 +45,8 @@ public class CreateMenu : MonoBehaviour
 
     public void SelectFolder()
     {
-        Manager.ActiveChipEditor.Data.folderName =
-            folderDropdown.options[folderDropdown.value].text;
+        string DropDownTextValue = folderDropdown.options[folderDropdown.value].text;
+        Manager.ActiveChipEditor.Data.FolderIndex = FolderSystem.ReverseIndex(DropDownTextValue);
     }
 
     public void ColourSliderChanged()
@@ -90,12 +90,8 @@ public class CreateMenu : MonoBehaviour
     {
         allChipNames = Manager.instance.AllChipNames();
         folderDropdown.ClearOptions();
-        folderDropdown.AddOptions(
-            ChipBarUI.instance.selectedFolderDropdown.options.GetRange(
-                2, ChipBarUI.instance.selectedFolderDropdown.options.Count - 3));
-        folderDropdown.value = ChipBarUI.selectedFolderIndex > 1
-                                   ? ChipBarUI.selectedFolderIndex - 2
-                                   : 0;
+        var ddopt = ChipBarUI.instance.FolderDropdown.options;
+        folderDropdown.AddOptions(ddopt.GetRange(1, ddopt.Count - 2));
         doneButton.interactable = false;
         chipNameField.SetTextWithoutNotify("");
         SetSuggestedColour();
@@ -103,7 +99,7 @@ public class CreateMenu : MonoBehaviour
 
     public void FinishCreation()
     {
-        Manager.ActiveChipEditor.Data.folderName = folderDropdown.options[folderDropdown.value].text;
+        Manager.ActiveChipEditor.Data.FolderIndex = FolderSystem.ReverseIndex(folderDropdown.options[folderDropdown.value].text);
         Manager.ActiveChipEditor.Data.scale = ScalingManager.scale;
         Manager.instance.SaveAndPackageChip();
     }
@@ -139,3 +135,4 @@ public class CreateMenu : MonoBehaviour
         Manager.ActiveChipEditor.Data.NameColour = chipNameField.textComponent.color;
     }
 }
+

@@ -1,120 +1,154 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing.Drawing2D;
+using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
-public enum MenuType {
-  CreateChipMenu = 0,
-  EditChipMenu = 1,
-  LoggingMenu = 2,
-  NewFolderMenu = 3,
-  SubmitMenu = 4
-}
-;
+public enum MenuType
+{
+    None = -1,
+    CreateChipMenu = 0,
+    EditChipMenu = 1,
+    LoggingMenu = 2,
+    NewFolderMenu = 3,
+    SubmitMenu = 4,
+    ClockMenu = 5,
+    EditFolderMenu = 6,
+};
 
-public class UIManager : MonoBehaviour {
-  public static UIManager instance;
+public class UIManager : MonoBehaviour
+{
+    public static UIManager instance;
 
-  [Header("References")]
-  public GameObject createButton;
-  public GameObject updateButton;
-  public List<UIMenu> menus;
-  public GameObject outsideMenuArea;
+    [Header("References")]
+    public GameObject createButton;
+    public GameObject updateButton;
+    public GameObject outsideMenuArea;
+    public TMP_Text ChipName;
 
-  public Palette palette;
+    public MenuDictionary Menus;
 
-  UIMenu currentOpenedMenu;
+    public Palette palette;
+    public bool IsAnyMenuOpen => OpenedMenu != null;
+    MenuType currentMenuType = MenuType.None;
 
-  void Awake() {
-    instance = this;
-    foreach (UIMenu menu in menus) {
-      menu.Close();
-    }
-    outsideMenuArea.SetActive(false);
-  }
+    UIMenu OpenedMenu;
 
-  public static void NewSubmitMenu(string header, string text,
-                                   UnityAction onSubmit) {
-    SubmitMenu submitMenu =
-        instance.GetMenuByType(MenuType.SubmitMenu).GetComponent<SubmitMenu>();
-    submitMenu.SetHeaderText(header);
-    submitMenu.SetContentText(text);
-    submitMenu.SetOnSubmitAction(onSubmit);
-    instance.OpenMenu(MenuType.SubmitMenu);
-  }
+    ClockMenu ClockMenu;
+    EditChipMenu editChipMenu;
 
-  public static Palette Palette {
-    get { return instance.palette; }
-  }
 
-  public void OpenMenu(MenuType menuType) {
-    SetMenuPosition(menuType);
-    UIMenu newMenu = GetMenuByType(menuType);
-    if (currentOpenedMenu && currentOpenedMenu != newMenu) {
-      CloseMenu();
+    void Awake()
+    {
+        instance = this;
+        foreach (var menu in Menus)
+            menu.Value.Close();
+        outsideMenuArea.SetActive(false);
+
+        ClockMenu = FindObjectOfType<ClockMenu>(true);
+        editChipMenu = FindObjectOfType<EditChipMenu>(true);
+
     }
 
-    if (newMenu.showBG) {
-      outsideMenuArea.SetActive(true);
+    public static void NewSubmitMenu(string header, string text,
+                                     UnityAction onSubmit)
+    {
+        SubmitMenu submitMenu = instance.Menus[MenuType.SubmitMenu].GetComponent<SubmitMenu>();
+        submitMenu.SetHeaderText(header);
+        submitMenu.SetContentText(text);
+        submitMenu.SetOnSubmitAction(onSubmit);
+        instance.OpenMenu(MenuType.SubmitMenu);
     }
 
-    currentOpenedMenu = newMenu;
-    currentOpenedMenu.Open();
+    public static Palette Palette => instance.palette;
 
-    FindObjectOfType<ChipInteraction>(true).gameObject.SetActive(false);
-    FindObjectOfType<PinAndWireInteraction>(true).gameObject.SetActive(false);
-  }
+    public void OpenCreateChipMenu() => OpenMenu(MenuType.CreateChipMenu);
+    public void OpenMenu(MenuType menuType)
+    {
+        UIMenu newMenu = Menus[menuType];
+        if (OpenedMenu && OpenedMenu != newMenu)
+            CloseMenu();
+        SetCurrentMenuState(newMenu, menuType);
 
-  public void OpenMenu(int index) { OpenMenu((MenuType)index); }
+        if (OpenedMenu.showBG)
+            outsideMenuArea.SetActive(true);
 
-  public void CloseMenu() {
-    if (currentOpenedMenu) {
-      currentOpenedMenu.Close();
-      currentOpenedMenu = null;
+        SetMenuPosition();
+        OpenedMenu.Open();
+
+        SetActiveInteraction(false);
     }
-    outsideMenuArea.SetActive(false);
-    FindObjectOfType<ChipInteraction>(true).gameObject.SetActive(true);
-    FindObjectOfType<PinAndWireInteraction>(true).gameObject.SetActive(true);
-  }
-
-  public void SetEditorMode(ChipEditorMode newMode) {
-    createButton.SetActive(newMode == ChipEditorMode.Create);
-    updateButton.SetActive(newMode == ChipEditorMode.Update);
-  }
-
-  void SetMenuPosition(MenuType menuType) {
-    if (menuType == MenuType.EditChipMenu) {
-      SetChipEditMenuPosition();
+    public void CloseMenu()
+    {
+        if (OpenedMenu)
+        {
+            OpenedMenu.Close();
+            SetCurrentMenuState(null, MenuType.None);
+        }
+        outsideMenuArea.SetActive(false);
+        SetActiveInteraction(true);
     }
-  }
 
-  void SetChipEditMenuPosition() {
-    foreach (GameObject obj in InputHelper.GetUIObjectsUnderMouse()) {
-      ButtonText buttonText = obj.GetComponent<ButtonText>();
-      if (buttonText != null) {
-        FindObjectOfType<EditChipMenu>().EditChip(buttonText.buttonText.text);
-        menus[1].transform.position =
-            new Vector3(obj.transform.position.x, menus[1].transform.position.y,
-                        menus[1].transform.position.z);
-        RectTransform rect = menus[1].GetComponent<RectTransform>();
-        rect.anchoredPosition =
-            new Vector2(Mathf.Clamp(rect.anchoredPosition.x, -800, 800),
-                        rect.anchoredPosition.y);
-        break;
-      }
+    private void SetActiveInteraction(bool IsActive)
+    {
+        FindObjectOfType<ChipInteraction>(true).gameObject.SetActive(IsActive);
+        FindObjectOfType<PinAndWireInteraction>(true).gameObject.SetActive(IsActive);
     }
-  }
 
-  public void OnClickOutsideMenu() {
-    if (currentOpenedMenu.onClickBG != null) {
-      currentOpenedMenu.onClickBG.Invoke();
+    public void SetEditorMode(ChipEditorMode newMode, string s = null)
+    {
+        createButton.SetActive(newMode == ChipEditorMode.Create);
+        updateButton.SetActive(newMode == ChipEditorMode.Update);
+        ChipName.text = newMode == ChipEditorMode.Update && s != null ? s : "";
+
     }
-  }
 
-  public UIMenu GetMenuByIndex(int index) {
-    return index + 1 > menus.Count ? null : menus[index];
-  }
+    private void SetCurrentMenuState(UIMenu newMenu, MenuType menuType)
+    {
+        OpenedMenu = newMenu;
+        currentMenuType = menuType;
+    }
+    void SetMenuPosition()
+    {
+        if (currentMenuType == MenuType.EditChipMenu)
+            SetChipEditMenuPosition();
+        if (currentMenuType == MenuType.ClockMenu)
+            SetClockMenuPosition();
+    }
 
-  public UIMenu GetMenuByType(MenuType menuType) {
-    return menus[(int)menuType];
-  }
+    void SetChipEditMenuPosition()
+    {
+        if (currentMenuType != MenuType.EditChipMenu) return;
+        foreach (GameObject obj in InputHelper.GetUIObjectsUnderMouse())
+        {
+            ButtonText buttonText = obj.GetComponent<ButtonText>();
+            if (buttonText != null)
+            {
+                editChipMenu.EditChipInit(buttonText.buttonText.text);
+                OpenedMenu.transform.position = new Vector3(obj.transform.position.x, OpenedMenu.transform.position.y, OpenedMenu.transform.position.z);
+                RectTransform rect = OpenedMenu.GetComponent<RectTransform>();
+                rect.anchoredPosition = new Vector2(Mathf.Clamp(rect.anchoredPosition.x, -800, 800), rect.anchoredPosition.y);
+                break;
+            }
+        }
+    }
+
+    void SetClockMenuPosition()
+    {
+        var Clock = InputHelper.GetObjectUnderMouse2D(1 << LayerMask.NameToLayer("Chip")).GetComponent<Clock>();
+        if (Clock != null)
+        {
+            ClockMenu.SetClockToEdit(Clock);
+            OpenedMenu.transform.position = new Vector3(Clock.transform.position.x, Clock.transform.position.y - 2, OpenedMenu.transform.position.z);
+        }
+    }
+
+
+    public void OnClickOutsideMenu()
+    {
+        if (OpenedMenu != null && OpenedMenu.onClickBG != null)
+            OpenedMenu.onClickBG.Invoke();
+    }
 }

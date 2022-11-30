@@ -9,6 +9,18 @@ public static class SaveSystem
 
     static string activeProjectName = "Untitled";
     const string fileExtension = ".txt";
+    static string CustomFoldersFileName = "CustomFolders";
+
+    private static string FoldersFilePath => Path.Combine(CurrentSaveProfileDirectoryPath, CustomFoldersFileName + ".json");
+    static string CurrentSaveProfileDirectoryPath => Path.Combine(SaveDataDirectoryPath, activeProjectName);
+
+    public static string SaveDataDirectoryPath => Path.Combine(Application.persistentDataPath, "SaveData");
+    static string CurrentSaveProfileWireLayoutDirectoryPath => Path.Combine(CurrentSaveProfileDirectoryPath, "WireLayout");
+    static string HDDSaveFilePath => Path.Combine(CurrentSaveProfileDirectoryPath, "HDDContents.json");
+    public static string GetPathToSaveFile(string saveFileName) => Path.Combine(CurrentSaveProfileDirectoryPath, saveFileName + fileExtension);
+
+    public static string GetPathToWireSaveFile(string saveFileName) => Path.Combine(CurrentSaveProfileWireLayoutDirectoryPath, saveFileName + fileExtension);
+
 
     public static void SetActiveProject(string projectName)
     {
@@ -20,6 +32,7 @@ public static class SaveSystem
         // Create save directory (if doesn't exist already)
         Directory.CreateDirectory(CurrentSaveProfileDirectoryPath);
         Directory.CreateDirectory(CurrentSaveProfileWireLayoutDirectoryPath);
+        FolderLoader.CreateDefault(FoldersFilePath);
     }
 
     public static string[] GetChipSavePaths()
@@ -38,7 +51,7 @@ public static class SaveSystem
         // fileExtension);
     }
 
-    public static void LoadAll(Manager manager)
+    public static void LoadAllChips(Manager manager)
     {
         // Load any saved chips
         ChipLoader.LoadAllChips(GetChipSavePaths(), manager);
@@ -50,26 +63,10 @@ public static class SaveSystem
         return ChipLoader.GetAllSavedChips(GetChipSavePaths());
     }
 
-    public static string GetPathToSaveFile(string saveFileName)
+    public static IDictionary<string, SavedChip> GetAllSavedChipsDic()
     {
-        return Path.Combine(CurrentSaveProfileDirectoryPath,
-                            saveFileName + fileExtension);
-    }
-
-    public static string GetPathToWireSaveFile(string saveFileName)
-    {
-        return Path.Combine(CurrentSaveProfileWireLayoutDirectoryPath,
-                            saveFileName + fileExtension);
-    }
-
-    static string CurrentSaveProfileDirectoryPath
-    {
-        get { return Path.Combine(SaveDataDirectoryPath, activeProjectName); }
-    }
-
-    static string CurrentSaveProfileWireLayoutDirectoryPath
-    {
-        get { return Path.Combine(CurrentSaveProfileDirectoryPath, "WireLayout"); }
+        // Load any saved chips but is Dic
+        return ChipLoader.GetAllSavedChipsDic(GetChipSavePaths());
     }
 
     public static string[] GetSaveNames()
@@ -88,61 +85,37 @@ public static class SaveSystem
         return savedProjectPaths;
     }
 
-    public static string SaveDataDirectoryPath
-    {
-        get
-        {
-            const string saveFolderName = "SaveData";
-            return Path.Combine(Application.persistentDataPath, saveFolderName);
-        }
-    }
 
     public static Dictionary<string, List<int>> LoadHDDContents()
     {
-        string hddSaveFile =
-            Path.Combine(CurrentSaveProfileDirectoryPath, "HDDContents.json");
-        if (File.Exists(hddSaveFile))
+        if (File.Exists(HDDSaveFilePath))
         {
-            string jsonString = ReadFile(hddSaveFile);
+            string jsonString = ReadFile(HDDSaveFilePath);
             return JsonConvert.DeserializeObject<Dictionary<string, List<int>>>(
                 jsonString);
         }
         return new Dictionary<string, List<int>> { };
     }
 
+
+
     public static void SaveHDDContents(Dictionary<string, List<int>> contents)
     {
-        string hddSaveFile =
-            Path.Combine(CurrentSaveProfileDirectoryPath, "HDDContents.json");
-        string jsonStr = JsonConvert.SerializeObject(contents);
-        // Format json string
-        jsonStr = jsonStr.Replace("{", "{\n\t")
-                      .Replace("}", "\n}")
-                      .Replace("],", "],\n\t");
-        WriteFile(hddSaveFile, jsonStr);
+        string jsonStr = JsonConvert.SerializeObject(contents, Formatting.Indented);
+        WriteFile(HDDSaveFilePath, jsonStr);
     }
 
-    public static Dictionary<string, int> LoadCustomFolders()
+
+    public static Dictionary<int, string> LoadCustomFolders()
     {
-        string customFoldersFile =
-            Path.Combine(CurrentSaveProfileDirectoryPath, "CustomFolders.json");
-        if (File.Exists(customFoldersFile))
-        {
-            string jsonString = ReadFile(customFoldersFile);
-            return JsonConvert.DeserializeObject<Dictionary<string, int>>(jsonString);
-            ;
-        }
-        return new Dictionary<string, int>();
+        return FolderLoader.LoadCustomFolders(FoldersFilePath);
     }
 
-    public static void SaveCustomFolders(Dictionary<string, int> folders)
+    public static void SaveCustomFolders(Dictionary<int, string> folders)
     {
-        string customFoldersFile =
-            Path.Combine(CurrentSaveProfileDirectoryPath, "CustomFolders.json");
-        string jsonString =
-            JsonConvert.SerializeObject(folders, Formatting.Indented);
-        WriteFile(customFoldersFile, jsonString);
+        FolderLoader.SaveCustomFolders(FoldersFilePath, folders);
     }
+
 
     public static string ReadFile(string path)
     {
@@ -151,7 +124,6 @@ public static class SaveSystem
             return reader.ReadToEnd();
         }
     }
-
     public static void WriteFile(string path, string content)
     {
         using (StreamWriter writer = new StreamWriter(path))
@@ -159,4 +131,15 @@ public static class SaveSystem
             writer.Write(content);
         }
     }
+
+
+    public static SavedChip ReadChip(string chipName) => JsonUtility.FromJson<SavedChip>(ReadFile(GetPathToSaveFile(chipName)));
+    public static SavedWireLayout ReadWire(string wireFile) => JsonUtility.FromJson<SavedWireLayout>(ReadFile(GetPathToWireSaveFile(wireFile)));
+
+
+    public static void WriteChip(string chipName, string saveString) => WriteFile(GetPathToSaveFile(chipName), saveString);
+    public static void WriteWire(string chipName, string saveContent) => WriteFile(GetPathToWireSaveFile(chipName), saveContent);
+    public static void WriteFoldersFile(string FolderFileStr) => WriteFile(FoldersFilePath, FolderFileStr);
+
 }
+
