@@ -2013,17 +2013,27 @@ MonoBehaviour:
     useful and make your project look much better.\n\n<size=header><color=header><color=#75ADFF><link=\"https://github.com/TQMatvey\">TQMatvey</link></color>
     - Enable Vertical Synchronization (VSync)</color></size>\nHow we didn't have
     this already? Finally :D \n\n<size=header><color=header><color=#75ADFF><link=\"https://github.com/VitoBarra\">VitoBarra</link></color>
-    - New chip dependecy load system</color></size>\nRecursive handler for component
-    dependencies, changed some fields in save file and implemented code to ensure
-    compatibility.\n\n<size=header><color=header><color=#75ADFF><link=\"https://github.com/AOx0\">AOx0</link></color>
-    - Run/Stop Button & Native File Selector</color></size>\nMerged all forks and
-    tweaked everything for the program to compile. Pause/Play the simulation when
-    you want, i thought this would solve the program's bad performance on macOS but
-    turned out it didn't, still is a pretty button-option to have. Also included
-    and fixed UnityStandaloneFileBrowser to work on Darwin-Arm and Linux with <color=#75ADFF><link=\"https://github.com/gkngkc/UnityStandaloneFileBrowser/pull/116\">this</link></color>
+    - Chip dependecy load system, enhanced Backwards Compatibility, Folder Actions,
+    Clocks & Fixes</color></size>\nRecursive handler for component dependencies,
+    changed some fields in save file and implemented code to ensure compatibility.
+    Introduce actions for folders like delete, rename, move chips between folders,
+    and include a Fallback folder for backwards compatibility. Add Clock with full
+    Hz support. Fixed Issues <color=#75ADFF><link=\"https://github.com/DigitalLogicSimCommunity/Digital-Logic-Sim-CE/issues/28\">#28</link></color>,
+    <color=#75ADFF><link=\"https://github.com/DigitalLogicSimCommunity/Digital-Logic-Sim-CE/issues/34\">#34</link></color>,
+    <color=#75ADFF><link=\"https://github.com/DigitalLogicSimCommunity/Digital-Logic-Sim-CE/issues/36\">#36</link></color>,
+    <color=#75ADFF><link=\"https://github.com/DigitalLogicSimCommunity/Digital-Logic-Sim-CE/issues/31\">#31</link></color>,
+    <color=#75ADFF><link=\"https://github.com/DigitalLogicSimCommunity/Digital-Logic-Sim-CE/issues/28\">#32</link></color>
+    and <color=#75ADFF><link=\"https://github.com/DigitalLogicSimCommunity/Digital-Logic-Sim-CE/issues/28\">#33</link></color>.\n\n<size=header><color=header><color=#75ADFF><link=\"https://github.com/AOx0\">AOx0</link></color>
+    - Run/Stop Button, Native File Selector Dialog & FPS Target</color></size>\nMerged
+    all forks and tweaked everything for the program to compile. Pause/Play the simulation
+    when you want. Also included and fixed UnityStandaloneFileBrowser to work on
+    Darwin-Arm and Linux with <color=#75ADFF><link=\"https://github.com/gkngkc/UnityStandaloneFileBrowser/pull/116\">this</link></color>
     and <color=#75ADFF><link=\"https://github.com/gkngkc/UnityStandaloneFileBrowser/pull/106\">this</link></color>
     PRs, so all credit for that to <color=#75ADFF><link=\"https://github.com/tonidurans\">tonidurans</link></color>
-    and <color=#75ADFF><link=\"https://github.com/Menci\">Menci</link></color>.\n"
+    and <color=#75ADFF><link=\"https://github.com/Menci\">Menci</link></color>. Included
+    in v0.39.0 various options for FPS targeting from within settings.\n\n\n\n<size=header>Huge
+    thanks to all contribuitors!! The Community Edition couldn't be possible without
+    your help.</size>"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -3268,7 +3278,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Version 0.38 - CE <size=25><color=#505050> (22 Jul 2022)</color></size>
+  m_text: Version 0.39 - CE <size=25><color=#505050> (1 Dec 2022)</color></size>
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -4255,17 +4265,27 @@ MonoBehaviour:
     useful and make your project look much better.\n\n<size=30><color=#DDDDDD><color=#75ADFF><link=\"https://github.com/TQMatvey\">TQMatvey</link></color>
     - Enable Vertical Synchronization (VSync)</color></size>\nHow we didn't have
     this already? Finally :D \n\n<size=30><color=#DDDDDD><color=#75ADFF><link=\"https://github.com/VitoBarra\">VitoBarra</link></color>
-    - New chip dependecy load system</color></size>\nRecursive handler for component
-    dependencies, changed some fields in save file and implemented code to ensure
-    compatibility.\n\n<size=30><color=#DDDDDD><color=#75ADFF><link=\"https://github.com/AOx0\">AOx0</link></color>
-    - Run/Stop Button & Native File Selector</color></size>\nMerged all forks and
-    tweaked everything for the program to compile. Pause/Play the simulation when
-    you want, i thought this would solve the program's bad performance on macOS but
-    turned out it didn't, still is a pretty button-option to have. Also included
-    and fixed UnityStandaloneFileBrowser to work on Darwin-Arm and Linux with <color=#75ADFF><link=\"https://github.com/gkngkc/UnityStandaloneFileBrowser/pull/116\">this</link></color>
+    - Chip dependecy load system, enhanced Backwards Compatibility, Folder Actions,
+    Clocks & Fixes</color></size>\nRecursive handler for component dependencies,
+    changed some fields in save file and implemented code to ensure compatibility.
+    Introduce actions for folders like delete, rename, move chips between folders,
+    and include a Fallback folder for backwards compatibility. Add Clock with full
+    Hz support. Fixed Issues <color=#75ADFF><link=\"https://github.com/DigitalLogicSimCommunity/Digital-Logic-Sim-CE/issues/28\">#28</link></color>,
+    <color=#75ADFF><link=\"https://github.com/DigitalLogicSimCommunity/Digital-Logic-Sim-CE/issues/34\">#34</link></color>,
+    <color=#75ADFF><link=\"https://github.com/DigitalLogicSimCommunity/Digital-Logic-Sim-CE/issues/36\">#36</link></color>,
+    <color=#75ADFF><link=\"https://github.com/DigitalLogicSimCommunity/Digital-Logic-Sim-CE/issues/31\">#31</link></color>,
+    <color=#75ADFF><link=\"https://github.com/DigitalLogicSimCommunity/Digital-Logic-Sim-CE/issues/28\">#32</link></color>
+    and <color=#75ADFF><link=\"https://github.com/DigitalLogicSimCommunity/Digital-Logic-Sim-CE/issues/28\">#33</link></color>.\n\n<size=30><color=#DDDDDD><color=#75ADFF><link=\"https://github.com/AOx0\">AOx0</link></color>
+    - Run/Stop Button, Native File Selector Dialog & FPS Target</color></size>\nMerged
+    all forks and tweaked everything for the program to compile. Pause/Play the simulation
+    when you want. Also included and fixed UnityStandaloneFileBrowser to work on
+    Darwin-Arm and Linux with <color=#75ADFF><link=\"https://github.com/gkngkc/UnityStandaloneFileBrowser/pull/116\">this</link></color>
     and <color=#75ADFF><link=\"https://github.com/gkngkc/UnityStandaloneFileBrowser/pull/106\">this</link></color>
     PRs, so all credit for that to <color=#75ADFF><link=\"https://github.com/tonidurans\">tonidurans</link></color>
-    and <color=#75ADFF><link=\"https://github.com/Menci\">Menci</link></color>.\n"
+    and <color=#75ADFF><link=\"https://github.com/Menci\">Menci</link></color>. Included
+    in v0.39.0 various options for FPS targeting from within settings.\n\n\n\n<size=30>Huge
+    thanks to all contribuitors!! The Community Edition couldn't be possible without
+    your help.</size>"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
