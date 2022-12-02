@@ -10,13 +10,14 @@ public class TargetFrameRate : MonoBehaviour {
 
 	void Awake () {
 	    // Its a dead simple app. There's no need for 120 fps
-	    // By default the vSyncCount is 4 (1/4 of max fps, ex. 120/4 = 30)
+	    // By default the vSyncCount is 2 (1/2 of max fps, ex. 120/2 = 60)
+	    PlayerPrefs.DeleteAll();
 
-	    // We opt to use vSync by default with vSyncCount of 1/4
-	    vSyncRate.value = PlayerPrefs.GetInt("vSyncRate", 4);
+	    // We opt to use vSync by default with vSyncCount of 1/2
+	    vSyncRate.value = PlayerPrefs.GetInt("vSyncRate", 2);
 	    QualitySettings.vSyncCount = vSyncRate.value;
 	    
-	    // By default TargetFrames is 0
+	    // By default TargetFrames is 0 (-1)
 	    FpsTarget.value = PlayerPrefs.GetInt("fpsTarget", 0);
 	    Application.targetFrameRate =  FpsTarget.value != 0 ? FpsTarget.value * 10 : -1;
 	}
@@ -48,7 +49,7 @@ public class TargetFrameRate : MonoBehaviour {
 		
 		if (value == 0)
 		{
-			SetVSyncRatio(4);
+			SetVSyncRatio(2);
 		}
 		
 		PlayerPrefs.SetInt("fpsTarget", value);
