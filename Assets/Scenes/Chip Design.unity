@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
+  m_IndirectSpecularColor: {r: 0.3731193, g: 0.38073996, b: 0.3587269, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -11979,7 +11979,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1aa08ab6e0800fa44ae55d278d1423e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Content: {fileID: 0}
+  m_Content: {fileID: 1234171969}
   m_Horizontal: 1
   m_Vertical: 0
   m_MovementType: 2
@@ -15566,10 +15566,10 @@ Camera:
   m_FocalLength: 50
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0
-    y: 0.01048553
-    width: 1
-    height: 0.97902894
+    x: 0.007607162
+    y: 0
+    width: 0.9847857
+    height: 1
   near clip plane: 0.3
   far clip plane: 1500
   field of view: 60
@@ -27400,6 +27400,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 707e03c65a80345cf9c9e26633c5010e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  vSyncRate: {fileID: 0}
+  FpsTarget: {fileID: 0}
 --- !u!114 &1830893911
 MonoBehaviour:
   m_ObjectHideFlags: 0
