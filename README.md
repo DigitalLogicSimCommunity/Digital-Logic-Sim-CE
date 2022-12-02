@@ -26,14 +26,21 @@ This version includes plenty of new features, including:
 
 To download this version, head to the [latest release][1], download, unzip and play!
 
-This is based on the original Digital Logic Sim by [SebLague][2] at [https://github.com/SebLague/Digital-Logic-Sim][3]
+This is based on the original Digital Logic Sim by [SebLague][2] at [SebLague/Digital-Logic-Sim][3]
 
 [Watch video][4]
 
 ![Simulation Screenshot][image-1]
 
-Similar projects:
-- [Digital-Logic-Sim-2][5]
+## Similar projects:
+- [SebLague/Digital-Logic-Sim][3]
+- [UkrainianBanderasCat/Digital-Logic-Sim-2][5]
+
+## Contributors
+
+<a href="https://github.com/DigitalLogicSimCommunity/Digital-Logic-Sim-CE/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=DigitalLogicSimCommunity/Digital-Logic-Sim-CE" />
+</a>
 
 [1]:	https://github.com/DigitalLogicSimCommunity/Digital-Logic-Sim-CE/releases/latest
 [2]:	https://github.com/SebLague
