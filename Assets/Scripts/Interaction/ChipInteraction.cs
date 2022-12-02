@@ -501,7 +501,7 @@ public class ChipInteraction : Interactable
         selectedChips.Clear();
     }
 
-    public override void DeleteComand()
+    public override void DeleteCommand()
     {
         if (!UIManager.instance.IsAnyMenuOpen)
             HandleDeletion();

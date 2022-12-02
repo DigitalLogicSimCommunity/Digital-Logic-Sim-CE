@@ -18,7 +18,7 @@ public class InteractionManager : MonoBehaviour
         if (InteractableWhitFocus == null) return;
 
         if (InputHelper.AnyOfTheseKeysDown(KeyCode.Backspace, KeyCode.Delete) || Input.GetMouseButton(2))
-            InteractableWhitFocus.DeleteComand();
+            InteractableWhitFocus.DeleteCommand();
     }
 
     public bool HadFocus(Interactable interactable) => InteractableWhitFocus == interactable;

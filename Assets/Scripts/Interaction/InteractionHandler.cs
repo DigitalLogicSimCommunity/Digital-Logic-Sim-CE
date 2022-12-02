@@ -17,7 +17,7 @@ public abstract class Interactable : MonoBehaviour
 
     public abstract void OrderedUpdate();
 
-    public abstract void DeleteComand();
+    public abstract void DeleteCommand();
 
 
 

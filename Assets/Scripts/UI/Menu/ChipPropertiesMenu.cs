@@ -55,6 +55,7 @@ public class ChipPropertiesMenu : MonoBehaviour
 
         Opened = true;
     }
+    
     public void DisableUI()
     {
         if (!Opened) return;
@@ -85,7 +86,7 @@ public class ChipPropertiesMenu : MonoBehaviour
 
     void Delete()
     {
-        CurrentInterface.DeleteComand();
+        CurrentInterface.DeleteCommand();
     }
     void OnValueDropDownChange(int mode)
     {

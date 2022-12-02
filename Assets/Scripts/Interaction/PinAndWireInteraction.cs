@@ -347,7 +347,7 @@ public class PinAndWireInteraction : Interactable
 
     public override bool CanReleaseFocus() => _currentState != State.PlacingWire && !pinUnderMouse;
 
-    public override void DeleteComand()
+    public override void DeleteCommand()
     {
         if (_currentState == State.None)
             HandleWireDeletion();

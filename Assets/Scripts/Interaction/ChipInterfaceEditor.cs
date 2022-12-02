@@ -346,6 +346,7 @@ public class ChipInterfaceEditor : Interactable
                 visiblePins.AddRange(spawnedSignal.inputPins);
                 visiblePins.AddRange(spawnedSignal.outputPins);
                 spawnedSignals[i] = spawnedSignal;
+                
             }
 
             if (IsGroup)
@@ -583,7 +584,7 @@ public class ChipInterfaceEditor : Interactable
 
 
 
-    public override void DeleteComand()
+    public override void DeleteCommand()
     {
         if (!Input.GetKeyDown(KeyCode.Backspace))
             DeleteSelected();
