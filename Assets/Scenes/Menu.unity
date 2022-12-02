@@ -1009,6 +1009,8 @@ MonoBehaviour:
   projectNameField: {fileID: 1670382600}
   confirmProjectButton: {fileID: 5803949137266396444}
   fullscreenToggle: {fileID: 73739993}
+  vSyncRate: {fileID: 821203550}
+  fpsTarget: {fileID: 1248916832}
 --- !u!4 &111305409
 Transform:
   m_ObjectHideFlags: 0
@@ -1036,8 +1038,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 707e03c65a80345cf9c9e26633c5010e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vSyncRate: {fileID: 821203550}
-  FpsTarget: {fileID: 1248916832}
 --- !u!1 &142003984
 GameObject:
   m_ObjectHideFlags: 0
@@ -4658,8 +4658,8 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 111305410}
-        m_TargetAssemblyTypeName: TargetFrameRate, Assembly-CSharp
+      - m_Target: {fileID: 111305408}
+        m_TargetAssemblyTypeName: MainMenu, Assembly-CSharp
         m_MethodName: SetVSyncRatio
         m_Mode: 0
         m_Arguments:
@@ -7128,9 +7128,9 @@ Camera:
   m_FocalLength: 50
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0.007607162
+    x: 0.011763334
     y: 0
-    width: 0.9847857
+    width: 0.97647333
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
@@ -7463,8 +7463,8 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 111305410}
-        m_TargetAssemblyTypeName: TargetFrameRate, Assembly-CSharp
+      - m_Target: {fileID: 111305408}
+        m_TargetAssemblyTypeName: MainMenu, Assembly-CSharp
         m_MethodName: SetFpsTarget
         m_Mode: 0
         m_Arguments:
