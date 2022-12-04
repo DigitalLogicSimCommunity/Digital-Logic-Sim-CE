@@ -10,17 +10,17 @@ public static class ChipLoader
 
     public static SavedChip[] GetAllSavedChips(string[] chipPaths)
     {
-        SavedChip[] savedChips = new SavedChip[chipPaths.Length];
+        var savedChips = new SavedChip[chipPaths.Length];
 
         // Read saved chips from file
-        for (int i = 0; i < chipPaths.Length; i++)
+        for (var i = 0; i < chipPaths.Length; i++)
         {
-            string chipSaveString = SaveSystem.ReadFile(chipPaths[i]);
+            var chipSaveString = SaveSystem.ReadFile(chipPaths[i]);
             SaveCompatibility.FixSaveCompatibility(ref chipSaveString);
             savedChips[i] = JsonUtility.FromJson<SavedChip>(chipSaveString);
         }
 
-        foreach (SavedChip chip in savedChips)
+        foreach (var chip in savedChips)
             chip.ValidateDefaultData();
 
         return savedChips;
@@ -28,34 +28,30 @@ public static class ChipLoader
 
     public static Dictionary<string, SavedChip> GetAllSavedChipsDic(string[] chipPaths)
     {
-        var ChipToLoadDic = new Dictionary<string, SavedChip>();
-        foreach (var chip in GetAllSavedChips(chipPaths))
-            ChipToLoadDic.Add(chip.Data.name, chip);
-
-        return ChipToLoadDic;
+        return GetAllSavedChips(chipPaths).ToDictionary(chip => chip.Data.name);
     }
 
     public static async void LoadAllChips(string[] chipPaths, Manager manager)
     {
         var sw = System.Diagnostics.Stopwatch.StartNew();
-        var ChipsToLoadDic = GetAllSavedChipsDic(chipPaths);
+        var chipsToLoadDic = GetAllSavedChipsDic(chipPaths);
 
-        ProgressBar progressBar = ProgressBar.New("Loading All Chips...", wholeNumbers: true);
-        progressBar.Open(0, ChipsToLoadDic.Count + manager.builtinChips.Length);
+        var progressBar = ProgressBar.New("Loading All Chips...", wholeNumbers: true);
+        progressBar.Open(0, chipsToLoadDic.Count + manager.builtinChips.Length);
         progressBar.SetValue(0, "Start Loading...");
 
         // Maintain dictionary of loaded chips (initially just the built-in chips)
-        Dictionary<string, Chip> loadedChips = new Dictionary<string, Chip>();
-        int i = 0;
+        var loadedChips = new Dictionary<string, Chip>();
+        var i = 0;
         for (; i < manager.builtinChips.Length; i++)
         {
-            Chip builtinChip = manager.builtinChips[i];
+            var builtinChip = manager.builtinChips[i];
             progressBar.SetValue(i, $"Loading '{builtinChip.chipName}'...");
             loadedChips.Add(builtinChip.chipName, builtinChip);
             await Task.Yield();
         }
 
-        foreach (var chip in ChipsToLoadDic)
+        foreach (var chip in chipsToLoadDic)
         {
             progressBar.SetValue(i, $"Loading '{chip.Value.Data.name}'...");
             if (!loadedChips.ContainsKey(chip.Key))
@@ -84,7 +80,7 @@ public static class ChipLoader
             {
                 if (string.Equals(dependancy, "SIGNAL IN") || string.Equals(dependancy, "SIGNAL OUT")) continue;
                 if (!loadedChips.ContainsKey(dependancy))
-                { ResolveDependecy(ChipsToLoadDic[dependancy]); await Task.Yield(); i++; }
+                { ResolveDependecy(chipsToLoadDic[dependancy]); await Task.Yield(); i++; }
             }
             if (!loadedChips.ContainsKey(chip.Data.name))
             {
@@ -355,57 +351,55 @@ public static class ChipLoader
         var allChips = SaveSystem.GetAllSavedChips();
         var nameUpdateLookupTable = new Dictionary<string, string>();
 
-        using (StreamReader reader = new StreamReader(path))
+        using var reader = new StreamReader(path);
+        var numberOfChips = Int32.Parse(reader.ReadLine());
+
+        for (var i = 0; i < numberOfChips; i++)
         {
-            int numberOfChips = Int32.Parse(reader.ReadLine());
+            string chipName = reader.ReadLine();
+            int saveDataLength = Int32.Parse(reader.ReadLine());
+            int wireSaveDataLength = Int32.Parse(reader.ReadLine());
 
-            for (int i = 0; i < numberOfChips; i++)
+            string saveData = "";
+            string wireSaveData = "";
+
+            for (int j = 0; j < saveDataLength; j++)
             {
-                string chipName = reader.ReadLine();
-                int saveDataLength = Int32.Parse(reader.ReadLine());
-                int wireSaveDataLength = Int32.Parse(reader.ReadLine());
-
-                string saveData = "";
-                string wireSaveData = "";
-
-                for (int j = 0; j < saveDataLength; j++)
-                {
-                    saveData += reader.ReadLine() + "\n";
-                }
-                for (int j = 0; j < wireSaveDataLength; j++)
-                {
-                    wireSaveData += reader.ReadLine() + "\n";
-                }
-
-                // Rename chip if already exist
-                if (Array.FindIndex(allChips, c => c.Data.name == chipName) >= 0)
-                {
-                    int nameCounter = 2;
-                    string newName;
-                    do
-                    {
-                        newName = chipName + nameCounter.ToString();
-                        nameCounter++;
-                    } while (Array.FindIndex(allChips, c => c.Data.name == newName) >= 0);
-
-                    nameUpdateLookupTable.Add(chipName, newName); chipName = newName;
-                }
-
-                // Update name inside file if there was some names changed
-                foreach (KeyValuePair<string, string> nameToReplace in nameUpdateLookupTable)
-                {
-                    saveData = saveData
-                            .Replace("\"name\": \"" + nameToReplace.Key + "\"",
-                                     "\"name\": \"" + nameToReplace.Value + "\"")
-                            .Replace("\"chipName\": \"" + nameToReplace.Key + "\"",
-                                     "\"chipName\": \"" + nameToReplace.Value + "\"");
-                }
-
-                string chipSaveFile = SaveSystem.GetPathToSaveFile(chipName);
-
-                SaveSystem.WriteChip(chipName, saveData);
-                SaveSystem.WriteWire(chipName, wireSaveData);
+                saveData += reader.ReadLine() + "\n";
             }
+            for (int j = 0; j < wireSaveDataLength; j++)
+            {
+                wireSaveData += reader.ReadLine() + "\n";
+            }
+
+            // Rename chip if already exist
+            if (Array.FindIndex(allChips, c => c.Data.name == chipName) >= 0)
+            {
+                int nameCounter = 2;
+                string newName;
+                do
+                {
+                    newName = chipName + nameCounter.ToString();
+                    nameCounter++;
+                } while (Array.FindIndex(allChips, c => c.Data.name == newName) >= 0);
+
+                nameUpdateLookupTable.Add(chipName, newName); chipName = newName;
+            }
+
+            // Update name inside file if there was some names changed
+            foreach (KeyValuePair<string, string> nameToReplace in nameUpdateLookupTable)
+            {
+                saveData = saveData
+                    .Replace("\"name\": \"" + nameToReplace.Key + "\"",
+                        "\"name\": \"" + nameToReplace.Value + "\"")
+                    .Replace("\"chipName\": \"" + nameToReplace.Key + "\"",
+                        "\"chipName\": \"" + nameToReplace.Value + "\"");
+            }
+
+            string chipSaveFile = SaveSystem.GetPathToSaveFile(chipName);
+
+            SaveSystem.WriteChip(chipName, saveData);
+            SaveSystem.WriteWire(chipName, wireSaveData);
         }
     }
 }

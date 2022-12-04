@@ -72,7 +72,6 @@ public class ChipInterfaceEditor : Interactable
     int currentGroupID;
     Dictionary<int, ChipSignal[]> groupsByID;
 
-    private bool IsGroup => currentGroupSize > 1;
 
     void Awake()
     {
@@ -330,6 +329,8 @@ public class ChipInterfaceEditor : Interactable
         {
             ChipSignal[] spawnedSignals = new ChipSignal[currentGroupSize];
 
+            var isGroup = currentGroupSize > 1;
+
             for (int i = 0; i < currentGroupSize; i++)
             {
                 float posY = CalcY(InputHelper.MouseWorldPos.y, currentGroupSize, i);
@@ -337,7 +338,7 @@ public class ChipInterfaceEditor : Interactable
 
                 ChipSignal spawnedSignal = Instantiate(signalPrefab, spawnPos, Quaternion.identity, signalHolder);
                 spawnedSignal.GetComponent<IOScaler>().UpdateScale();
-                if (IsGroup)
+                if (isGroup)
                 {
                     spawnedSignal.GroupID = currentGroupID;
                     spawnedSignal.displayGroupDecimalValue = true;
@@ -348,7 +349,7 @@ public class ChipInterfaceEditor : Interactable
                 spawnedSignals[i] = spawnedSignal;
             }
 
-            if (IsGroup)
+            if (isGroup)
             {
                 groupsByID.Add(currentGroupID, spawnedSignals);
                 // Reset group size after spawning
@@ -492,7 +493,7 @@ public class ChipInterfaceEditor : Interactable
             dragHandleStartY = selectedSignals[selectedSignals.Count / 2].transform.position.y;
         }
 
-        PropertiesMenu.EnableUI(this, selectedSignals[0].signalName, IsGroup, selectedSignals[0].useTwosComplement,
+        PropertiesMenu.EnableUI(this, selectedSignals[0].signalName, selectedSignals.Count > 1, selectedSignals[0].useTwosComplement,
                                    currentEditorName, signalToDrag.signalName, (int)selectedSignals[0].wireType);
         RequestFocus();
 
