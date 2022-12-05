@@ -126,16 +126,17 @@ public class ChipInterfaceEditor : Interactable
 
 
     // Event handler when changed input or output pin wire type
-    public void ModeChanged(int mode)
+    public void ChangeWireType(int mode)
     {
-        if (IsSomethingSelected)
+        if (!IsSomethingSelected)
             return;
 
         // Change output pin wire mode
+        foreach (var sig in selectedSignals)
+            sig.wireType = (Pin.WireType)mode;
+        
         foreach (var pin in selectedSignals.SelectMany(x => x.inputPins))
-        {
             pin.wireType = (Pin.WireType)mode;
-        }
 
         // Change input pin wire mode
         if (selectedSignals[0] is InputSignal)
@@ -143,12 +144,9 @@ public class ChipInterfaceEditor : Interactable
             foreach (InputSignal signal in selectedSignals)
             {
                 var pin = signal.outputPins[0];
-                if (pin == null)
-                    return;
+                if (pin == null) return;
                 pin.wireType = (Pin.WireType)mode;
-                // Turn off input pin
-                if (pin.State == 1)
-                    signal.ToggleActive();
+                signal.SetState(0);
             }
         }
     }
@@ -347,7 +345,7 @@ public class ChipInterfaceEditor : Interactable
                 visiblePins.AddRange(spawnedSignal.inputPins);
                 visiblePins.AddRange(spawnedSignal.outputPins);
                 spawnedSignals[i] = spawnedSignal;
-                
+
             }
 
             if (isGroup)
@@ -428,7 +426,7 @@ public class ChipInterfaceEditor : Interactable
 
             if (selectedSignals.Contains(singnal))
                 handleState = HasFocus ? HandleState.SelectedAndFocused : HandleState.Selected;
-            else if(singnal == highlightedSignal)
+            else if (singnal == highlightedSignal)
                 handleState = HandleState.Highlighted;
 
             DrawHandle(singnal.transform.position.y, handleState);
@@ -494,8 +492,10 @@ public class ChipInterfaceEditor : Interactable
             dragHandleStartY = selectedSignals[selectedSignals.Count / 2].transform.position.y;
         }
 
-        PropertiesMenu.EnableUI(this, selectedSignals[0].signalName, selectedSignals.Count > 1, selectedSignals[0].useTwosComplement,
-                                   currentEditorName, signalToDrag.signalName, (int)selectedSignals[0].wireType);
+        PropertiesMenu?.EnableUI(this,
+                selectedSignals[0].signalName, selectedSignals.Count > 1,
+                selectedSignals[0].useTwosComplement, currentEditorName,
+                signalToDrag.signalName, (int)selectedSignals[0].wireType);
         RequestFocus();
 
         UpdatePropertyUIPosition();
