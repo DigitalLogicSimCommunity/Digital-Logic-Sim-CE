@@ -4,24 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-[System.Serializable]
-public struct ChipData
-{
-    public string name;
-    public int creationIndex;
-    public Color Colour;
-    public Color NameColour;
-    public string folderName;
-    public float scale;
 
-    public void ValidateDefaultData()
-    {
-        if (String.IsNullOrEmpty(folderName))
-            folderName = "User";
-        if (float.IsNaN(scale))
-            scale = 1f;
-    }
-}
 
 [System.Serializable]
 // Composite chip is a custom chip made up from other chips ("components")
@@ -47,13 +30,10 @@ public class SavedChip
                                 .ToArray();
 
         // Create serializable chips
-        savedComponentChips =
-            new SavedComponentChip[chipSaveData.componentChips.Length];
+        savedComponentChips = new SavedComponentChip[chipSaveData.componentChips.Length];
+
         for (int i = 0; i < chipSaveData.componentChips.Length; i++)
-        {
-            savedComponentChips[i] = new SavedComponentChip(
-                chipSaveData, chipSaveData.componentChips[i]);
-        }
+            savedComponentChips[i] = new SavedComponentChip(chipSaveData, chipSaveData.componentChips[i]);
     }
 
     public void ValidateDefaultData()

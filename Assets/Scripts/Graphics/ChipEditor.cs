@@ -9,7 +9,8 @@ public class ChipEditor : MonoBehaviour
     public ChipInterfaceEditor outputsEditor;
     public ChipInteraction chipInteraction;
     public PinAndWireInteraction pinAndWireInteraction;
-    public PinNameDisplayManager pinNameDisplayManager;
+
+    public PinNameDisplayManager pinNameDisplayManager ;
 
     public ChipData Data;
 
@@ -17,17 +18,10 @@ public class ChipEditor : MonoBehaviour
     {
         Data = new ChipData()
         {
-            folderName = "User",
+            FolderIndex = 0,
             scale = 1
         };
 
-        InteractionHandler[] allHandlers = { inputsEditor, outputsEditor,
-                                         chipInteraction,
-                                         pinAndWireInteraction };
-        foreach (var handler in allHandlers)
-        {
-            handler.InitAllHandlers(allHandlers);
-        }
 
         pinAndWireInteraction.Init(chipInteraction, inputsEditor, outputsEditor);
         pinAndWireInteraction.onConnectionChanged += OnChipNetworkModified;
@@ -47,11 +41,11 @@ public class ChipEditor : MonoBehaviour
     public void LoadFromSaveData(ChipSaveData saveData)
     {
         Data = saveData.Data;
+        ScalingManager.scale = Data.scale;
 
         // Load component chips
-        for (int i = 0; i < saveData.componentChips.Length; i++)
+        foreach (Chip componentChip in saveData.componentChips)
         {
-            Chip componentChip = saveData.componentChips[i];
             if (componentChip is InputSignal inp)
             {
                 inp.wireType = inp.outputPins[0].wireType;
@@ -71,13 +65,13 @@ public class ChipEditor : MonoBehaviour
         // Load wires
         if (saveData.wires != null)
         {
-            for (int i = 0; i < saveData.wires.Length; i++)
+            foreach (Wire wire in saveData.wires)
             {
-                pinAndWireInteraction.LoadWire(saveData.wires[i]);
+                pinAndWireInteraction.LoadWire(wire);
             }
         }
-        ScalingManager.scale = Data.scale;
-        FindObjectOfType<ChipEditorOptions>().SetUIValues(this);
+
+        ChipEditorOptions.instance.SetUIValues(this);
     }
 
     public void UpdateChipSizes()

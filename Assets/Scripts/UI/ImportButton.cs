@@ -30,7 +30,7 @@ public class ImportButton : MonoBehaviour
 
     void EditChipBar()
     {
-        chipBarUI.ReloadBar();
-        SaveSystem.LoadAll(manager);
+        chipBarUI.ReloadChipButton();
+        SaveSystem.LoadAllChips(manager);
     }
 }
