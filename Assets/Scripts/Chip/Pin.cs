@@ -7,7 +7,9 @@ public class Pin : MonoBehaviour
     public enum WireType { Simple, Bus4, Bus8, Bus16, Bus32 }
     public enum PinType { ChipInput, ChipOutput }
     public PinType pinType;
+
     public WireType wireType;
+
     // The chip that this pin is attached to (either as an input or output
     // terminal)
     public Chip chip;
@@ -189,4 +191,6 @@ public class Pin : MonoBehaviour
         transform.localScale = Vector3.one * radius * 2;
         UpdateColor();
     }
+
+
 }
