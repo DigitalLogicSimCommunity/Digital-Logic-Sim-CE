@@ -55,7 +55,7 @@ public class ChipPropertiesMenu : MonoBehaviour
 
         Opened = true;
     }
-    
+
     public void DisableUI()
     {
         if (!Opened) return;
@@ -90,6 +90,7 @@ public class ChipPropertiesMenu : MonoBehaviour
     }
     void OnValueDropDownChange(int mode)
     {
-        CurrentInterface.ModeChanged(mode);
+        if (CurrentInterface != null)
+            CurrentInterface.ChangeWireType(mode);
     }
 }
