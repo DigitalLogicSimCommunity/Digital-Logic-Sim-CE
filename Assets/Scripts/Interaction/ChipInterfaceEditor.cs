@@ -128,7 +128,7 @@ public class ChipInterfaceEditor : Interactable
     // Event handler when changed input or output pin wire type
     public void ModeChanged(int mode)
     {
-        if (IsSomethingSelected)
+        if (!IsSomethingSelected)
             return;
 
         // Change output pin wire mode
