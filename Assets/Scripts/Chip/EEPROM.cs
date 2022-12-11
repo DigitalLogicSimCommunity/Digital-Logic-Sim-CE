@@ -14,7 +14,7 @@ public class EEPROM : BuiltinChip
     public Pin dataInPinPrefab;
     public Pin dataOutPinPrefab;
 
-    public bool alwaysLoadFromSaveFile = false;
+    public bool autoSaveAndLoad = false;
 
     private float pinSpacing = 0.15f;
     private float busSpacing = 0.2f;
@@ -24,7 +24,7 @@ public class EEPROM : BuiltinChip
         base.Awake();
         contents = new byte[((long)1 << (addrBusSize * 8)) * dataBusSize];
         // Debug.Log("EEPROM contents " + contents.Length);
-        if (alwaysLoadFromSaveFile)
+        if (autoSaveAndLoad)
             SaveSystem.LoadEEPROMContents().CopyTo(contents, 0);
     }
 
@@ -150,18 +150,18 @@ public class EEPROM : BuiltinChip
             {
                 data <<= 8;
                 data += contents[index + i];
+                // Debug.Log("EEPROM read " + contents[index + i] + " at index " + (index + i) + " resulting in data " + data + "");
             }
         }
         catch
         {
-            Debug.Log("EEPROM read error at index " + (index));
+            Debug.Log("EEPROM read error at address " + (address));
         }
 
         //reading
         for (int i = 0; i < outputPins.Length; i++)
         {
-            outputPins[i].ReceiveSignal(data & 1);
-            data >>= 2;
+            outputPins[i].ReceiveSignal(data & (1<<(outputPins.Length-i-1)));
         }
         if (inputPins[0].State > 0)
         {
@@ -172,15 +172,14 @@ public class EEPROM : BuiltinChip
                 newData <<= 1;
                 newData += inputPins[i + 1 + addrBusSize * 8].State;
             }
-            bool updateFile = newData != data;
 
-            if (updateFile)
+            if (newData != data)
             {
                 for (int i = dataBusSize - 1; i >= 0; i--)
                 {
                     try
                     {
-                        contents[index + i] = (byte)(newData & 0xFF);
+                        contents[index + i] = (byte)newData;
                     }
                     catch
                     {
@@ -188,7 +187,8 @@ public class EEPROM : BuiltinChip
                     }
                     newData >>= 8;
                 }
-                SaveSystem.SaveEEPROMContents(contents);
+                if (autoSaveAndLoad)
+                    SaveSystem.SaveEEPROMContents(contents);
             }
         }
     }
