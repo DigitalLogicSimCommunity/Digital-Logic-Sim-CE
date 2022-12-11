@@ -84,11 +84,18 @@ public class EEPROM : BuiltinChip
 
     }
 
+    private void OnMouseOver()
+    {
+        if (Input.GetMouseButtonDown(1))
+            UIManager.instance.OpenMenu(MenuType.EEPROMMenu);
+    }
+
     public void OpenAndFlashBinary()
     {
+        Debug.Log("OpenAndFlashBinary");
         var extensions = new[] {
-      new ExtensionFilter("Binary file", "bin"),
-    };
+        new ExtensionFilter("Binary file", "bin"),
+      };
 
         StandaloneFileBrowser.OpenFilePanelAsync(
           "Open binary file", "", extensions, true, (string[] paths) =>

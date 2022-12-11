@@ -15,6 +15,7 @@ public enum MenuType
     NewFolderMenu = 3,
     SubmitMenu = 4,
     ClockMenu = 5,
+    EEPROMMenu = 7,
     EditFolderMenu = 6,
 };
 
@@ -37,6 +38,7 @@ public class UIManager : MonoBehaviour
     UIMenu OpenedMenu;
 
     ClockMenu ClockMenu;
+    EEPROMMenu EEPROMMenu;
     EditChipMenu editChipMenu;
 
 
@@ -48,6 +50,7 @@ public class UIManager : MonoBehaviour
         outsideMenuArea.SetActive(false);
 
         ClockMenu = FindObjectOfType<ClockMenu>(true);
+        EEPROMMenu = FindObjectOfType<EEPROMMenu>(true);
         editChipMenu = FindObjectOfType<EditChipMenu>(true);
 
     }
@@ -116,6 +119,8 @@ public class UIManager : MonoBehaviour
             SetChipEditMenuPosition();
         if (currentMenuType == MenuType.ClockMenu)
             SetClockMenuPosition();
+        if (currentMenuType == MenuType.EEPROMMenu)
+            SetEEPROMMenuPosition();
     }
 
     void SetChipEditMenuPosition()
@@ -142,6 +147,16 @@ public class UIManager : MonoBehaviour
         {
             ClockMenu.SetClockToEdit(Clock);
             OpenedMenu.transform.position = new Vector3(Clock.transform.position.x, Clock.transform.position.y - 2, OpenedMenu.transform.position.z);
+        }
+    }
+
+    void SetEEPROMMenuPosition()
+    {
+        var EEPROM = InputHelper.GetObjectUnderMouse2D(1 << LayerMask.NameToLayer("Chip")).GetComponent<EEPROM>();
+        if (EEPROM != null)
+        {
+            EEPROMMenu.SetEEPROMToEdit(EEPROM);
+            OpenedMenu.transform.position = new Vector3(EEPROM.transform.position.x, EEPROM.transform.position.y - 2, OpenedMenu.transform.position.z);
         }
     }
 
