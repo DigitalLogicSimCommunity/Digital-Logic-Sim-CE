@@ -116,7 +116,7 @@ public class EEPROM : BuiltinChip {
     int address = 0;
     for (int i = 0; i < (addrBusSize*8); i++) {
       address <<=1; 
-      address += inputPins[i+1].State ?1:0;
+      address += inputPins[i+1].State;
     }
     int index = address * dataBusSize;
     int data = 0;
@@ -129,15 +129,15 @@ public class EEPROM : BuiltinChip {
     
     //reading
     for (int i = 0; i < outputPins.Length; i++) {
-      outputPins[i].ReceiveSignal((data & 1)==1);
+      outputPins[i].ReceiveSignal(data & 1);
       data >>= 2;
     }
-    if (inputPins[0].State) {
+    if (inputPins[0].State>0) {
       //writing
       int newData = 0;
       for (int i = 0; i < (dataBusSize*8); i++) {
         newData <<=1; 
-        newData += inputPins[i+1+addrBusSize*8].State ?1:0;
+        newData += inputPins[i+1+addrBusSize*8].State;
       }
       bool updateFile = newData != data;
       

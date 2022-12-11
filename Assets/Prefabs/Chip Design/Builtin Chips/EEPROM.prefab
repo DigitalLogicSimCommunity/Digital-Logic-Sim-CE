@@ -211,9 +211,9 @@ MonoBehaviour:
   bounds: {fileID: 0}
   packageColour: {r: 0.5, g: 0.5, b: 0.5, a: 0}
   writePin: {fileID: 6457705426190250272}
-  addrBusSize: 16
+  addrBusSize: 2
   addrPinPrefab: {fileID: 3558293974790791664}
-  dataBusSize: 16
+  dataBusSize: 2
   dataInPinPrefab: {fileID: 394754419250833084}
   dataOutPinPrefab: {fileID: 2134446557393080565}
 --- !u!114 &-1534845107842312262
