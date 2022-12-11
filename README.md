@@ -6,7 +6,7 @@ This version includes plenty of new features, including:
   - Custom Hz Clock
   - 8×8 Display
   - Buses
-  - Persistent HDD
+  - flashable EEPROM (load .bin files)
   - And more!
 - Zoom in/out and zoom helper for easier navigation
 - View and edit already saved chips
