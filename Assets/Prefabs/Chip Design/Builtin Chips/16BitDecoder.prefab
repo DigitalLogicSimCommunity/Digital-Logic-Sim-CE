@@ -2438,13 +2438,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'msb
-
-
-    Encoder
-
-
-    lsb
+  m_text: 'Encoder
 
 '
   m_isRightToLeft: 0

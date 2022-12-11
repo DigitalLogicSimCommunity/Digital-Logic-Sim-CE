@@ -17,6 +17,8 @@
 *.DS_Store
 # /.vscode/
 
+*.app
+
 # Never ignore Asset meta data
 !/[Aa]ssets/**/*.meta
 
