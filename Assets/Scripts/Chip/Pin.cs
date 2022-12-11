@@ -28,7 +28,7 @@ public class Pin : MonoBehaviour
     [HideInInspector]
     public List<Pin> childPins = new List<Pin>();
     // Current state of the pin: 0 == LOW, 1 == HIGH
-    int currentState;
+    bool currentState;
 
     bool interact;
 
@@ -84,7 +84,7 @@ public class Pin : MonoBehaviour
             {
                 newColor = interactCol;
             }
-            else if (simActive && currentState == 1)
+            else if (simActive && currentState)
             {
                 newColor = wireType == WireType.Simple ? onCol : onColBus;
             }
@@ -100,7 +100,7 @@ public class Pin : MonoBehaviour
     }
 
     // Get the current state of the pin: 0 == LOW, 1 == HIGH
-    public int State
+    public bool State
     {
         get { return currentState; }
     }
@@ -116,7 +116,7 @@ public class Pin : MonoBehaviour
     // Receive signal: 0 == LOW, 1 = HIGH
     // Sets the current state to the signal
     // Passes the signal on to any connected pins / electronic component
-    public void ReceiveSignal(int signal)
+    public void ReceiveSignal(bool signal)
     {
         currentState = signal;
         if (pinType == PinType.ChipInput && !cyclic)
