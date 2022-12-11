@@ -15,17 +15,17 @@ public class InputSignal : ChipSignal
 
     public void ToggleActive()
     {
-        currentState ^=true;
+        currentState = 1 - currentState;
         SetCol();
     }
 
-    public void SetState(bool state)
+    public void SetState(int state)
     {
-        currentState = state;
+        currentState = state >= 1 ? 1 : 0;
         SetCol();
     }
 
-    public void SendSignal(bool signal)
+    public void SendSignal(int signal)
     {
         currentState = signal;
         outputPins[0].ReceiveSignal(signal);
@@ -34,7 +34,7 @@ public class InputSignal : ChipSignal
 
     public void SendOffSignal()
     {
-        outputPins[0].ReceiveSignal(false);
+        outputPins[0].ReceiveSignal(0);
         SetCol();
     }
 

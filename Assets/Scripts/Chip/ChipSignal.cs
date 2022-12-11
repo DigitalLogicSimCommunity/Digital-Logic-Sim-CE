@@ -6,7 +6,7 @@ using UnityEngine;
 public class ChipSignal : Chip
 {
 
-    public bool currentState;
+    public int currentState;
 
     public Palette palette;
     public MeshRenderer indicatorRenderer;
@@ -34,11 +34,11 @@ public class ChipSignal : Chip
         }
     }
 
-    public void SetDisplayState(bool state)
+    public void SetDisplayState(int state)
     {
 
         if (indicatorRenderer && interactable)
-            indicatorRenderer.material.color = state ? palette.onCol : palette.offCol;
+            indicatorRenderer.material.color = (state == 1) ? palette.onCol : palette.offCol;
     }
 
     public static bool InSameGroup(ChipSignal signalA, ChipSignal signalB) => (signalA.GroupID == signalB.GroupID) && (signalA.GroupID != -1);
