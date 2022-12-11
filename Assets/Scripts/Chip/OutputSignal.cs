@@ -5,7 +5,7 @@ public class OutputSignal : ChipSignal {
 
 	protected override void Start () {
 		base.Start ();
-		SetDisplayState (0);
+		SetDisplayState (false);
 	}
 
 	public override void ReceiveInputSignal (Pin inputPin) {

@@ -60,14 +60,14 @@ public class CustomChip : Chip
         }
         foreach (Pin pin in unconnectedInputs)
         {
-            pin.ReceiveSignal(0);
+            pin.ReceiveSignal(false);
             pin.chip.ReceiveInputSignal(pin);
         }
 
         // Pass processed signals on to ouput pins
         for (int i = 0; i < outputPins.Length; i++)
         {
-            int outputState = outputSignals[i].inputPins[0].State;
+            bool outputState = outputSignals[i].inputPins[0].State;
             outputPins[i].ReceiveSignal(outputState);
         }
     }

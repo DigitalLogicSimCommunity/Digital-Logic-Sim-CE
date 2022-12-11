@@ -38,9 +38,9 @@ public class Clock : BuiltinChip
     private IEnumerator ClockTick()
     {
         yield return Waiter;
-        outputPins[0].ReceiveSignal(1);
+        outputPins[0].ReceiveSignal(true);
         yield return Waiter;
-        outputPins[0].ReceiveSignal(0);
+        outputPins[0].ReceiveSignal(false);
         StartCoroutine(ClockTick());
     }
 
