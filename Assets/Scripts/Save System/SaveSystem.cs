@@ -16,7 +16,7 @@ public static class SaveSystem
 
     public static string SaveDataDirectoryPath => Path.Combine(Application.persistentDataPath, "SaveData");
     static string CurrentSaveProfileWireLayoutDirectoryPath => Path.Combine(CurrentSaveProfileDirectoryPath, "WireLayout");
-    static string EEPROMSaveFilePath => Path.Combine(CurrentSaveProfileDirectoryPath, "HDDContents.json");
+    static string EEPROMSaveFilePath => Path.Combine(CurrentSaveProfileDirectoryPath, "EEPROMContents.json");
     public static string GetPathToSaveFile(string saveFileName) => Path.Combine(CurrentSaveProfileDirectoryPath, saveFileName + fileExtension);
 
     public static string GetPathToWireSaveFile(string saveFileName) => Path.Combine(CurrentSaveProfileWireLayoutDirectoryPath, saveFileName + fileExtension);

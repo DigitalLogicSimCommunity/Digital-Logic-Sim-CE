@@ -14,14 +14,18 @@ public class EEPROM : BuiltinChip
     public Pin dataInPinPrefab;
     public Pin dataOutPinPrefab;
 
+    public bool alwaysLoadFromSaveFile = false;
+
     private float pinSpacing = 0.15f;
     private float busSpacing = 0.2f;
 
     protected override void Awake()
     {
         base.Awake();
-        contents = new byte[1 << (addrBusSize * 8) * dataBusSize];
-        SaveSystem.LoadEEPROMContents().CopyTo(contents, 0);
+        contents = new byte[((long)1 << (addrBusSize * 8)) * dataBusSize];
+        // Debug.Log("EEPROM contents " + contents.Length);
+        if (alwaysLoadFromSaveFile)
+            SaveSystem.LoadEEPROMContents().CopyTo(contents, 0);
     }
 
     protected override void Start()
@@ -148,7 +152,10 @@ public class EEPROM : BuiltinChip
                 data += contents[index + i];
             }
         }
-        catch { }
+        catch
+        {
+            Debug.Log("EEPROM read error at index " + (index));
+        }
 
         //reading
         for (int i = 0; i < outputPins.Length; i++)
@@ -171,7 +178,14 @@ public class EEPROM : BuiltinChip
             {
                 for (int i = dataBusSize - 1; i >= 0; i--)
                 {
-                    contents[index + i] = (byte)(newData & 0xFF);
+                    try
+                    {
+                        contents[index + i] = (byte)(newData & 0xFF);
+                    }
+                    catch
+                    {
+                        Debug.Log("EEPROM write error at index " + (index + i));
+                    }
                     newData >>= 8;
                 }
                 SaveSystem.SaveEEPROMContents(contents);
