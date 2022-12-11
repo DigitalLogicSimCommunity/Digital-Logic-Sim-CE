@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class HardDrive : BuiltinChip {
+public class EEPROM : BuiltinChip {
   public static Dictionary<string, List<int>> contents;
 
   protected override void Awake() {
     base.Awake();
-    contents = SaveSystem.LoadHDDContents();
+    contents = SaveSystem.LoadEEPROMContents();
   }
 
   protected override void ProcessOutput() {
@@ -46,7 +46,7 @@ public class HardDrive : BuiltinChip {
       }
       contents.Add(address, store);
       if (updateFile) {
-        SaveSystem.SaveHDDContents(contents);
+        SaveSystem.SaveEEPROMContents(contents);
       }
       break;
     default:

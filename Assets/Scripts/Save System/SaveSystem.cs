@@ -86,7 +86,7 @@ public static class SaveSystem
     }
 
 
-    public static Dictionary<string, List<int>> LoadHDDContents()
+    public static Dictionary<string, List<int>> LoadEEPROMContents()
     {
         if (File.Exists(HDDSaveFilePath))
         {
@@ -99,7 +99,7 @@ public static class SaveSystem
 
 
 
-    public static void SaveHDDContents(Dictionary<string, List<int>> contents)
+    public static void SaveEEPROMContents(Dictionary<string, List<int>> contents)
     {
         string jsonStr = JsonConvert.SerializeObject(contents, Formatting.Indented);
         WriteFile(HDDSaveFilePath, jsonStr);
