@@ -71,7 +71,8 @@ public class InputSignal : ChipSignal
 	public void OnEndEdit()
 	{
 		int enteredState = int.Parse(busInput.text == string.Empty ? "0" : busInput.text);
-		currentState = wireType != Pin.WireType.Bus32 ? System.Math.Min(enteredState, 1 << (Pin.NumBits(wireType)) - 1) : enteredState;
+		enteredState = wireType != Pin.WireType.Bus32 ? System.Math.Min(enteredState, 1 << (Pin.NumBits(wireType)) - 1) : enteredState;
+		currentState = System.Math.Max(enteredState, 0);
 		busInput.text = currentState.ToString();
 		busInput.gameObject.SetActive(false);
 		SetCol();
