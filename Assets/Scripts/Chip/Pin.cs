@@ -45,6 +45,23 @@ public class Pin : MonoBehaviour
 
     public static float interactionRadius => radius * 1.1f;
 
+    public static int NumBits(WireType type)
+	{
+        switch(type)
+		{
+            case WireType.Bus4:
+                return 4;
+            case WireType.Bus8:
+                return 8;
+            case WireType.Bus16:
+                return 16;
+            case WireType.Bus32:
+                return 32;
+            default:
+                return 1;
+        }
+	}
+
     void Awake()
     {
         material = GetComponent<MeshRenderer>().material;
@@ -84,7 +101,7 @@ public class Pin : MonoBehaviour
             {
                 newColor = interactCol;
             }
-            else if (simActive && currentState == 1)
+            else if (simActive && currentState > 0)
             {
                 newColor = wireType == WireType.Simple ? onCol : onColBus;
             }

@@ -12,6 +12,7 @@ public class ChipSignal : Chip
     public MeshRenderer indicatorRenderer;
     public MeshRenderer pinRenderer;
     public MeshRenderer wireRenderer;
+    public TMPro.TextMeshPro busReadout;
 
     public bool displayGroupDecimalValue { get; set; } = false;
     public bool useTwosComplement { get; set; } = true;
@@ -36,9 +37,15 @@ public class ChipSignal : Chip
 
     public void SetDisplayState(int state)
     {
-
         if (indicatorRenderer && interactable)
-            indicatorRenderer.material.color = (state == 1) ? palette.onCol : palette.offCol;
+        {
+            indicatorRenderer.material.color = wireType == Pin.WireType.Simple ? 
+                (state == 1 ? palette.onCol : palette.offCol) :
+                (state > 0 ? palette.busColor : palette.offCol);
+            if (state == 0 || wireType == Pin.WireType.Simple) busReadout.gameObject.SetActive(false);
+            else busReadout.gameObject.SetActive(true);
+            busReadout.text = state.ToString();
+        }
     }
 
     public static bool InSameGroup(ChipSignal signalA, ChipSignal signalB) => (signalA.GroupID == signalB.GroupID) && (signalA.GroupID != -1);
