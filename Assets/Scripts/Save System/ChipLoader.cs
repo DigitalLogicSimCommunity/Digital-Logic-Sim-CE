@@ -232,6 +232,8 @@ public static class ChipLoader
             {
                 loadedChipData.componentChips[i].inputPins[inputIndex].pinName =
                     componentToLoad.inputPins[inputIndex].name;
+                loadedChipData.componentChips[i].inputPins[inputIndex].wireType =
+                    componentToLoad.inputPins[inputIndex].wireType;
             }
 
             // Load output pin names
@@ -242,6 +244,8 @@ public static class ChipLoader
             {
                 loadedChipData.componentChips[i].outputPins[ouputIndex].pinName =
                     componentToLoad.outputPins[ouputIndex].name;
+                loadedChipData.componentChips[i].outputPins[ouputIndex].wireType =
+                    componentToLoad.outputPins[ouputIndex].wireType;
             }
         }
 
