@@ -12,6 +12,7 @@ public class LoadProjectMenu : MonoBehaviour
 
     void OnEnable()
     {
+        SaveSystem.MigrateSaves();
         string[] projectNames = SaveSystem.GetSaveNames();
 
         for (int i = 0; i < projectNames.Length; i++)

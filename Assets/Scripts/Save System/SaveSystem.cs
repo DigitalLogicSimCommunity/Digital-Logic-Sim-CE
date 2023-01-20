@@ -69,6 +69,25 @@ public static class SaveSystem
         return ChipLoader.GetAllSavedChipsDic(GetChipSavePaths());
     }
 
+    public static void MigrateSaves()
+	{
+        //old appdata path is at ../../Sebastian Lague/Digital Logic Sim
+
+        string oldAppDataPath = Path.Combine(new string[] { Directory.GetParent(Application.persistentDataPath).Parent.FullName, "Sebastian Lague", "Digital Logic Sim" });
+        if (Directory.Exists(oldAppDataPath))
+        {
+            string oldSaveDataPath = Path.Combine(oldAppDataPath, "SaveData");
+            string[] savedProjectPaths = Directory.GetDirectories(oldSaveDataPath);
+            foreach(string path in savedProjectPaths)
+			{
+                string folderName = Path.Combine(SaveDataDirectoryPath, Path.GetFileName(path));
+                if (Directory.Exists(folderName)) folderName = Path.Combine(SaveDataDirectoryPath, Path.GetFileName(path) + " - Copy");
+                Directory.Move(path, folderName);
+			}
+            Directory.Delete(Path.Combine(Directory.GetParent(Application.persistentDataPath).Parent.FullName, "Sebastian Lague"), true);
+        }
+    }
+
     public static string[] GetSaveNames()
     {
         string[] savedProjectPaths = new string[0];
