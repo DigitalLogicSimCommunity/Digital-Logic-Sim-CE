@@ -44,13 +44,9 @@ public class ChipInterfaceEditor : Interactable
     const float handleSizeX = 0.15f;
 
     string currentEditorName;
-    ChipEditor editorInstance;
     public ChipEditor CurrentEditor
     {
-        set { 
-            editorInstance = value;
-            currentEditorName = value.Data.name;
-        }
+        set => currentEditorName = value.Data.name;
     }
 
     ChipSignal highlightedSignal;
@@ -142,7 +138,7 @@ public class ChipInterfaceEditor : Interactable
         foreach (var pin in selectedSignals.SelectMany(x => x.inputPins))
         {
             pin.wireType = (Pin.WireType)mode;
-            editorInstance.pinAndWireInteraction.DestroyConnectedWires(pin);
+            Manager.ActiveChipEditor.pinAndWireInteraction.DestroyConnectedWires(pin);
         }
 
         // Change input pin wire mode
@@ -153,7 +149,7 @@ public class ChipInterfaceEditor : Interactable
                 var pin = signal.outputPins[0];
                 if (pin == null) return;
                 pin.wireType = (Pin.WireType)mode;
-                editorInstance.pinAndWireInteraction.DestroyConnectedWires(pin);
+                Manager.ActiveChipEditor.pinAndWireInteraction.DestroyConnectedWires(pin);
                 signal.SetState(0);
             }
         }
