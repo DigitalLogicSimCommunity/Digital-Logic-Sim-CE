@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using UnityEngine;
 
 // Provides input signal (0 or 1) to a chip.
@@ -70,9 +71,18 @@ public class InputSignal : ChipSignal
 
 	public void OnEndEdit()
 	{
-		int enteredState = int.Parse(busInput.text == string.Empty ? "0" : busInput.text);
-		enteredState = wireType != Pin.WireType.Bus32 ? System.Math.Min(enteredState, (1 << Pin.NumBits(wireType)) - 1) : enteredState;
-		currentState = System.Math.Max(enteredState, 0);
+		int enteredState;
+		try
+		{
+			enteredState = int.Parse(busInput.text == string.Empty ? "0" : busInput.text);
+		}
+		catch(Exception e) {
+			if (e is OverflowException)
+				enteredState = int.MaxValue;
+			else throw e;
+		}
+		enteredState = wireType != Pin.WireType.Bus32 ? Math.Min(enteredState, (1 << Pin.NumBits(wireType)) - 1) : enteredState;
+		currentState = Math.Max(enteredState, 0);
 		busInput.text = currentState.ToString();
 		busInput.gameObject.SetActive(false);
 		SetCol();
