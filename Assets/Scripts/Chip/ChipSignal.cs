@@ -12,7 +12,7 @@ public class ChipSignal : Chip
     public MeshRenderer indicatorRenderer;
     public MeshRenderer pinRenderer;
     public MeshRenderer wireRenderer;
-    public TMPro.TextMeshPro busReadout;
+    public TMPro.TextMeshProUGUI busReadout;
 
     public bool displayGroupDecimalValue { get; set; } = false;
     public bool useTwosComplement { get; set; } = true;
