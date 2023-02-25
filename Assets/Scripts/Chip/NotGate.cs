@@ -5,7 +5,7 @@
 	}
 
 	protected override void ProcessOutput () {
-		int outputSignal = 1 - inputPins[0].State;
+		uint outputSignal = 1 - inputPins[0].State;
 		outputPins[0].ReceiveSignal (outputSignal);
 	}
 }

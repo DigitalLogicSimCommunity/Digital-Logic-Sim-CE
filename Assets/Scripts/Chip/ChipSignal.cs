@@ -6,7 +6,7 @@ using UnityEngine;
 public class ChipSignal : Chip
 {
 
-    public int currentState;
+    public uint currentState;
 
     public Palette palette;
     public MeshRenderer indicatorRenderer;
@@ -35,7 +35,7 @@ public class ChipSignal : Chip
         }
     }
 
-    public void SetDisplayState(int state)
+    public void SetDisplayState(uint state)
     {
         if (indicatorRenderer && interactable)
         {

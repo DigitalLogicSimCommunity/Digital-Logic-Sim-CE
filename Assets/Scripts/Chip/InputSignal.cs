@@ -20,13 +20,13 @@ public class InputSignal : ChipSignal
 		SetCol();
 	}
 
-	public void SetState(int state)
+	public void SetState(uint state)
 	{
-		currentState = state >= 1 ? 1 : 0;
+		currentState = state >= 1 ? 1U : 0U;
 		SetCol();
 	}
 
-	public void SendSignal(int signal)
+	public void SendSignal(uint signal)
 	{
 		currentState = signal;
 		outputPins[0].ReceiveSignal(signal);
@@ -71,17 +71,17 @@ public class InputSignal : ChipSignal
 
 	public void OnEndEdit()
 	{
-		int enteredState;
+		uint enteredState;
 		try
 		{
-			enteredState = int.Parse(busInput.text == string.Empty ? "0" : busInput.text);
+			enteredState = uint.Parse(busInput.text == string.Empty ? "0" : busInput.text);
 		}
 		catch(Exception e) {
 			if (e is OverflowException)
 				enteredState = int.MaxValue;
 			else throw e;
 		}
-		enteredState = wireType != Pin.WireType.Bus32 ? Math.Min(enteredState, (1 << Pin.NumBits(wireType)) - 1) : enteredState;
+		enteredState = wireType != Pin.WireType.Bus32 ? Math.Min(enteredState, (uint)(1 << Pin.NumBits(wireType)) - 1) : enteredState;
 		currentState = Math.Max(enteredState, 0);
 		busInput.text = currentState.ToString();
 		busInput.gameObject.SetActive(false);
