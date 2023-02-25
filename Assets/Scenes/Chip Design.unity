@@ -28101,6 +28101,8 @@ MonoBehaviour:
   - {fileID: 6632021948943085525, guid: f6debe3209e55ab4f9d299c0728c8b55, type: 3}
   - {fileID: 286808261455957341, guid: 184fc6762f746804aa23328309645795, type: 3}
   - {fileID: -6260489656382857768, guid: 99de4470dbba3194e9450daa3e1073ad, type: 3}
+  - {fileID: 4830304959902391766, guid: 505a2f2318d18494d82991e6b57104b8, type: 3}
+  - {fileID: 7079573870702136499, guid: 00cac01c885936f4ab0c9ef122b43f65, type: 3}
   SpawnableCustomChips: []
   UIManager: {fileID: 1579521357}
 --- !u!4 &1830893909
