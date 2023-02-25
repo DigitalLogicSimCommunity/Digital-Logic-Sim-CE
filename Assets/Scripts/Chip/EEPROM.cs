@@ -126,9 +126,9 @@ public class EEPROM : BuiltinChip
 
 	protected override void ProcessOutput()
 	{
-		int address = inputPins[1].State;
-		int index = address * 2;
-		int data = contents[index] << 8 | contents[index + 1];
+		uint address = inputPins[1].State;
+		uint index = address * 2;
+		uint data = (uint)(contents[index] << 8 | contents[index + 1]);
 
 		//reading
 		outputPins[0].ReceiveSignal(data);
@@ -136,7 +136,7 @@ public class EEPROM : BuiltinChip
 		if (inputPins[0].State > 0)
 		{
 			//writing
-			int newData = inputPins[2].State;
+			uint newData = inputPins[2].State;
 
 			if (newData != data)
 			{
