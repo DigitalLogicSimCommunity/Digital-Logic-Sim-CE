@@ -72,14 +72,14 @@ public class DecimalDisplay : MonoBehaviour
 
                 bool useTwosComplement = signals[0].useTwosComplement;
 
-                uint decimalValue = 0;
+                int decimalValue = 0;
                 for (int i = 0; i < signals.Length; i++)
                 {
                     uint signalState = signals[signals.Length - 1 - i].currentState;
                     if (useTwosComplement && i == signals.Length - 1)
-                        decimalValue |= (uint)(-(signalState << i));
+                        decimalValue |= (-((int)signalState << i));
                     else
-                        decimalValue |= signalState << i;
+                        decimalValue |= (int)(signalState << i);
                 }
                 text.text = decimalValue + "";
             }
