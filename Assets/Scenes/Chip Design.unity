@@ -32507,10 +32507,10 @@ MonoBehaviour:
   m_FillRect: {fileID: 1381265107}
   m_HandleRect: {fileID: 2124479330}
   m_Direction: 0
-  m_MinValue: 0.05
-  m_MaxValue: 0.5
+  m_MinValue: 0.2
+  m_MaxValue: 3
   m_WholeNumbers: 0
-  m_Value: 0.15
+  m_Value: 1
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
