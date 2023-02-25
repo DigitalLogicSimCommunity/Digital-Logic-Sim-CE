@@ -6,13 +6,13 @@ using UnityEngine;
 public class ChipSignal : Chip
 {
 
-    public int currentState;
+    public uint currentState;
 
     public Palette palette;
     public MeshRenderer indicatorRenderer;
     public MeshRenderer pinRenderer;
     public MeshRenderer wireRenderer;
-    public TMPro.TextMeshPro busReadout;
+    public TMPro.TextMeshProUGUI busReadout;
 
     public bool displayGroupDecimalValue { get; set; } = false;
     public bool useTwosComplement { get; set; } = true;
@@ -35,7 +35,7 @@ public class ChipSignal : Chip
         }
     }
 
-    public void SetDisplayState(int state)
+    public void SetDisplayState(uint state)
     {
         if (indicatorRenderer && interactable)
         {

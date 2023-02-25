@@ -6,10 +6,10 @@ public class Bus : Chip {
 
 	public MeshRenderer meshRenderer;
 	public Palette palette;
-	const int HighZ = -1;
+	public const uint HighZ = 0x9FCE80B6U; //sufficiently random that it hopefully won't be accidentally encountered?
 
 	protected override void ProcessOutput () {
-		int outputSignal = -1;
+		uint outputSignal = HighZ;
 		for (int i = 0; i < inputPins.Length; i++) {
 			if (inputPins[i].HasParent) {
 				if (inputPins[i].State != HighZ)
@@ -29,9 +29,9 @@ public class Bus : Chip {
 		SetCol (outputSignal);
 	}
 
-	void SetCol (int signal) {
+	void SetCol (uint signal) {
 		meshRenderer.material.color = (signal == 1) ? palette.onCol : palette.offCol;
-		if (signal == -1) {
+		if (signal == HighZ) {
 			meshRenderer.material.color = palette.highZCol;
 		}
 	}
