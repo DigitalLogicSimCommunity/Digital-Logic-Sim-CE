@@ -105,20 +105,20 @@ public static class SaveSystem
     }
 
 
-    public static Dictionary<string, List<int>> LoadHDDContents()
+    public static Dictionary<string, List<uint>> LoadHDDContents()
     {
         if (File.Exists(HDDSaveFilePath))
         {
             string jsonString = ReadFile(HDDSaveFilePath);
-            return JsonConvert.DeserializeObject<Dictionary<string, List<int>>>(
+            return JsonConvert.DeserializeObject<Dictionary<string, List<uint>>>(
                 jsonString);
         }
-        return new Dictionary<string, List<int>> { };
+        return new Dictionary<string, List<uint>> { };
     }
 
 
 
-    public static void SaveHDDContents(Dictionary<string, List<int>> contents)
+    public static void SaveHDDContents(Dictionary<string, List<uint>> contents)
     {
         string jsonStr = JsonConvert.SerializeObject(contents, Formatting.Indented);
         WriteFile(HDDSaveFilePath, jsonStr);

@@ -2,7 +2,7 @@
 using UnityEngine;
 
 public class HardDrive : BuiltinChip {
-  public static Dictionary<string, List<int>> contents;
+  public static Dictionary<string, List<uint>> contents;
 
   protected override void Awake() {
     base.Awake();
@@ -29,7 +29,7 @@ public class HardDrive : BuiltinChip {
     case 1:
       bool updateFile = false;
       string address = "";
-      List<int> store = new List<int>();
+      List<uint> store = new List<uint>();
       for (int i = 5; i < 13; i++) {
         store.Add(inputPins[i].State);
       }
