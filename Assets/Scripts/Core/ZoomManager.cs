@@ -16,7 +16,7 @@ public class ZoomManager : MonoBehaviour
     public bool showZoomHelper = true;
 
     [Header("Mouse Zoom Settings")]
-    public float mouseWheelSensitivity = 0.1f;
+    public float mouseWheelSensitivity = 1f;
     public float mouseWheelDeadzone = 0.01f;
     public float mouseZoomSpeed = 12f;
     public float camMoveSpeed = 12f;

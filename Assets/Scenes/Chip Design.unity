@@ -655,7 +655,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetZoom: 0
   showZoomHelper: 1
-  mouseWheelSensitivity: 0.1
+  mouseWheelSensitivity: 1
   mouseWheelDeadzone: 0.01
   mouseZoomSpeed: 12
   camMoveSpeed: 12
@@ -15847,9 +15847,9 @@ Camera:
   m_FocalLength: 50
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0.044656366
+    x: 0
     y: 0
-    width: 0.91068727
+    width: 1
     height: 1
   near clip plane: 0.3
   far clip plane: 1500
@@ -31765,7 +31765,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 371857214}
   m_HandleRect: {fileID: 371857213}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:

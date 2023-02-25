@@ -11,11 +11,10 @@ public class Keyboard : BuiltinChip
         print(Input.anyKey);
         if (Input.anyKey)
         {
-            if (Input.inputString != "" || Input.inputString != null)
+            if (Input.inputString?.ToCharArray()?.Length > 0)
             {
                 chars = new List<string>();
-                print(Input.inputString[0]);
-                char tmp = Input.inputString[0];
+                char tmp = Input.inputString.ToCharArray()[0];
                 int temp = (int)tmp;
 
                 string binary = Convert.ToString(temp, 2);
@@ -35,7 +34,7 @@ public class Keyboard : BuiltinChip
 
                 for (int i = 0; i < chars.Count; i++)
                 {
-                    int outputSignal = int.Parse(chars[i]);
+                    uint outputSignal = uint.Parse(chars[i]);
                     outputPins[i].ReceiveSignal(outputSignal);
                 }
             }
@@ -45,7 +44,7 @@ public class Keyboard : BuiltinChip
         {
             for (int i = 0; i < 8; i++)
             {
-                int outputSignal = 0;
+                uint outputSignal = 0;
                 outputPins[i].ReceiveSignal(outputSignal);
             }
         }
