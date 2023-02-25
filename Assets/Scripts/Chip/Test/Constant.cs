@@ -8,7 +8,7 @@ public class Constant : Chip {
 	public Palette palette;
 	
 	public void SendSignal () {
-		outputPins[0].ReceiveSignal ((high) ? 1 : 0);
+		outputPins[0].ReceiveSignal ((high) ? 1U : 0);
 		//Debug.Log ("Send const signal to " + outputPins[0].childPins[0].pinName + " " + outputPins[0].childPins[0].chip.chipName);
 	}
 

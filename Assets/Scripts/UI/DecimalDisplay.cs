@@ -75,11 +75,11 @@ public class DecimalDisplay : MonoBehaviour
                 int decimalValue = 0;
                 for (int i = 0; i < signals.Length; i++)
                 {
-                    int signalState = signals[signals.Length - 1 - i].currentState;
+                    uint signalState = signals[signals.Length - 1 - i].currentState;
                     if (useTwosComplement && i == signals.Length - 1)
-                        decimalValue |= -(signalState << i);
+                        decimalValue |= (-((int)signalState << i));
                     else
-                        decimalValue |= signalState << i;
+                        decimalValue |= (int)(signalState << i);
                 }
                 text.text = decimalValue + "";
             }

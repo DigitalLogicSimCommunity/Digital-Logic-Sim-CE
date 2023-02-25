@@ -67,7 +67,7 @@ public class CustomChip : Chip
         // Pass processed signals on to ouput pins
         for (int i = 0; i < outputPins.Length; i++)
         {
-            int outputState = outputSignals[i].inputPins[0].State;
+            uint outputState = outputSignals[i].inputPins[0].State;
             outputPins[i].ReceiveSignal(outputState);
         }
     }

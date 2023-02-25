@@ -145,7 +145,7 @@ public class Wire : MonoBehaviour
             {
 
                 // High Z
-                if (ChipOutputPin.State == -1)
+                if (ChipOutputPin.State == Bus.HighZ)
                 {
                     onCol = palette.highZCol;
                     offCol = palette.highZCol;

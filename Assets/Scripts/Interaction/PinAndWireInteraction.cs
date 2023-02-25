@@ -226,6 +226,18 @@ public class PinAndWireInteraction : Interactable
             DestroyWire(wiresByChipInputPin[chipInputPin]);
     }
 
+    public void DestroyConnectedWires(Pin pin)
+	{
+        List<Wire> allWiresStatic = new(allWires);
+        foreach(Wire w in allWiresStatic)
+		{
+            if(w.startPin == pin || w.endPin == pin)
+			{
+                DestroyWire(w);
+			}
+		}
+	}
+
     void DestroyWire(Wire wire)
     {
         wiresByChipInputPin.Remove(wire.ChipInputPin);

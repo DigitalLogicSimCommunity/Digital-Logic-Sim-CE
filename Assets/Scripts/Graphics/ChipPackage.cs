@@ -26,7 +26,7 @@ public class ChipPackage : MonoBehaviour
             SetColour(builtinChip.packageColour);
         }
         nameText.fontSize = ScalingManager.packageFontSize;
-    }
+    }   
 
     public void PackageCustomChip(ChipEditor chipEditor)
     {

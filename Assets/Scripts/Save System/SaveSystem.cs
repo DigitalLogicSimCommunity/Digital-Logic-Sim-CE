@@ -16,7 +16,7 @@ public static class SaveSystem
 
     public static string SaveDataDirectoryPath => Path.Combine(Application.persistentDataPath, "SaveData");
     static string CurrentSaveProfileWireLayoutDirectoryPath => Path.Combine(CurrentSaveProfileDirectoryPath, "WireLayout");
-    static string HDDSaveFilePath => Path.Combine(CurrentSaveProfileDirectoryPath, "HDDContents.json");
+    static string EEPROMSaveFilePath => Path.Combine(CurrentSaveProfileDirectoryPath, "EEPROMContents.json");
     public static string GetPathToSaveFile(string saveFileName) => Path.Combine(CurrentSaveProfileDirectoryPath, saveFileName + fileExtension);
 
     public static string GetPathToWireSaveFile(string saveFileName) => Path.Combine(CurrentSaveProfileWireLayoutDirectoryPath, saveFileName + fileExtension);
@@ -69,6 +69,25 @@ public static class SaveSystem
         return ChipLoader.GetAllSavedChipsDic(GetChipSavePaths());
     }
 
+    public static void MigrateSaves()
+	{
+        //old appdata path is at ../../Sebastian Lague/Digital Logic Sim
+
+        string oldAppDataPath = Path.Combine(new string[] { Directory.GetParent(Application.persistentDataPath).Parent.FullName, "Sebastian Lague", "Digital Logic Sim" });
+        if (Directory.Exists(oldAppDataPath))
+        {
+            string oldSaveDataPath = Path.Combine(oldAppDataPath, "SaveData");
+            string[] savedProjectPaths = Directory.GetDirectories(oldSaveDataPath);
+            foreach(string path in savedProjectPaths)
+			{
+                string folderName = Path.Combine(SaveDataDirectoryPath, Path.GetFileName(path));
+                if (Directory.Exists(folderName)) folderName = Path.Combine(SaveDataDirectoryPath, Path.GetFileName(path) + " - Copy");
+                Directory.Move(path, folderName);
+			}
+            Directory.Delete(Path.Combine(Directory.GetParent(Application.persistentDataPath).Parent.FullName, "Sebastian Lague"), true);
+        }
+    }
+
     public static string[] GetSaveNames()
     {
         string[] savedProjectPaths = new string[0];
@@ -86,23 +105,23 @@ public static class SaveSystem
     }
 
 
-    public static Dictionary<string, List<int>> LoadHDDContents()
+    public static byte[] LoadEEPROMContents()
     {
-        if (File.Exists(HDDSaveFilePath))
+        if (File.Exists(EEPROMSaveFilePath))
         {
-            string jsonString = ReadFile(HDDSaveFilePath);
-            return JsonConvert.DeserializeObject<Dictionary<string, List<int>>>(
+            string jsonString = ReadFile(EEPROMSaveFilePath);
+            return JsonConvert.DeserializeObject<byte[]>(
                 jsonString);
         }
-        return new Dictionary<string, List<int>> { };
+        return new byte[] { };
     }
 
 
 
-    public static void SaveHDDContents(Dictionary<string, List<int>> contents)
+    public static void SaveEEPROMContents(byte[] contents)
     {
         string jsonStr = JsonConvert.SerializeObject(contents, Formatting.Indented);
-        WriteFile(HDDSaveFilePath, jsonStr);
+        WriteFile(EEPROMSaveFilePath, jsonStr);
     }
 
 

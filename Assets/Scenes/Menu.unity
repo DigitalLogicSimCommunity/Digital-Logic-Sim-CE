@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.3731193, g: 0.38073996, b: 0.3587269, a: 1}
+  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1963,7 +1963,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &362332508
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1992,7 +1992,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 362332507}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
@@ -2031,7 +2031,10 @@ MonoBehaviour:
     and <color=#75ADFF><link=\"https://github.com/gkngkc/UnityStandaloneFileBrowser/pull/106\">this</link></color>
     PRs, so all credit for that to <color=#75ADFF><link=\"https://github.com/tonidurans\">tonidurans</link></color>
     and <color=#75ADFF><link=\"https://github.com/Menci\">Menci</link></color>. Included
-    in v0.39.0 various options for FPS targeting from within settings.\n\n\n\n<size=header>Huge
+    in v0.39.0 various options for FPS targeting from within settings.\n\n<size=header><color=header><color=#75ADFF><link=\"https://github.com/pudy248\">pudy248</link></color>
+    - Edit Bus IO Pins</color></size>\nAdded full support for 32 bit busses by rearranging
+    some internals and adding their encoder/decoders. Added bus IO pin readout and
+    editing to simplify testing large chips. Fixed a number of existing bugs.\n\n<size=header>Huge
     thanks to all contribuitors!! The Community Edition couldn't be possible without
     your help.</size>"
   m_isRightToLeft: 0
@@ -3278,7 +3281,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Version 0.39.1 - CE <size=25><color=#505050> (5 Dec 2022)</color></size>
+  m_text: Version 0.40.0 - CE <size=25><color=#505050> (20 Jan 2023)</color></size>
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -3680,7 +3683,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'DIGITAL LOGIC SIM '
+  m_text: DIGITAL LOGIC SIM <color=#FFFF00>CE</color>
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -3707,10 +3710,10 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 140
+  m_fontSize: 135
   m_fontSizeBase: 135
   m_fontWeight: 400
-  m_enableAutoSizing: 1
+  m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 140
   m_fontStyle: 1
@@ -4283,7 +4286,10 @@ MonoBehaviour:
     and <color=#75ADFF><link=\"https://github.com/gkngkc/UnityStandaloneFileBrowser/pull/106\">this</link></color>
     PRs, so all credit for that to <color=#75ADFF><link=\"https://github.com/tonidurans\">tonidurans</link></color>
     and <color=#75ADFF><link=\"https://github.com/Menci\">Menci</link></color>. Included
-    in v0.39.0 various options for FPS targeting from within settings.\n\n\n\n<size=30>Huge
+    in v0.39.0 various options for FPS targeting from within settings.\n\n<size=30><color=#DDDDDD><color=#75ADFF><link=\"https://github.com/pudy248\">pudy248</link></color>
+    - Edit Bus IO Pins</color></size>\nAdded full support for 32 bit busses by rearranging
+    some internals and adding their encoder/decoders. Added bus IO pin readout and
+    editing to simplify testing large chips. Fixed a number of existing bugs.\n\n<size=30>Huge
     thanks to all contribuitors!! The Community Edition couldn't be possible without
     your help.</size>"
   m_isRightToLeft: 0
@@ -7128,9 +7134,9 @@ Camera:
   m_FocalLength: 50
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0.027129143
+    x: 0
     y: 0
-    width: 0.9457417
+    width: 1
     height: 1
   near clip plane: 0.3
   far clip plane: 1000

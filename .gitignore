@@ -15,7 +15,9 @@
 /Digital Logic Sim.app/
 *Digital Logic Sim*
 *.DS_Store
-/.vscode/
+# /.vscode/
+
+*.app
 
 # Never ignore Asset meta data
 !/[Aa]ssets/**/*.meta
