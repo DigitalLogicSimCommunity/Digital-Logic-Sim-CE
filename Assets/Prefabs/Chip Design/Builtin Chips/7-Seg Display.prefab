@@ -845,12 +845,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56121cab9da574d2b97c854754749ada, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chipType: 2
+  chipType: 0
   nameText: {fileID: 8290674754392318984}
   container: {fileID: 2610731671916508212}
   chipPinPrefab: {fileID: 8774343771143846598, guid: 3f5693e72562648d19f39eace0ccffd6,
     type: 3}
-  override_width_and_height: 1
+  override_width_and_height: 0
   override_width: 1.8
   override_height: 2
 --- !u!61 &7323259885008881835
@@ -1238,7 +1238,7 @@ Transform:
   m_GameObject: {fileID: 9053900416891449010}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0.01}
-  m_LocalScale: {x: 1.46, y: 1.76, z: 1}
+  m_LocalScale: {x: 1.5636971, y: 1.76, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1061605310987190673}
@@ -1451,7 +1451,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 6a76e2f11baf96347ad77ec5aa677e00,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.4147727
+      value: 0.41477266
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6a76e2f11baf96347ad77ec5aa677e00,
         type: 3}
@@ -1461,7 +1461,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 6a76e2f11baf96347ad77ec5aa677e00,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.09520546
+      value: 0.09521066
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6a76e2f11baf96347ad77ec5aa677e00,
         type: 3}
