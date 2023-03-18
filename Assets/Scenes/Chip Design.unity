@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311947, g: 0.38074005, b: 0.35872722, a: 1}
+  m_IndirectSpecularColor: {r: 0.3731193, g: 0.38073996, b: 0.3587269, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -15566,10 +15566,10 @@ Camera:
   m_FocalLength: 50
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0
-    y: 0.120984346
-    width: 1
-    height: 0.7580313
+    x: 0.007607162
+    y: 0
+    width: 0.9847857
+    height: 1
   near clip plane: 0.3
   far clip plane: 1500
   field of view: 60
@@ -27371,7 +27371,6 @@ MonoBehaviour:
   - {fileID: 6632021948943085525, guid: e7e9803706278f642855ed313fa69546, type: 3}
   - {fileID: 286808261455957341, guid: 184fc6762f746804aa23328309645795, type: 3}
   - {fileID: -6260489656382857768, guid: 99de4470dbba3194e9450daa3e1073ad, type: 3}
-  - {fileID: 3607623924780100970, guid: 16d339669b6f70a449ce59388dba251b, type: 3}
   SpawnableCustomChips: []
   UIManager: {fileID: 1579521357}
 --- !u!4 &1830893909
@@ -27401,6 +27400,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 707e03c65a80345cf9c9e26633c5010e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  vSyncRate: {fileID: 0}
+  FpsTarget: {fileID: 0}
 --- !u!114 &1830893911
 MonoBehaviour:
   m_ObjectHideFlags: 0
