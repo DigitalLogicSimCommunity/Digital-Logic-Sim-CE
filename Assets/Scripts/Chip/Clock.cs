@@ -43,6 +43,29 @@ public class Clock : BuiltinChip
         outputPins[0].ReceiveSignal(0);
         StartCoroutine(ClockTick());
     }
+    
+    protected override void Awake()
+    {
+        base.Awake();
+        SetSize();
+    }
+
+
+    void Update()
+    {
+        SetSize();
+    }
+    private void SetSize()
+    {
+        var package = GetComponent<ChipPackage>();
+        if (package != null)
+        {
+            package.override_width_and_height = true;
+            package.override_width =  ScalingManager.scale * 1.2f;
+            package.override_height = ScalingManager.scale *1.1f;
+            package.SetSizeAndSpacing(this);
+        }
+    }
 
     private void OnMouseOver()
     {

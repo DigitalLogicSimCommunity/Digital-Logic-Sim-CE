@@ -180,15 +180,15 @@ RectTransform:
   m_GameObject: {fileID: 3885747577041384937}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.0747093, y: 1.136986, z: 1.7680291}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8496502557923527695}
-  m_RootOrder: 2
+  m_Father: {fileID: 6886087423236142444}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0.227}
+  m_AnchoredPosition: {x: -0.0048361914, y: 0.220689}
   m_SizeDelta: {x: 0.6120467, y: 0.38978344}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!23 &867189486967230955
@@ -319,12 +319,12 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  _SortingLayer: 0
-  _SortingLayerID: 0
-  _SortingOrder: 0
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 867189486967230955}
   m_maskType: 0
+  _SortingLayer: 0
+  _SortingLayerID: 0
+  _SortingOrder: 0
 --- !u!1 &4998385166773776207
 GameObject:
   m_ObjectHideFlags: 0
@@ -377,6 +377,7 @@ MonoBehaviour:
   inputPins: []
   outputPins:
   - {fileID: 5126622102032161408}
+  Editable: 0
   bounds: {fileID: 0}
   packageColour: {r: 0.7254902, g: 0.24313727, b: 0.24313727, a: 0}
   _hz: 1
@@ -399,7 +400,7 @@ MonoBehaviour:
   container: {fileID: 6886087423236142444}
   chipPinPrefab: {fileID: 8774343771143846598, guid: 3f5693e72562648d19f39eace0ccffd6,
     type: 3}
-  override_width_and_height: 1
+  override_width_and_height: 0
   override_width: 1.2
   override_height: 1.1
 --- !u!61 &6336459448720122718
@@ -457,9 +458,10 @@ Transform:
   m_LocalPosition: {x: 0.0045, y: 0.0329, z: 0}
   m_LocalScale: {x: 0.93048424, y: 0.8795182, z: 0.5656016}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 6752752261016898421}
   m_Father: {fileID: 8496502557923527695}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &5518606748075228305
 MeshFilter:
@@ -539,9 +541,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 6886087423236142444}
   - {fileID: 8351000557739538985}
-  - {fileID: 6752752261016898421}
+  - {fileID: 6886087423236142444}
   m_Father: {fileID: 7239231081913411360}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -576,7 +577,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8496502557923527695}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -711,9 +712,9 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  _SortingLayer: 0
-  _SortingLayerID: 0
-  _SortingOrder: 0
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 8351000557739538980}
   m_maskType: 0
+  _SortingLayer: 0
+  _SortingLayerID: 0
+  _SortingOrder: 0
