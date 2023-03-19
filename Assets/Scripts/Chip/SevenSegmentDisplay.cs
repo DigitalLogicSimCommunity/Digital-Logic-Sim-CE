@@ -12,15 +12,23 @@ public class SevenSegmentDisplay : BuiltinChip
 
     void Update()
     {
+        SetSize();
+    }
+
+    private void SetSize()
+    {
         var package = GetComponent<ChipPackage>();
-        if (package != null)
+        // Limit size reduction so we can still read the thing.
+        if (package != null && ScalingManager.scale > 0.45f)
         {
             package.override_width_and_height = true;
             package.override_width =  ScalingManager.scale * 1.8f;
             package.override_height = ScalingManager.scale *2.0f;
             package.SetSizeAndSpacing(this);
         }
+
     }
+
 
     protected override void Awake()
     {
@@ -30,14 +38,7 @@ public class SevenSegmentDisplay : BuiltinChip
             segments[i].sharedMaterial = Material.Instantiate(segments[i].sharedMaterial);
             segments[i].sharedMaterial.color = offCol;
         }
-        var package = GetComponent<ChipPackage>();
-        if (package != null)
-        {
-            package.override_width_and_height = true;
-            package.override_width =  ScalingManager.scale * 1.8f;
-            package.override_height = ScalingManager.scale *2.0f;
-            package.SetSizeAndSpacing(this);
-        }
+        SetSize();
     }
 
     protected override void ProcessOutput()
