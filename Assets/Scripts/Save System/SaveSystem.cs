@@ -16,7 +16,7 @@ public static class SaveSystem
 
     public static string SaveDataDirectoryPath => Path.Combine(Application.persistentDataPath, "SaveData");
     static string CurrentSaveProfileWireLayoutDirectoryPath => Path.Combine(CurrentSaveProfileDirectoryPath, "WireLayout");
-    static string HDDSaveFilePath => Path.Combine(CurrentSaveProfileDirectoryPath, "HDDContents.json");
+    static string EEPROMSaveFilePath => Path.Combine(CurrentSaveProfileDirectoryPath, "EEPROMContents.json");
     public static string GetPathToSaveFile(string saveFileName) => Path.Combine(CurrentSaveProfileDirectoryPath, saveFileName + fileExtension);
 
     public static string GetPathToWireSaveFile(string saveFileName) => Path.Combine(CurrentSaveProfileWireLayoutDirectoryPath, saveFileName + fileExtension);
@@ -105,23 +105,23 @@ public static class SaveSystem
     }
 
 
-    public static Dictionary<string, List<uint>> LoadHDDContents()
+    public static byte[] LoadEEPROMContents()
     {
-        if (File.Exists(HDDSaveFilePath))
+        if (File.Exists(EEPROMSaveFilePath))
         {
-            string jsonString = ReadFile(HDDSaveFilePath);
-            return JsonConvert.DeserializeObject<Dictionary<string, List<uint>>>(
+            string jsonString = ReadFile(EEPROMSaveFilePath);
+            return JsonConvert.DeserializeObject<byte[]>(
                 jsonString);
         }
-        return new Dictionary<string, List<uint>> { };
+        return new byte[] { };
     }
 
 
 
-    public static void SaveHDDContents(Dictionary<string, List<uint>> contents)
+    public static void SaveEEPROMContents(byte[] contents)
     {
         string jsonStr = JsonConvert.SerializeObject(contents, Formatting.Indented);
-        WriteFile(HDDSaveFilePath, jsonStr);
+        WriteFile(EEPROMSaveFilePath, jsonStr);
     }
 
 

@@ -1963,7 +1963,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &362332508
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1992,7 +1992,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 362332507}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
@@ -2032,11 +2032,11 @@ MonoBehaviour:
     PRs, so all credit for that to <color=#75ADFF><link=\"https://github.com/tonidurans\">tonidurans</link></color>
     and <color=#75ADFF><link=\"https://github.com/Menci\">Menci</link></color>. Included
     in v0.39.0 various options for FPS targeting from within settings.\n\n<size=header><color=header><color=#75ADFF><link=\"https://github.com/pudy248\">pudy248</link></color>
-    - Edit Bus IO Pins</color></size>\nTesting bus chips was almost impossible before.
-    Now it isn't! Also, added full support for 32 bit busses for people insane enough
-    to make 32 bit systems, and fixed several bugs. \n\n<size=header>Huge thanks
-    to all contribuitors!! The Community Edition couldn't be possible without your
-    help.</size>"
+    - Edit Bus IO Pins</color></size>\nAdded full support for 32 bit busses by rearranging
+    some internals and adding their encoder/decoders. Added bus IO pin readout and
+    editing to simplify testing large chips. Fixed a number of existing bugs.\n\n<size=header>Huge
+    thanks to all contribuitors!! The Community Edition couldn't be possible without
+    your help.</size>"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -4287,10 +4287,11 @@ MonoBehaviour:
     PRs, so all credit for that to <color=#75ADFF><link=\"https://github.com/tonidurans\">tonidurans</link></color>
     and <color=#75ADFF><link=\"https://github.com/Menci\">Menci</link></color>. Included
     in v0.39.0 various options for FPS targeting from within settings.\n\n<size=30><color=#DDDDDD><color=#75ADFF><link=\"https://github.com/pudy248\">pudy248</link></color>
-    - Edit Bus IO Pins</color></size>\nTesting bus chips was almost impossible before.
-    Now it isn't! Also, added full support for 32 bit busses for people insane enough
-    to make 32 bit systems, and fixed several bugs. \n\n\n<size=30>Huge thanks to
-    all contribuitors!! The Community Edition couldn't be possible without your help.</size>"
+    - Edit Bus IO Pins</color></size>\nAdded full support for 32 bit busses by rearranging
+    some internals and adding their encoder/decoders. Added bus IO pin readout and
+    editing to simplify testing large chips. Fixed a number of existing bugs.\n\n<size=30>Huge
+    thanks to all contribuitors!! The Community Edition couldn't be possible without
+    your help.</size>"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -7133,9 +7134,9 @@ Camera:
   m_FocalLength: 50
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0.051167518
+    x: 0
     y: 0
-    width: 0.89766496
+    width: 1
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
