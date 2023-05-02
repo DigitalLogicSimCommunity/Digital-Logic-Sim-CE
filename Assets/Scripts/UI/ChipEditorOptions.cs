@@ -34,13 +34,13 @@ public class ChipEditorOptions : MonoBehaviour
         camMoveSpeedSlider.SetValueWithoutNotify(
             PlayerPrefs.GetFloat("CamMoveSpeed", 12f));
         scaleSlider.SetValueWithoutNotify(editor.Data.scale);
-        ScalingManager.UpdateScale();
+        ScalingManager.i.UpdateScale();
     }
 
     public void OnScaleChanged()
     {
-        ScalingManager.scale = scaleSlider.value;
-        ScalingManager.UpdateScale();
+        ScalingManager.i.SetScale( scaleSlider.value);
+        ScalingManager.i.UpdateScale();
     }
 
     public void OnDisplayPinNamesChanged(int value)

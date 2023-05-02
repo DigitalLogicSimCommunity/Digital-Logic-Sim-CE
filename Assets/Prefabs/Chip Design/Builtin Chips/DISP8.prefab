@@ -779,7 +779,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7239231081913411360}
   - component: {fileID: 286808261455957341}
-  - component: {fileID: -1534845107842312262}
+  - component: {fileID: 4327205257611331912}
   - component: {fileID: 6336459448720122718}
   m_Layer: 8
   m_Name: DISP8
@@ -832,10 +832,18 @@ MonoBehaviour:
   - {fileID: 1296498347741841845}
   - {fileID: 7170950011089252060}
   outputPins: []
+  Editable: 0
   bounds: {fileID: 0}
-  packageColour: {r: 0.3207547, g: 0.06505874, b: 0.30556488, a: 0}
+  PackageGraphicData:
+    PackageColour: {r: 0.32156864, g: 0.06666667, b: 0.30588236, a: 1}
+    TextColor: {r: 1, g: 1, b: 1, a: 1}
+    OverrideWidthAndHeight: 0
+    Width: 1
+    Height: 1
+  ChipType: 2
+  DefaultEnabled: 1
   textureRender: {fileID: 3209717946870843157}
---- !u!114 &-1534845107842312262
+--- !u!114 &4327205257611331912
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -844,17 +852,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 4998385166773776207}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 56121cab9da574d2b97c854754749ada, type: 3}
+  m_Script: {fileID: 11500000, guid: 04ae974c6262ed74897a340a38ee8d38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chipType: 2
   nameText: {fileID: 8351000557739538982}
   container: {fileID: 6886087423236142444}
-  chipPinPrefab: {fileID: 8774343771143846598, guid: 3f5693e72562648d19f39eace0ccffd6,
-    type: 3}
-  override_width_and_height: 1
-  override_width: 3
-  override_height: 3
 --- !u!61 &6336459448720122718
 BoxCollider2D:
   m_ObjectHideFlags: 0

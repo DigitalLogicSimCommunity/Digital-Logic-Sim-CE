@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class ZoomManager : MonoBehaviour
@@ -77,7 +78,7 @@ public class ZoomManager : MonoBehaviour
                     InputHelper.AnyOfTheseKeysHeld(KeyCode.DownArrow, KeyCode.S) ? 1
                                                                                  : 0;
                 targetCamPosition =
-                    targetCamPosition + (moveVec * camMoveSpeed) * 0.01f;
+                    targetCamPosition + moveVec * (camMoveSpeed * 0.01f);
             }
 
             if (Input.GetKeyDown(KeyCode.G))
@@ -95,11 +96,7 @@ public class ZoomManager : MonoBehaviour
                 targetZoom = Mathf.Clamp01(zoom + scrollAmount * mouseWheelSensitivity);
                 if (ChipInteraction.selectedChips.Count > 0)
                 {
-                    List<Vector3> chipPositions = new List<Vector3>();
-                    foreach (Chip chip in ChipInteraction.selectedChips)
-                    {
-                        chipPositions.Add(chip.transform.position);
-                    }
+                    List<Vector3> chipPositions = ChipInteraction.selectedChips.Select(chip => chip.transform.position).ToList();
                     targetCamPosition = MathUtility.Center(chipPositions) + focusOffset;
                 }
             }

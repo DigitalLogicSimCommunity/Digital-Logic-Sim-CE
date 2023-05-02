@@ -2,27 +2,55 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Core;
+using UnityEditor.UI;
 using UnityEngine;
+using UnityEngine.Serialization;
+using Object = UnityEngine.Object;
 
-public enum ChipEditorMode { Create, Update }
-;
+public enum ChipEditorMode
+{
+    Create,
+    Update
+};
+
 public class Manager : MonoBehaviour
 {
-    public static ChipEditorMode chipEditorMode;
 
-    public event Action<Chip> customChipCreated;
-    public event Action<Chip> customChipUpdated;
+    public static Manager instance;
+    private ChipEditorMode _chipEditorMode;
+
+    private  ChipEditorMode ChipEditorMode
+    {
+        get => _chipEditorMode;
+        set
+        {
+            _chipEditorMode = value;
+            OnEditorModeChage?.Invoke(_chipEditorMode);
+        }
+    }
+
+    //Event
+    public event Action<ChipEditorMode> OnEditorModeChage;
+    public event Action<SpawnableChip> customChipCreated;
+    public event Action<SpawnableChip> customChipUpdated;
+    public event Action OnEditorClear; 
+    
 
     public ChipEditor chipEditorPrefab;
-    public ChipPackage chipPackagePrefab;
     public Wire wirePrefab;
-    public Chip[] builtinChips;
-    public List<Chip> SpawnableCustomChips;
-    public UIManager UIManager;
+    public Chip[] SpawnableBuiltinChips;
+    public List<SpawnableChip> SpawnableCustomChips;
+    
+    [FormerlySerializedAs("UIManager")] public MenuManager menuManager;
 
-    ChipEditor activeChipEditor;
-    int currentChipCreationIndex;
-    public static Manager instance;
+    private ChipEditor activeChipEditor;
+    //Interaction Access
+    public static ChipEditor ActiveChipEditor => instance.activeChipEditor;
+    public static PinAndWireInteraction PinAndWireInteraction => instance.activeChipEditor.pinAndWireInteraction;
+    public static ChipInteraction ChipInteraction => instance.activeChipEditor.chipInteraction;
+    public static ChipInterfaceEditor InputsEditor => instance.activeChipEditor.inputsEditor;
+    public static ChipInterfaceEditor OutputsEditor => instance.activeChipEditor.outputsEditor;
 
     void Awake()
     {
@@ -33,72 +61,57 @@ public class Manager : MonoBehaviour
 
     void Start()
     {
-        SpawnableCustomChips = new List<Chip>();
+        SpawnableCustomChips = new List<SpawnableChip>();
         activeChipEditor = FindObjectOfType<ChipEditor>();
         SaveSystem.LoadAllChips(this);
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Y))
+        if (!Input.GetKeyDown(KeyCode.Y)) return;
+
+        Pin[] unconnectedInputs =
+            activeChipEditor.chipInteraction.UnconnectedInputPins;
+        Pin[] unconnectedOutputs =
+            activeChipEditor.chipInteraction.UnconnectedOutputPins;
+        if (unconnectedInputs.Length > 0)
         {
-            Pin[] unconnectedInputs =
-                activeChipEditor.chipInteraction.UnconnectedInputPins;
-            Pin[] unconnectedOutputs =
-                activeChipEditor.chipInteraction.UnconnectedOutputPins;
-            if (unconnectedInputs.Length > 0)
-            {
-                Debug.Log("Found " + unconnectedInputs.Length.ToString() +
-                          " unconnected input pins!");
-            }
-            if (unconnectedOutputs.Length > 0)
-            {
-                Debug.Log("Found " + unconnectedOutputs.Length.ToString() +
-                          " unconnected output pins!");
-            }
+            Debug.Log("Found " + unconnectedInputs.Length +
+                      " unconnected input pins!");
+        }
+
+        if (unconnectedOutputs.Length > 0)
+        {
+            Debug.Log("Found " + unconnectedOutputs.Length +
+                      " unconnected output pins!");
         }
     }
 
-    public static ChipEditor ActiveChipEditor => instance.activeChipEditor;
+
 
     public Chip GetChipPrefab(Chip chip)
     {
-        foreach (Chip prefab in builtinChips)
-        {
+        foreach (Chip prefab in SpawnableBuiltinChips)
             if (chip.chipName == prefab.chipName)
-            {
                 return prefab;
-            }
-        }
-        foreach (Chip prefab in SpawnableCustomChips)
-        {
-            if (chip.chipName == prefab.chipName)
-            {
-                return prefab;
-            }
-        }
-        return null;
+
+        return SpawnableCustomChips.FirstOrDefault(prefab => chip.chipName == prefab.chipName);
     }
 
     public static Chip GetChipByName(string name)
     {
-        foreach (Chip chip in instance.SpawnableCustomChips)
-        {
-            if (name == chip.chipName)
-            {
-                return chip;
-            }
-        }
-        return null;
+        return instance.SpawnableCustomChips.FirstOrDefault(chip => name == chip.chipName);
     }
 
-    public Chip LoadChip(ChipSaveData loadedChipData)
+    public Chip LoadCustomChip(ChipInstanceHolder instanceHolder)
     {
-        if (loadedChipData == null) return null;
-        activeChipEditor.LoadFromSaveData(loadedChipData);
-        currentChipCreationIndex = activeChipEditor.Data.creationIndex;
+        if (instanceHolder == null) return null;
 
-        Chip loadedChip = PackageChip();
+        activeChipEditor.Data = instanceHolder.Data;
+        ScalingManager.i.SetScale(instanceHolder.Data.scale);
+        ChipEditorOptions.instance.SetUIValues(activeChipEditor);
+
+        Chip loadedChip = PackageCustomChip();
         if (loadedChip is CustomChip custom)
             custom.ApplyWireModes();
 
@@ -108,126 +121,91 @@ public class Manager : MonoBehaviour
 
     public void ViewChip(Chip chip)
     {
-        ChipSaveData chipSaveData = ChipLoader.GetChipSaveData(chip, wirePrefab, activeChipEditor);
         ClearEditor();
-        chipEditorMode = ChipEditorMode.Update;
-        UIManager.SetEditorMode(chipEditorMode,chipSaveData.Data.name);
-        activeChipEditor.LoadFromSaveData(chipSaveData);
+        ChipEditorMode = ChipEditorMode.Update;
+        ChipInstanceHolder chipInstanceHolder = ChipLoader.GetChipInstanceData(chip, activeChipEditor);
+        ActiveChipEditor.Data = chipInstanceHolder.Data;
+
+        menuManager.SetEditingChipName(chipInstanceHolder.Data.name);
+        ScalingManager.i.SetScale(chipInstanceHolder.Data.scale);
+        ChipEditorOptions.instance.SetUIValues(activeChipEditor);
     }
 
     public void SaveAndPackageChip()
     {
         ChipSaver.Save(activeChipEditor);
-        PackageChip();
+        PackageCustomChip();
         ClearEditor();
     }
 
     public void UpdateChip()
     {
-        Chip updatedChip = TryPackageAndReplaceChip(activeChipEditor.Data.name);
+        SpawnableChip updatedChip =
+            ChipPackageSpawner.i.TryPackageAndReplaceChip(SpawnableCustomChips, activeChipEditor.Data.name);
+        customChipUpdated?.Invoke(updatedChip);
         ChipSaver.Update(activeChipEditor, updatedChip);
-        chipEditorMode = ChipEditorMode.Create;
+        ChipEditorMode = ChipEditorMode.Create;
         ClearEditor();
+        menuManager.SetEditingChipName("");
     }
 
     internal void DeleteChip(string nameBeforeChanging)
     {
         SpawnableCustomChips = SpawnableCustomChips.Where(x => !string.Equals(x.chipName, nameBeforeChanging)).ToList();
     }
+
     internal void RenameChip(string nameBeforeChanging, string nameAfterChanging)
     {
-        SpawnableCustomChips.Where(x => string.Equals(x.chipName, nameBeforeChanging)).First().chipName = nameAfterChanging;
-    }
-    void SetupPseudoInput(Chip customChip)
-    {
-        // TODO: Implement this
-        //  if (customChip is CustomChip custom) {
-        //  	custom.unconnectedInputs =
-        //  activeChipEditor.chipInteraction.UnconnectedInputPins; 	Pin pseudoPin =
-        //  Instantiate(chipPackagePrefab.chipPinPrefab.gameObject, parent:
-        //  customChip.transform).GetComponent<Pin>(); 	pseudoPin.pinName =
-        //  "PseudoInput"; 	pseudoPin.wireType = Pin.WireType.Simple;
-        //  	custom.pseudoInput = pseudoPin;
-        //  	pseudoPin.chip = customChip;
-        //  	foreach (Pin pin in custom.unconnectedInputs) {
-        //  		Pin.MakeConnection(pseudoPin, pin);
-        //  	}
-        //  }
+        SpawnableCustomChips.First(x => string.Equals(x.chipName, nameBeforeChanging)).chipName = nameAfterChanging;
     }
 
 
-
-
-    Chip PackageChip()
+    //Generate Package from current editing chip
+    SpawnableChip PackageCustomChip()
     {
-        Chip customChip = GeneratePackageAndChip();
+        var customChip = ChipPackageSpawner.i.GenerateCustomPackageAndChip();
 
         customChipCreated?.Invoke(customChip);
-        currentChipCreationIndex++;
         SpawnableCustomChips.Add(customChip);
         return customChip;
     }
-    Chip TryPackageAndReplaceChip(string original)
-    {
-        ChipPackage oldPackage = Array.Find(
-            GetComponentsInChildren<ChipPackage>(true), cp => cp.name == original);
-        if (oldPackage != null) { Destroy(oldPackage.gameObject); }
 
-        Chip customChip = GeneratePackageAndChip();
-
-        int index = SpawnableCustomChips.FindIndex(c => c.chipName == original);
-        if (index >= 0)
-        {
-            SpawnableCustomChips[index] = customChip;
-            customChipUpdated?.Invoke(customChip);
-        }
-
-
-
-        return customChip;
-    }
-
-    private Chip GeneratePackageAndChip()
-    {
-        ChipPackage package = Instantiate(chipPackagePrefab, transform);
-
-        package.PackageCustomChip(activeChipEditor);
-        package.gameObject.SetActive(false);
-
-        var customChip = package.GetComponent<Chip>();
-        SetupPseudoInput(customChip);
-        if (customChip is CustomChip c)
-            c.Init();
-
-        return customChip;
-    }
 
     public void ResetEditor()
     {
-        chipEditorMode = ChipEditorMode.Create;
-        UIManager.SetEditorMode(chipEditorMode);
+        ChipEditorMode = ChipEditorMode.Create;
         ClearEditor();
     }
 
-    void ClearEditor()
+    public GameObject ImplamentationHolder;
+
+    private void ClearEditor()
     {
+        //TODO: Don't destroy all the editor
         if (activeChipEditor)
         {
+            // if (activeChipEditor.gameObject.transform.childCount > 2)
+            // {
+            //     var ImplementationHolder = activeChipEditor.gameObject.transform.GetChild(2).gameObject;
+            //     Destroy(ImplementationHolder);
+            // }
+            //
+            // activeChipEditor.chipImplementationHolder = Instantiate(ImplamentationHolder, activeChipEditor.gameObject.transform).transform;
+            // activeChipEditor.Data = new ChipData();
+
             Destroy(activeChipEditor.gameObject);
-            UIManager.SetEditorMode(chipEditorMode,UIManager.ChipName.text);
         }
-        activeChipEditor =
-            Instantiate(chipEditorPrefab, Vector3.zero, Quaternion.identity);
+
+        activeChipEditor = Instantiate(chipEditorPrefab, Vector3.zero, Quaternion.identity);
 
         activeChipEditor.inputsEditor.CurrentEditor = activeChipEditor;
         activeChipEditor.outputsEditor.CurrentEditor = activeChipEditor;
 
-        activeChipEditor.Data.creationIndex = currentChipCreationIndex;
-
-        Simulation.instance.ResetSimulation();
-        ScalingManager.scale = 1;
+        OnEditorClear?.Invoke();
         ChipEditorOptions.instance.SetUIValues(activeChipEditor);
+
     }
+
 
     public void ChipButtonHanderl(Chip chip)
     {
@@ -239,9 +217,9 @@ public class Manager : MonoBehaviour
 
     public void LoadMainMenu()
     {
-        if (chipEditorMode == ChipEditorMode.Update)
+        if (ChipEditorMode == ChipEditorMode.Update)
         {
-            chipEditorMode = ChipEditorMode.Create;
+            ChipEditorMode = ChipEditorMode.Create;
             ClearEditor();
         }
         else
@@ -254,31 +232,25 @@ public class Manager : MonoBehaviour
     public List<string> AllChipNames(bool builtin = true, bool custom = true)
     {
         List<string> allChipNames = new List<string>();
-        if (builtin)
-            foreach (Chip chip in builtinChips)
-                allChipNames.Add(chip.chipName);
-        if (custom)
-            foreach (Chip chip in SpawnableCustomChips)
-                allChipNames.Add(chip.chipName);
+
+        if (builtin) allChipNames.AddRange(SpawnableBuiltinChips.Select(chip => chip.chipName));
+        if (custom) allChipNames.AddRange(SpawnableCustomChips.Select(chip => chip.chipName));
 
         return allChipNames;
     }
+
     public Dictionary<string, Chip> AllSpawnableChipDic()
     {
-        Dictionary<string, Chip> allChipDic = new Dictionary<string, Chip>();
+        var allChips = new List<Chip>(SpawnableBuiltinChips);
+        allChips.AddRange(SpawnableCustomChips);
 
-        foreach (Chip chip in builtinChips)
-            allChipDic.Add(chip.chipName, chip);
-        foreach (Chip chip in SpawnableCustomChips)
-            allChipDic.Add(chip.chipName, chip);
-        return allChipDic;
+        return allChips.ToDictionary(chip => chip.chipName);
     }
 
     public void ChangeFolderToChip(string ChipName, int index)
     {
-        if (SpawnableCustomChips.Where(x => string.Equals(x.name, ChipName)).First() is CustomChip customChip)
+        if (SpawnableCustomChips.First(x => string.Equals(x.name, ChipName)) is CustomChip customChip)
             customChip.FolderIndex = index;
         ChipSaver.ChangeFolder(ChipName, index);
     }
-
 }

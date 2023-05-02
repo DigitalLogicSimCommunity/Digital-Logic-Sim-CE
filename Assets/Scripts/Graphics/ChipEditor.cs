@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class ChipEditor : MonoBehaviour
 {
@@ -10,7 +11,7 @@ public class ChipEditor : MonoBehaviour
     public ChipInteraction chipInteraction;
     public PinAndWireInteraction pinAndWireInteraction;
 
-    public PinNameDisplayManager pinNameDisplayManager ;
+    public PinNameDisplayManager pinNameDisplayManager;
 
     public ChipData Data;
 
@@ -25,71 +26,43 @@ public class ChipEditor : MonoBehaviour
 
         pinAndWireInteraction.Init(chipInteraction, inputsEditor, outputsEditor);
         pinAndWireInteraction.onConnectionChanged += OnChipNetworkModified;
-        GetComponentInChildren<Canvas>().worldCamera = Camera.main;
+    }
+
+    private void Start()
+    {
+        pinAndWireInteraction.RegisterEditorArea(GetComponentInChildren<PlacmentAreaEvent>(true).MouseInteraction);
+        ScalingManager.i.OnScaleChange += () => pinNameDisplayManager.UpdateTextSize(ScalingManager.PinDisplayFontSize);
     }
 
     void LateUpdate()
     {
-        inputsEditor.OrderedUpdate();
-        outputsEditor.OrderedUpdate();
         pinAndWireInteraction.OrderedUpdate();
         chipInteraction.OrderedUpdate();
     }
 
-    void OnChipNetworkModified() { CycleDetector.MarkAllCycles(this); }
-
-    public void LoadFromSaveData(ChipSaveData saveData)
+    void OnChipNetworkModified()
     {
-        Data = saveData.Data;
-        ScalingManager.scale = Data.scale;
+        CycleDetector.MarkAllCycles(this);
+    }
 
+    public Chip LoadInstanceData(Chip chipData, Vector3 pos, Quaternion rot)
+    {
         // Load component chips
-        foreach (Chip componentChip in saveData.componentChips)
+        switch (chipData)
         {
-            if (componentChip is InputSignal inp)
-            {
+            case InputSignal inp:
                 inp.wireType = inp.outputPins[0].wireType;
-                inputsEditor.LoadSignal(inp);
-            }
-            else if (componentChip is OutputSignal outp)
-            {
+                return inputsEditor.LoadSignal(inp, pos.y);
+            case OutputSignal outp:
                 outp.wireType = outp.inputPins[0].wireType;
-                outputsEditor.LoadSignal(outp);
-            }
-            else
-            {
-                chipInteraction.LoadChip(componentChip);
-            }
-        }
-
-        // Load wires
-        if (saveData.wires != null)
-        {
-            foreach (Wire wire in saveData.wires)
-            {
-                pinAndWireInteraction.LoadWire(wire);
-            }
-        }
-
-        ChipEditorOptions.instance.SetUIValues(this);
-    }
-
-    public void UpdateChipSizes()
-    {
-        foreach (Chip chip in chipInteraction.allChips)
-        {
-            ChipPackage package = chip.GetComponent<ChipPackage>();
-            if (package)
-            {
-                package.SetSizeAndSpacing(chip);
-            }
+                return outputsEditor.LoadSignal(outp, pos.y);
+            default:
+                return chipInteraction.LoadChip(chipData, pos);
         }
     }
 
-    void OnDestroy()
+    public Wire LoadWire(Pin connectedPin, Pin pin)
     {
-        chipInteraction.visiblePins.Clear();
-        inputsEditor.visiblePins.Clear();
-        outputsEditor.visiblePins.Clear();
+        return pinAndWireInteraction.CreateAndLoadWire(connectedPin, pin);
     }
 }

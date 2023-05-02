@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BuiltinChip : Chip {
-	public Color packageColour;
+public class BuiltinChip : SpawnableChip
+{
+
+    public bool DefaultEnabled = true;
 }

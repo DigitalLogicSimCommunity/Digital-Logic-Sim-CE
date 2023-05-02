@@ -1,16 +1,15 @@
-﻿using UnityEngine;
+﻿using Interaction.Display;
+using UnityEngine;
 
 // Output signal of a chip.
+[RequireComponent(typeof(SignalDisplay))]
 public class OutputSignal : ChipSignal {
 
-	protected override void Start () {
-		base.Start ();
-		SetDisplayState (0);
-	}
+
 
 	public override void ReceiveInputSignal (Pin inputPin) {
-		currentState = inputPin.State;
-		SetDisplayState (inputPin.State);
+		State = inputPin.State;
+		NotifyStateChange();
 	}
 
 	public override void UpdateSignalName (string newName) {
