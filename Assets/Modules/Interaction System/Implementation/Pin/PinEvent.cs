@@ -9,6 +9,7 @@ using UnityEngine;
 public class PinEvent : MonoBehaviour
 {
     public MouseInteraction<Pin> MouseInteraction;
+    public Action OnMOuseOver;
 
     private void Awake()
     {
@@ -19,5 +20,10 @@ public class PinEvent : MonoBehaviour
     private void Start()
     {
         Manager.PinAndWireInteraction.RegisterPin(MouseInteraction);
+    }
+
+    private void OnMouseOver()
+    {
+        OnMOuseOver?.Invoke();
     }
 }

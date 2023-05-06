@@ -87,6 +87,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6030731073773259993, guid: fecc938b0c660450ba39ad175f13ffc0,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6030731073773259993, guid: fecc938b0c660450ba39ad175f13ffc0,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6030731073773259993, guid: fecc938b0c660450ba39ad175f13ffc0,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8932756024906521167, guid: fecc938b0c660450ba39ad175f13ffc0,
         type: 3}
       propertyPath: EditorType
@@ -124,7 +139,6 @@ MonoBehaviour:
   outputPins: []
   Editable: 0
   bounds: {fileID: 0}
-  currentState: 0
   wireType: 0
   signalName: 
 --- !u!114 &6372941233556377301 stripped

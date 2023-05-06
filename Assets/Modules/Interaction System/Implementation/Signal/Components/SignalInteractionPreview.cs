@@ -2,6 +2,7 @@
 using System.Linq;
 using Interaction.Display;
 using UnityEngine;
+using VitoBarra.Utils.TextVerifier;
 
 namespace Interaction.Signal
 {
@@ -67,6 +68,11 @@ namespace Interaction.Signal
 
             UpdatePreviewColor();
             PreviewSignal.SetPinInteractable(false);
+        }
+
+        public void UpdatePositionWithScale(float positionX)
+        {
+            PreviewSignal.transform.SetXPos(positionX);
         }
     }
 }

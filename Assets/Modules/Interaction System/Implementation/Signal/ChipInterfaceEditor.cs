@@ -164,7 +164,13 @@ public class ChipInterfaceEditor : MonoBehaviour
         GetComponent<BoxCollider2D>().size = new Vector2(ScalingManager.IoBarGraphicWidth, 1);
         
         
+        float containerX = chipContainer.position.x +
+                           chipContainer.localScale.x / 2 *
+                           ((editorInterfaceType == EditorInterfaceType.Input) ? -1 : 1);
         
+        PreviewSignal.UpdatePositionWithScale(containerX);
+
+
     }
 
 

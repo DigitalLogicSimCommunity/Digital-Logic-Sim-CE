@@ -151,7 +151,7 @@ public class SaveCompatibility : MonoBehaviour
         DirtyBit = true;
     }
 
-    public static void From037to038(ref JObject lol)
+    private static void From037to038(ref JObject lol)
     {
         if (lol.Property("Data") == null)
         {
@@ -187,7 +187,7 @@ public class SaveCompatibility : MonoBehaviour
         DirtyBit = true;
     }
 
-    public static void From038to039(ref JObject lol)
+    private static void From038to039(ref JObject lol)
     {
         var OldData = lol.Property("Data").Value as JObject;
 

@@ -20,6 +20,7 @@ namespace Interaction.Signal
         public const int MaxGroupSize = 16;
 
         public event Action OnGroupSizeChange;
+        public event Action OnPropertyChange;
 
         //Editor 
         [SerializeField] private ChipSignal signalPrefab;
@@ -211,7 +212,7 @@ namespace Interaction.Signal
 
         private void UpdateCenterPosition()
         {
-            MoveCenterYPosition(transform.position.y);
+            MoveCenterYPosition(GroupCenter.y);
         }
 
         private float GetYForGroupMember(float DesideredCeterY, int index)
@@ -307,6 +308,8 @@ namespace Interaction.Signal
 
             if (IsGroup)
                 DecimalDisplay.UpdateDecimalDisplay(Signals.ChipSignals, UseTwosComplement);
+            
+            OnPropertyChange?.Invoke();
         }
 
         public void SetBusValue(int state)

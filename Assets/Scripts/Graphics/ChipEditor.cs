@@ -11,7 +11,6 @@ public class ChipEditor : MonoBehaviour
     public ChipInteraction chipInteraction;
     public PinAndWireInteraction pinAndWireInteraction;
 
-    public PinNameDisplayManager pinNameDisplayManager;
 
     public ChipData Data;
 
@@ -31,7 +30,6 @@ public class ChipEditor : MonoBehaviour
     private void Start()
     {
         pinAndWireInteraction.RegisterEditorArea(GetComponentInChildren<PlacmentAreaEvent>(true).MouseInteraction);
-        ScalingManager.i.OnScaleChange += () => pinNameDisplayManager.UpdateTextSize(ScalingManager.PinDisplayFontSize);
     }
 
     void LateUpdate()

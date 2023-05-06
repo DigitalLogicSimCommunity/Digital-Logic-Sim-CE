@@ -4,20 +4,27 @@ using System;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-class ColorConverter : JsonConverter<Color>
+class ColorConverter : JsonConverter
 {
-    public override Color ReadJson(JsonReader reader, Type objectType, Color existingValue, bool hasExistingValue, JsonSerializer serializer)
+    
+    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+    {
+        var s = Regex.Unescape(JsonUtility.ToJson(value));
+        writer.WriteRawValue(s);
+    }
+
+    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
     {
         JObject jsonObject = JObject.Load(reader);
 
         return jsonObject.ToObject<Color>(serializer);
     }
 
-    public override void WriteJson(JsonWriter writer, Color value, JsonSerializer serializer)
+    public override bool CanConvert(Type objectType)
     {
-        var s = Regex.Unescape(JsonUtility.ToJson(value));
-        writer.WriteRawValue(s);
+        return true;
     }
+
 
     public static JsonSerializer GenerateSerializerConverter()
     {
@@ -32,5 +39,7 @@ class ColorConverter : JsonConverter<Color>
         JsonConverteForColor.Converters.Add(new ColorConverter());
         return JsonConverteForColor;
     }
+
+
 }
 

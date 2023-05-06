@@ -52,11 +52,11 @@ public class ScalingManager : MonoBehaviour
     public static float PinDisplayTextOffset => i.pinDisplayTextOffset;
 
 
-    const float maxPinDisplayFontSize = 1.75f;
-    const float minPinDisplayFontSize = 0.3f;
+    const float maxPinDisplayFontSize = 10f;
+    const float minPinDisplayFontSize = 3f;
 
     [SerializeField, Range(minPinDisplayFontSize, maxPinDisplayFontSize)]
-    private float pinDisplayFontSize = 1.75f;
+    private float pinDisplayFontSize = 10f;
 
     public static float PinDisplayFontSize => i.pinDisplayFontSize;
 
@@ -98,32 +98,42 @@ public class ScalingManager : MonoBehaviour
 
     const float maxIOBarDistance = 8.15f;
     const float minIOBarDistance = 7.85f;
+
     [SerializeField, Range(minIOBarDistance, maxIOBarDistance)]
     private float ioBarDistance = 8.15f;
+
     public static float IoBarDistance => i.ioBarDistance;
 
     const float maxIOBarGraphicWidth = 1f;
     const float minIOBarGraphicWidth = 0.5f;
+
     [SerializeField, Range(minIOBarGraphicWidth, maxIOBarGraphicWidth)]
     private float ioBarGraphicWidth = 1f;
+
     public static float IoBarGraphicWidth => i.ioBarGraphicWidth;
 
     const float maxGroupSpacing = 0.22f;
     const float minGroupSpacing = 0.055f;
+
     [SerializeField, Range(minGroupSpacing, maxGroupSpacing)]
     private float groupSpacing = 0.22f;
+
     public static float GroupSpacing => i.groupSpacing;
 
     const float maxPropertiesUIX = 1.45f;
     const float minPropertiesUIX = 1.1f;
+
     [SerializeField, Range(minPropertiesUIX, maxPropertiesUIX)]
     private float propertiesUIX = 1.45f;
+
     public static float PropertiesUIX => i.propertiesUIX;
 
     const float maxPropertiesUIXZoom = 0.8f;
     const float minPropertiesUIXZoom = 0;
+
     [SerializeField, Range(minPropertiesUIXZoom, maxPropertiesUIXZoom)]
     private float propertiesUIXZoom = 0f;
+
     public static float PropertiesUIXZoom => i.propertiesUIXZoom;
 
     void Awake()
@@ -163,7 +173,7 @@ public class ScalingManager : MonoBehaviour
         groupSpacing = Mathf.Lerp(minGroupSpacing, maxGroupSpacing, scale);
 
         pinDisplayFontSize =
-            Mathf.Clamp(fontSize, minPinDisplayFontSize, maxPinDisplayFontSize);
+            Mathf.Lerp(minPinDisplayFontSize, maxPinDisplayFontSize, scale);
         packageFontSize =
             Mathf.Clamp(fontSize * 1.5f, minPackageFontSize, maxPackageFontSize);
         wireThickness =
@@ -185,7 +195,7 @@ public class ScalingManager : MonoBehaviour
     public void SetScale(float newScale)
     {
         scale = newScale;
-        OnScaleChange?.Invoke();
+        UpdateScale();
     }
 
     private void OnValidate()
