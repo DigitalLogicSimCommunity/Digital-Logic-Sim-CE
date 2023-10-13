@@ -1,5 +1,4 @@
-
-using Interaction.Display;
+using Interaction.Signal.Display;
 using UI.ThemeSystem;
 using UnityEngine;
 using VitoBarra.Utils.TextVerifier;

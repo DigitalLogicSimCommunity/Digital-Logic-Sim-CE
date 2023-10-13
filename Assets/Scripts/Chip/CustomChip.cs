@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using UnityEngine;
 using System.Collections.Generic;
-using DLS.Simulation;
+using DLS.Core.Simulation;
 
 public class CustomChip : SpawnableChip
 {

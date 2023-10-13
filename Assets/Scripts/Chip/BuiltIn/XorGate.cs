@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using Core;
-using DLS.Simulation;
+using DLS.Core.Simulation;
 using UnityEngine;
 
 public class XorGate : BuiltinChip

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Timeline;
 
 public class ThemeManager : MonoBehaviour
 {
@@ -28,8 +29,8 @@ public class ThemeManager : MonoBehaviour
         var offset = 0.1f;
         foreach (var colour in palette.voltageColours)
         {
-            colour.DisplayPriority = zPriority + offset;
             zPriority += offset;
+            colour.DisplayPriority = zPriority;
         }
     }
 
@@ -51,5 +52,11 @@ public class ThemeManager : MonoBehaviour
             OnDefaultThemeChange?.Invoke();
             palette.DefaultIndex--;
         }
+    }
+
+
+    public Palette.VoltageColour GetTheme(string Themename)
+    {
+        return palette.GetTheme(Themename);
     }
 }

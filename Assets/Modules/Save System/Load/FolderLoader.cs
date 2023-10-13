@@ -7,13 +7,10 @@ public static class FolderLoader
 
     public static Dictionary<int, string> LoadCustomFolders(string path)
     {
-        if (File.Exists(path))
-        {
-            string FoldersJson = SaveSystem.ReadFile(path);
-            SaveCompatibility.FixFolderCompatibility(ref FoldersJson);
-            return JsonConvert.DeserializeObject<Dictionary<int, string>>(FoldersJson);
-        }
-        return new Dictionary<int, string>();
+        if (!File.Exists(path)) return new Dictionary<int, string>();
+        string FoldersJson = SaveSystem.ReadFile(path);
+        SaveCompatibility.FixFolderCompatibility(ref FoldersJson);
+        return JsonConvert.DeserializeObject<Dictionary<int, string>>(FoldersJson);
     }
 
     public static void SaveCustomFolders(string path, IDictionary<int, string> folders)

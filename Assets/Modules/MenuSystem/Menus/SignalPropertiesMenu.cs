@@ -225,13 +225,13 @@ public class SignalPropertiesMenu : MonoBehaviour
 
     public void RegisterSignalGroup(SignalInteraction signalInteraction)
     {
-        signalInteraction.OnDragig += SetPosition;
+        signalInteraction.OnDragging += SetPosition;
         signalInteraction.OnDeleteInteraction += DeleteFinalizer;
     }
 
     private void UnregisterSignalGroup(SignalInteraction signalInteraction)
     {
-        signalInteraction.OnDragig -= SetPosition;
+        signalInteraction.OnDragging -= SetPosition;
         signalInteraction.OnDeleteInteraction -= DeleteFinalizer;
     }
 

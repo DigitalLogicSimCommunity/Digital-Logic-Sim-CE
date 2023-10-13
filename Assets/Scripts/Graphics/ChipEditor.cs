@@ -50,10 +50,10 @@ public class ChipEditor : MonoBehaviour
         {
             case InputSignal inp:
                 inp.wireType = inp.outputPins[0].wireType;
-                return inputsEditor.LoadSignal(inp, pos.y);
+                return inputsEditor.LoadSignal(inp, pos.y, inp.GroupId);
             case OutputSignal outp:
                 outp.wireType = outp.inputPins[0].wireType;
-                return outputsEditor.LoadSignal(outp, pos.y);
+                return outputsEditor.LoadSignal(outp, pos.y, outp.GroupId);
             default:
                 return chipInteraction.LoadChip(chipData, pos);
         }

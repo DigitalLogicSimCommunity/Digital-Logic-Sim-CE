@@ -1,24 +1,31 @@
 using UnityEngine;
 using UnityEngine.UI;
+using DLS.Core.Simulation;
 
 public class RunButton : MonoBehaviour
 {
     public Button button;
-    public Simulation sim;
     public Color onCol;
     public Color offCol;
+    
+    
+    private Simulation _simulation;
 
-    void Start() { button.targetGraphic.color = sim.active ? onCol : offCol; }
+    void Start()
+    {
+        _simulation = Simulation.instance;
+        button.targetGraphic.color = _simulation.active ? onCol : offCol;
+    }
 
     public void ToggleSimulationActive()
     {
-        sim.ToogleActive();
-        button.targetGraphic.color = sim.active ? onCol : offCol;
+        _simulation.ToggleActive();
+        button.targetGraphic.color = _simulation.active ? onCol : offCol;
     }
 
     public void SetOff() { button.targetGraphic.color = offCol; }
 
-    void OnValidate()
+    private void OnValidate()
     {
         if (button == null)
             button = GetComponent<Button>();

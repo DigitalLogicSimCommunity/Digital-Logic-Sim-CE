@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Core;
-using DLS.Simulation;
+using DLS.Core.Simulation;
 using UnityEngine;
 using TMPro;
 public class Clock : BuiltinChip

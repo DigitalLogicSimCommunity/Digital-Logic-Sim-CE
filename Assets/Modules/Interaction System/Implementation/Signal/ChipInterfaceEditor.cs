@@ -75,7 +75,9 @@ public class ChipInterfaceEditor : MonoBehaviour
 
     private void Start()
     {
-        PreviewSignal = new SignalInteractionPreview(SignalBuilder.Build(InputHelper.MouseWorldPos.y, 1,Pin.WireType.Simple,false).obj, transform);
+        PreviewSignal =
+            new SignalInteractionPreview(
+                SignalBuilder.Build(InputHelper.MouseWorldPos.y, 1, Pin.WireType.Simple, false).obj, transform);
         DesiredGroupSize = 1;
         ScalingManager.i.OnScaleChange += UpdateScale;
         CreateGroup.i.onGroupSizeSettingPressed += OnGroupSizeSettingPressed;
@@ -95,10 +97,15 @@ public class ChipInterfaceEditor : MonoBehaviour
         DesiredGroupSize = x;
     }
 
-    public ChipSignal LoadSignal(ChipSignal signal, float y)
+    public ChipSignal LoadSignal(ChipSignal signal, float y, int groupID)
     {
-        var Chip = AddSignal(y, 1,signal.wireType, false).Signals.ChipSignals[0];
-        return Chip;
+        var e = SignalsByID.GetValueOrDefault(groupID);
+        ChipSignal chip;
+        if (e != null) return e.AddOneSignal().ChipSignal;
+        
+        chip = CreateSignalInteractionGroup(y, 1, signal.wireType, false).Signals.ChipSignals[0];
+        return chip;
+
     }
 
 
@@ -141,16 +148,17 @@ public class ChipInterfaceEditor : MonoBehaviour
         if (InputHelper.CompereTagObjectUnderMouse2D(ProjectTags.InterfaceMask, ProjectLayer.Default)) return;
 
 
-        AddSignal(InputHelper.MouseWorldPos.y,  DesiredGroupSize);
+        CreateSignalInteractionGroup(InputHelper.MouseWorldPos.y, DesiredGroupSize);
         DesiredGroupSize = 1;
 
 
         OnChipsAddedOrDeleted?.Invoke();
     }
 
-    private SignalInteraction AddSignal(float yPos, int groupSize, Pin.WireType wireType = Pin.WireType.Simple ,bool focusRequired = true)
+    private SignalInteraction CreateSignalInteractionGroup(float yPos, int groupSize, Pin.WireType wireType = Pin.WireType.Simple,
+        bool focusRequired = true)
     {
-        var Interactable = SignalBuilder.Build(yPos, groupSize,wireType, focusRequired);
+        var Interactable = SignalBuilder.Build(yPos, groupSize, wireType, focusRequired);
         SignalsByID.Add(Interactable.id, Interactable.obj);
         return Interactable.obj;
     }
@@ -158,19 +166,18 @@ public class ChipInterfaceEditor : MonoBehaviour
     private void UpdateScale()
     {
         transform.localPosition =
-            new Vector3(ScalingManager.IoBarDistance * (editorInterfaceType == EditorInterfaceType.Input ? -1f : 1f),
+            new Vector3(
+                ScalingManager.IoBarDistance * (editorInterfaceType == EditorInterfaceType.Input ? -1f : 1f),
                 transform.localPosition.y, transform.localPosition.z);
         barGraphic.localScale = new Vector3(ScalingManager.IoBarGraphicWidth, 1, 1);
         GetComponent<BoxCollider2D>().size = new Vector2(ScalingManager.IoBarGraphicWidth, 1);
-        
-        
+
+
         float containerX = chipContainer.position.x +
                            chipContainer.localScale.x / 2 *
                            ((editorInterfaceType == EditorInterfaceType.Input) ? -1 : 1);
-        
+
         PreviewSignal.UpdatePositionWithScale(containerX);
-
-
     }
 
 

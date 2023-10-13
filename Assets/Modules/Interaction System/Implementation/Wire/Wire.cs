@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using DLS.Simulation;
+using DLS.Core.Simulation;
 using UnityEngine;
 using UnityEngine.Serialization;
 using VitoBarra.System.Interaction;

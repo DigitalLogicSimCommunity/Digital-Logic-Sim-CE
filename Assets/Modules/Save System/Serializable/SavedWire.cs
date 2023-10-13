@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [System.Serializable]
 public class SavedWire
@@ -10,6 +11,7 @@ public class SavedWire
     public int childChipIndex;
     public int childChipInputIndex;
     public Vector2[] anchorPoints;
+    public string ColourThemeName;
 
     public SavedWire(ChipInstanceHolder chipInstanceHolder, Wire wire)
     {
@@ -23,5 +25,7 @@ public class SavedWire
         childChipInputIndex = childPin.index;
 
         anchorPoints = wire.anchorPoints.ToArray();
+
+        ColourThemeName = wire.GetComponentInChildren<WireDisplay>().GetCurrentThemeName();
     }
 }

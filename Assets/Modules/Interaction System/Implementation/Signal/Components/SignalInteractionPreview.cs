@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Interaction.Display;
+﻿using System.Linq;
+using Interaction.Signal.Display;
 using UnityEngine;
 using VitoBarra.Utils.TextVerifier;
 

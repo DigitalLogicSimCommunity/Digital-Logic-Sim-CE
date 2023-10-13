@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Core;
-using DLS.Simulation;
+using DLS.Core.Simulation;
 using UnityEngine;
 
 public class NotGate : BuiltinChip

@@ -1,4 +1,4 @@
-﻿using Interaction.Display;
+﻿using Interaction.Signal.Display;
 using UnityEngine;
 
 // Output signal of a chip.

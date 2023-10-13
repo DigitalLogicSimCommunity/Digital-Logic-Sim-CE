@@ -74,18 +74,17 @@ public static class SaveSystem
         //old appdata path is at ../../Sebastian Lague/Digital Logic Sim
 
         string oldAppDataPath = Path.Combine(new string[] { Directory.GetParent(Application.persistentDataPath).Parent.FullName, "Sebastian Lague", "Digital Logic Sim" });
-        if (Directory.Exists(oldAppDataPath))
+        if (!Directory.Exists(oldAppDataPath)) return;
+        
+        string oldSaveDataPath = Path.Combine(oldAppDataPath, "SaveData");
+        string[] savedProjectPaths = Directory.GetDirectories(oldSaveDataPath);
+        foreach(string path in savedProjectPaths)
         {
-            string oldSaveDataPath = Path.Combine(oldAppDataPath, "SaveData");
-            string[] savedProjectPaths = Directory.GetDirectories(oldSaveDataPath);
-            foreach(string path in savedProjectPaths)
-			{
-                string folderName = Path.Combine(SaveDataDirectoryPath, Path.GetFileName(path));
-                if (Directory.Exists(folderName)) folderName = Path.Combine(SaveDataDirectoryPath, Path.GetFileName(path) + " - Copy");
-                Directory.Move(path, folderName);
-			}
-            Directory.Delete(Path.Combine(Directory.GetParent(Application.persistentDataPath).Parent.FullName, "Sebastian Lague"), true);
+            string folderName = Path.Combine(SaveDataDirectoryPath, Path.GetFileName(path));
+            if (Directory.Exists(folderName)) folderName = Path.Combine(SaveDataDirectoryPath, Path.GetFileName(path) + " - Copy");
+            Directory.Move(path, folderName);
         }
+        Directory.Delete(Path.Combine(Directory.GetParent(Application.persistentDataPath).Parent.FullName, "Sebastian Lague"), true);
     }
 
     public static string[] GetSaveNames()
@@ -99,7 +98,7 @@ public static class SaveSystem
         {
             string[] pathSections =
                 savedProjectPaths[i].Split(Path.DirectorySeparatorChar);
-            savedProjectPaths[i] = pathSections[pathSections.Length - 1];
+            savedProjectPaths[i] = pathSections[^1];
         }
         return savedProjectPaths;
     }
@@ -107,13 +106,10 @@ public static class SaveSystem
 
     public static byte[] LoadEEPROMContents()
     {
-        if (File.Exists(EEPROMSaveFilePath))
-        {
-            string jsonString = ReadFile(EEPROMSaveFilePath);
-            return JsonConvert.DeserializeObject<byte[]>(
-                jsonString);
-        }
-        return new byte[] { };
+        if (!File.Exists(EEPROMSaveFilePath)) return new byte[] { };
+        string jsonString = ReadFile(EEPROMSaveFilePath);
+        return JsonConvert.DeserializeObject<byte[]>(
+            jsonString);
     }
 
 
@@ -138,17 +134,13 @@ public static class SaveSystem
 
     public static string ReadFile(string path)
     {
-        using (StreamReader reader = new StreamReader(path))
-        {
-            return reader.ReadToEnd();
-        }
+        using StreamReader reader = new StreamReader(path);
+        return reader.ReadToEnd();
     }
     public static void WriteFile(string path, string content)
     {
-        using (StreamWriter writer = new StreamWriter(path))
-        {
-            writer.Write(content);
-        }
+        using StreamWriter writer = new StreamWriter(path);
+        writer.Write(content);
     }
 
 

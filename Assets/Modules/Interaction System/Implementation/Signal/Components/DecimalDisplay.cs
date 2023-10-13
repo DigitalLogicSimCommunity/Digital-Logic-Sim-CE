@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using DLS.Simulation;
+using DLS.Core.Simulation;
 using TMPro;
 using UnityEngine;
 
@@ -20,7 +20,7 @@ public class DecimalDisplay : MonoBehaviour
     public void UpdateDecimalDisplay(IList<ChipSignal> signals, bool useTwosComplement)
     {
         int decimalValue = 0;
-        for (int i = 0; i < signals.Count; i++)
+        for (var i = 0; i < signals.Count; i++)
         {
             var signalState = signals[signals.Count - 1 - i].State[0];
             if (useTwosComplement && i == signals.Count - 1)

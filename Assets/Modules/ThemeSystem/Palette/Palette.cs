@@ -1,6 +1,7 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
-using DLS.Simulation;
+using DLS.Core.Simulation;
 using Interaction;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -22,22 +23,7 @@ public class Palette : ScriptableObject
     public int DefaultIndex
     {
         get => defaultIndex;
-        set
-        {
-            if (value >= voltageColours.Length)
-            {
-                defaultIndex = 0;
-                return;
-            }
-
-            if (value < 0)
-            {
-                defaultIndex = voltageColours.Length - 1;
-                return;
-            }
-
-            defaultIndex = value;
-        }
+        set => defaultIndex = value < 0 ? voltageColours.Length - 1 : value % voltageColours.Length;
     }
 
 

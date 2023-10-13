@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.Tracing;
-using System.Linq;
-using DLS.Simulation;
-using Interaction.Display;
-using SebInput.Internal;
+﻿using DLS.Core.Simulation;
+using Interaction.Signal.Display;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 // Provides input signal (0 or 1) to a chip.
 // When designing a chip, this input signal can be manually set to 0 or 1 by the player.

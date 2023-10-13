@@ -11,6 +11,7 @@ public class SavedWireLayout {
 		Wire[] allWires = chipInstanceHolder.wires;
 		serializableWires = new SavedWire[allWires.Length];
 
+		
 		for (int i = 0; i < allWires.Length; i++) {
 			serializableWires[i] = new SavedWire (chipInstanceHolder, allWires[i]);
 		}

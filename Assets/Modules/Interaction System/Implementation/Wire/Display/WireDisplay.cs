@@ -1,24 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using DLS.Simulation;
+using DLS.Core.Simulation;
+using DLS.UI.ThemeSystem;
 using UI.ThemeSystem;
 using UnityEngine;
 
-public class WireDisplay : MonoBehaviour, IThemeSettable
+public class WireDisplay : ThemeDisplay
 {
     LineRenderer LineRenderer;
     EdgeCollider2D WireCollider;
-
-    Palette.VoltageColour CurrentTheme;
 
 
     const float thicknessMultiplier = 0.1f;
     Material mat;
     bool selected;
 
-    public Color editCol;
-    Palette _signalPalette;
     List<Vector2> drawPoints = new List<Vector2>();
 
 
@@ -37,18 +34,14 @@ public class WireDisplay : MonoBehaviour, IThemeSettable
         WireCollider = GetComponentInParent<EdgeCollider2D>();
 
         mat = LineRenderer.material;
-        mat.color = editCol;
+        mat.color = Color.black;
         RegisterEvent();
     }
 
 
-    private void Start()
+    protected override void Start()
     {
-        _signalPalette = ThemeManager.Palette;
-        CurrentTheme = _signalPalette.GetDefaultTheme();
-        CurrentStatusColor = CurrentTheme.Low;
-
-
+        base.Start();
         NormalAppearance();
     }
 
@@ -70,7 +63,7 @@ public class WireDisplay : MonoBehaviour, IThemeSettable
         wire.OnWireChange += UpdateSmoothedLine;
         wire.OnPlacing += () =>
         {
-            UpdateColor();
+            CheckedApplyTheme();
             Placed = true;
             NormalAppearance();
             wire.startPin.OnStateChange += SetStatusColor;
@@ -96,34 +89,37 @@ public class WireDisplay : MonoBehaviour, IThemeSettable
 
     private bool Focused;
 
-    private void UpdateColor()
+    protected override void ApplyTheme()
     {
-        if (CurrentTheme == null)
-        {
-            _signalPalette = ThemeManager.Palette;
-            CurrentTheme = _signalPalette.GetDefaultTheme();
-        }
-
-        mat.color = CurrentTheme.GetColour(PinStates.AllLow(Pin.WireType.Simple));
+        mat.color = SimulationColor;
+        CurrentThemeNAme = CurrentTheme.Name;
     }
 
+    public string CurrentThemeNAme;
 
-    private Color CurrentStatusColor;
+
+    private Color SimulationColor =>
+        IsSimulationActive ? CurrentTheme.GetColour(CurrentState, CurrentWireType) : CurrentTheme.Low;
 
     void SetStatusColor(PinStates pinState, Pin.WireType wireType)
     {
         if (!Placed) return;
 
-        CurrentStatusColor = CurrentTheme.GetColour(pinState, wireType);
-        mat.color = IsSimulationActive ? CurrentStatusColor : CurrentTheme.Low;
+        CurrentState = pinState;
+        CurrentWireType = wireType;
+        ApplyTheme();
     }
+
+    public PinStates CurrentState { get; set; }
+
+    public Pin.WireType CurrentWireType { get; set; }
 
 
     private void SelectAppearance()
     {
         if (!Focused) return;
         SetUpThickness(ScalingManager.WireSelectedThickness * thicknessMultiplier);
-        mat.color = _signalPalette.PinInteractionPalette.WireHighlighte;
+        mat.color = ThemeManager.Palette.PinInteractionPalette.WireHighlighte;
     }
 
     private void NormalAppearance()
@@ -132,7 +128,7 @@ public class WireDisplay : MonoBehaviour, IThemeSettable
         SetUpThickness(ScalingManager.WireThickness * thicknessMultiplier);
         if (Placed)
         {
-            mat.color = IsSimulationActive ? CurrentStatusColor : CurrentTheme.Low;
+            ApplyTheme();
             SetDepth(CurrentTheme.DisplayPriority);
         }
         else
@@ -141,6 +137,7 @@ public class WireDisplay : MonoBehaviour, IThemeSettable
             SetDepth(1);
         }
     }
+
 
     private void SetUpThickness(float thickness)
     {
@@ -219,15 +216,9 @@ public class WireDisplay : MonoBehaviour, IThemeSettable
         drawPoints.Add(anchorPoints[^1]);
     }
 
-    public void SetDepth(float Depth)
+    private void SetDepth(float Depth)
     {
         // depth = Depth * 0.01f;
         transform.localPosition = Vector3.forward * Depth;
-    }
-
-    public void SetTheme(Palette.VoltageColour voltageColour)
-    {
-        CurrentTheme = voltageColour;
-        UpdateColor();
     }
 }

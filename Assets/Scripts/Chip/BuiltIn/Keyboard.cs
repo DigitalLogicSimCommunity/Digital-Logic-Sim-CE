@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using Core;
-using DLS.Simulation;
+using DLS.Core.Simulation;
 
 namespace DLS.Chip.BuiltIn
 {

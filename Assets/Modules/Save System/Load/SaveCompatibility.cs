@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using System;
+using DLS.SaveSystem.Serializable.SerializationHelper;
 
 public class SaveCompatibility : MonoBehaviour
 {

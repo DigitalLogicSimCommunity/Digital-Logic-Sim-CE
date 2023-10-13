@@ -1,18 +1,17 @@
 ﻿using System;
-using DLS.Simulation;
+using DLS.Core.Simulation;
+using DLS.UI.ThemeSystem;
 using UI.ThemeSystem;
 using UnityEngine;
 using UnityEngine.Serialization;
 using static Pin;
 
-namespace Interaction.Display
+namespace Interaction.Signal.Display
 {
     [RequireComponent(typeof(ChipSignal))]
-    public class SignalDisplay : MonoBehaviour, IThemeSettable
+    public class SignalDisplay : ThemeDisplay
     {
         public Palette signalPalette;
-
-        public Palette.VoltageColour CurrentTheme;
 
         //Signals
         public MeshRenderer indicatorRenderer;
@@ -80,20 +79,19 @@ namespace Interaction.Display
             set => SavedState = value;
         }
 
+
+        protected override void ApplyTheme()
+        {
+            DrawSignals(State, WireType);
+        }
+        //called by event
         private void DrawSignals(PinStates state, WireType wireType = WireType.Simple)
         {
             WireType = wireType;
             State = state;
             if (!indicatorRenderer) return;
 
-
             indicatorRenderer.material.color = CurrentTheme.GetColour(State, wireType);
-        }
-
-        public void SetTheme(Palette.VoltageColour voltageColour)
-        {
-            CurrentTheme = voltageColour;
-            DrawSignals(State, WireType);
         }
     }
 }

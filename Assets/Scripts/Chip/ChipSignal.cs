@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using DLS.Simulation;
-using Interaction.Display;
+using DLS.Core.Simulation;
+using Interaction.Signal.Display;
 using UnityEngine;
-using UnityEngine.Serialization;
 using static Pin;
 
 // Base class for input and output signals
 [RequireComponent(typeof(SignalDisplay))]
 public class ChipSignal : Chip
 {
+    public int GroupId = -1;
+    public bool isInGroup;
     public event Action<WireType, PinStates> OnStateChange;
     public event Action<bool> OnInteractableSet;
 

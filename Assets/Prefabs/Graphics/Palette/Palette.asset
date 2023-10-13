@@ -15,35 +15,35 @@ MonoBehaviour:
   PinInteractionPalette: {fileID: 11400000, guid: a19c5975e33af2047a5e9e929dfc3d5b,
     type: 2}
   nonInteractableCol: {r: 0.37254903, g: 0.37254903, b: 0.37254903, a: 1}
-  defaultIndex: 3
+  defaultIndex: 0
   voltageColours:
-  - Name: Red
+  - Name: red
     High: {r: 0.91372555, g: 0.19215688, b: 0.27058825, a: 1}
     HighBus: {r: 0.745283, g: 0.53686494, b: 0.45349768, a: 1}
     Low: {r: 0.20000002, g: 0.09411766, b: 0.098039225, a: 1}
     Tristate: {r: 0, g: 0, b: 0, a: 1}
-    DisplayPriority: 1.1
-  - Name: Blue
+    DisplayPriority: 1.6
+  - Name: blue
     High: {r: 0.078431375, g: 0.49803925, b: 1, a: 1}
     HighBus: {r: 0.50907797, g: 0.6995736, b: 0.754717, a: 1}
     Low: {r: 0, g: 0.098039225, b: 0.34901962, a: 1}
     Tristate: {r: 0, g: 0, b: 0, a: 1}
-    DisplayPriority: 1.2
+    DisplayPriority: 1.7
   - Name: yellow
     High: {r: 1, g: 0.60784316, b: 0, a: 1}
     HighBus: {r: 0.7264151, g: 0.60951144, b: 0.42831078, a: 1}
     Low: {r: 0.32156864, g: 0.20784315, b: 0.043137256, a: 1}
     Tristate: {r: 0, g: 0, b: 0, a: 1}
-    DisplayPriority: 1.3000001
+    DisplayPriority: 1.8000001
   - Name: indigo
     High: {r: 0.54901963, g: 0.28627452, b: 1, a: 1}
     HighBus: {r: 0.60206354, g: 0.5241189, b: 0.735849, a: 1}
     Low: {r: 0.18039216, g: 0.098039225, b: 0.3019608, a: 1}
     Tristate: {r: 0, g: 0, b: 0, a: 1}
-    DisplayPriority: 1.4000001
+    DisplayPriority: 1.9000001
   - Name: green
     High: {r: 0.121568635, g: 0.6901961, b: 0.227451, a: 1}
     HighBus: {r: 0.5097454, g: 0.745283, b: 0.5536041, a: 1}
     Low: {r: 0.027450982, g: 0.14901961, b: 0.07058824, a: 1}
     Tristate: {r: 0, g: 0, b: 0, a: 1}
-    DisplayPriority: 1.5000001
+    DisplayPriority: 2

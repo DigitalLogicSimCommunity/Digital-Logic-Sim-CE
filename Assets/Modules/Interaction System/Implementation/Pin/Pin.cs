@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using DLS.Simulation;
+using DLS.Core.Simulation;
 using UnityEngine;
 
 public class Pin : MonoBehaviour
@@ -65,7 +65,7 @@ public class Pin : MonoBehaviour
     void Start()
     {
         currentState = PinStates.Zero;
-        Simulation.instance.OnSimulationTogle += (_) => NotifyStateChange();
+        Simulation.instance.OnSimulationToggle += (_) => NotifyStateChange();
     }
 
 

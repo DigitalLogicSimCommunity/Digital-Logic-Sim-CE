@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace DLS.Simulation
+namespace DLS.Core.Simulation
 {
     public enum PinState
     {

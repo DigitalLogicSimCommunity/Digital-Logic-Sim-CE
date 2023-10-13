@@ -231,9 +231,10 @@ public static class ChipLoader
         if (chipToTryLoad == null)
             return null;
 
-        ChipInstanceHolder loadedChipData =LoadChipWithWires(chipToTryLoad, Manager.instance.AllSpawnableChipDic(), chipEditor);
+        ChipInstanceHolder loadedChipData = LoadChipWithWires(chipToTryLoad, Manager.instance.AllSpawnableChipDic(), chipEditor);
         SavedWireLayout wireLayout = SaveSystem.ReadWire(loadedChipData.Data.name);
 
+        // This fixes a bug where if a pin were unnamed, some connections were random.
         //Work Around solution. it just Work but maybe is worth to change the entire way to save WireLayout (idk i don't think so)
         for (int i = 0; i < loadedChipData.wires.Length; i++)
         {
@@ -269,16 +270,18 @@ public static class ChipLoader
                     .pinName;
             }
 
-            int wireIndex = Array.FindIndex(loadedChipData.wires,
-                w => w.startPin.pinName == startPinName && w.endPin.pinName == endPinName);
-            if (wireIndex >= 0)
-                loadedChipData.wires[wireIndex].SetAnchorPoints(wire.anchorPoints);
+            var wireIndex = Array.FindIndex(loadedChipData.wires,w => w.startPin.pinName == startPinName && w.endPin.pinName == endPinName);
+            if (wireIndex < 0) continue;
+            loadedChipData.wires[wireIndex].SetAnchorPoints(wire.anchorPoints);
+            var wireDisplay = loadedChipData.wires[wireIndex].GetComponentInChildren<WireDisplay>();
+            
+            //The null check for 'wire.ThemeName' is redundant here since it's already handled in the method
+            wireDisplay.SetTheme(wire.ColourThemeName);
+
         }
 
         foreach (var wire in loadedChipData.wires)
-        {
             wire.endPin.pinName = wire.endPin.pinName.Remove(wire.endPin.pinName.Length - 1);
-        }
 
         return loadedChipData;
     }

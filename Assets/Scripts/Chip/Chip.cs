@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DLS.Core.Simulation;
 
 public class Chip : MonoBehaviour
 {

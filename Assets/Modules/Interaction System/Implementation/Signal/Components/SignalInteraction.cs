@@ -1,15 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using DLS.Simulation;
-using Interaction.Display;
+using DLS.Core.Simulation;
 using JetBrains.Annotations;
-using TMPro;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.Rendering.VirtualTexturing;
-using UnityEngine.Serialization;
 using VitoBarra.System.Interaction;
 using VitoBarra.Utils.TextVerifier;
 
@@ -18,6 +12,7 @@ namespace Interaction.Signal
     public class SignalInteraction : Interactable
     {
         public const int MaxGroupSize = 16;
+        private int GroupID = -1;
 
         public event Action OnGroupSizeChange;
         public event Action OnPropertyChange;
@@ -26,6 +21,8 @@ namespace Interaction.Signal
         [SerializeField] private ChipSignal signalPrefab;
 
         private DecimalDisplay DecimalDisplay;
+        
+        
 
 
         //Work Variable
@@ -36,18 +33,9 @@ namespace Interaction.Signal
         public int GroupSize
         {
             get => _groupSize;
-            private set
-            {
-                _groupSize = value switch
-                {
-                    < 0 => 0,
-                    <= MaxGroupSize => value,
-                    _ => MaxGroupSize
-                };
-            }
+            private set => _groupSize = value < 0 ? 0 : value % MaxGroupSize;
         }
 
-        private int ID;
 
 
         float BoundsTop;
@@ -59,7 +47,7 @@ namespace Interaction.Signal
 
         //Event
         public event Action<Chip> OnDeleteChip;
-        public event Action<Vector3, EditorInterfaceType> OnDragig;
+        public event Action<Vector3, EditorInterfaceType> OnDragging;
         [CanBeNull] public event Action OnDeleteInteraction;
 
 
@@ -89,7 +77,7 @@ namespace Interaction.Signal
             ScalingManager.i.OnScaleChange -= UpdateCenterPosition;
         }
 
-        public void init(Pin.WireType wireType, float _boundsBottom, float _boundsTop,
+        public void Init(Pin.WireType wireType, int _groupID, float _boundsBottom, float _boundsTop,
             EditorInterfaceType _editorInterfaceType, Vector3 _pinContainers, bool displayEnabled = true)
         {
             WireType = wireType;
@@ -98,6 +86,7 @@ namespace Interaction.Signal
             BoundsTop = _boundsTop;
             PinContainers = _pinContainers;
             DisplayEnabled = displayEnabled;
+            GroupID = _groupID;
         }
 
 
@@ -134,6 +123,9 @@ namespace Interaction.Signal
         {
             var spawnedSignal = Instantiate(signalPrefab, PinContainers, Quaternion.identity, transform);
 
+            spawnedSignal.GroupId = GroupID;
+            spawnedSignal.isInGroup = IsGroup;
+            
             var e = Signals.AddSignals(spawnedSignal);
             e.ChipSignal.wireType = wireType;
             RegisterHandler(e.HandleEvent);
@@ -181,7 +173,7 @@ namespace Interaction.Signal
 
         private void NotifyMovement()
         {
-            OnDragig?.Invoke(GroupCenter, EditorInterfaceType);
+            OnDragging?.Invoke(GroupCenter, EditorInterfaceType);
             Manager.ActiveChipEditor.chipInteraction.NotifyMovement();
         }
 
@@ -340,6 +332,12 @@ namespace Interaction.Signal
             OnGroupSizeChange?.Invoke();
 
             return list;
+        }
+        
+        
+        public SignalReferenceHolder AddOneSignal()
+        {
+            return SetGroupSize(GroupSize +1)[^1];
         }
 
         #endregion

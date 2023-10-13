@@ -38,10 +38,11 @@ namespace Interaction.Signal
             var ContaierPosition = new Vector3(xContainer, yPos, zContainer);
             var SignalInteractable = GameObject.Instantiate(SignalInteractablePref,SignalHolder);
             SignalInteractable.transform.SetPositionAndRotation(ContaierPosition, SignalInteractable.transform.rotation);
-            SignalInteractable.init(wireType,BoundsBottom,BoundsTop,editorInterfaceType,ContaierPosition,DisplayEnabled);
+            SignalInteractable.Init(wireType, NextGroupID ,BoundsBottom,BoundsTop,editorInterfaceType,ContaierPosition,DisplayEnabled);
             SignalInteractable.SetUpCreation(OnDeleteChip, desiredGroupSize, RequiredFocus);
 
-            return (NextGroupID++,SignalInteractable);
+            NextGroupID++;
+            return (NextGroupID-1,SignalInteractable);
         }
     }
 }
