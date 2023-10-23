@@ -1,14 +1,16 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DLS.Core.Simulation;
 
 public class Chip : MonoBehaviour
 {
 
 
     public string chipName = "Untitled";
-    public Pin[] inputPins;
-    public Pin[] outputPins;
+    public List<Pin> inputPins;
+    public List<Pin> outputPins;
     public bool Editable = false;
     // Number of input signals received (on current simulation step)
     int numInputSignalsReceived;
@@ -25,11 +27,10 @@ public class Chip : MonoBehaviour
 
     public void InitSimulationFrame()
     {
-        if (lastSimulationInitFrame != Simulation.simulationFrame)
-        {
-            lastSimulationInitFrame = Simulation.simulationFrame;
-            ProcessCycleAndUnconnectedInputs();
-        }
+        if (lastSimulationInitFrame == Simulation.simulationFrame) return;
+        
+        lastSimulationInitFrame = Simulation.simulationFrame;
+        ProcessCycleAndUnconnectedInputs();
     }
 
     // Receive input signal from pin: either pin has power, or pin does not have
@@ -47,7 +48,7 @@ public class Chip : MonoBehaviour
 
         numInputSignalsReceived++;
 
-        if (numInputSignalsReceived == inputPins.Length)
+        if (numInputSignalsReceived == inputPins.Count)
         {
             ProcessOutput();
         }
@@ -55,15 +56,15 @@ public class Chip : MonoBehaviour
 
     void ProcessCycleAndUnconnectedInputs()
     {
-        for (int i = 0; i < inputPins.Length; i++)
+        foreach (var pin in inputPins)
         {
-            if (inputPins[i].cyclic)
+            if (pin.cyclic)
             {
-                ReceiveInputSignal(inputPins[i]);
+                ReceiveInputSignal(pin);
             }
-            else if (!inputPins[i].HasParent)
+            else if (!pin.HasParent)
             {
-                inputPins[i].ReceiveSignal(0);
+                pin.ReceiveZero();
                 // ReceiveInputSignal (inputPins[i]);
             }
         }
@@ -75,13 +76,23 @@ public class Chip : MonoBehaviour
 
     void SetPinIndices()
     {
-        for (int i = 0; i < inputPins.Length; i++)
+        try
         {
-            inputPins[i].index = i;
+            for (int i = 0; i < inputPins.Count; i++)
+            {
+                inputPins[i].index = i;
+            }
+
+            for (int i = 0; i < outputPins.Count; i++)
+            {
+                outputPins[i].index = i;
+            }
+
         }
-        for (int i = 0; i < outputPins.Length; i++)
+        catch (Exception e)
         {
-            outputPins[i].index = i;
+            Console.WriteLine(chipName);
+            throw;
         }
     }
 
