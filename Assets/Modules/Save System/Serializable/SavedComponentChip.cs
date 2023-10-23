@@ -14,6 +14,11 @@ public class SavedComponentChip {
 
 	public int signalGroupId =-1;
 	public bool isInGroup = false;
+
+	public SavedComponentChip()
+	{
+	}
+
 	public SavedComponentChip (ChipInstanceHolder chipInstanceHolder, Chip chip) {
 		chipName = chip.chipName;
 

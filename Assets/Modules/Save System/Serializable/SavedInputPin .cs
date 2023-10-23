@@ -12,6 +12,10 @@ public class SavedInputPin {
 	public bool isCylic;
 	public Pin.WireType wireType;
 
+	public SavedInputPin()
+	{
+	}
+
 	public SavedInputPin (ChipInstanceHolder chipInstanceHolder, Pin pin) {
 		name = pin.pinName;
 		isCylic = pin.cyclic;
