@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -6,7 +7,7 @@ using UnityEngine.UI;
 
 public class CreateGroup : MonoBehaviour
 {
-
+    public static CreateGroup i;
     public event System.Action<int> onGroupSizeSettingPressed;
 
     public TMP_InputField groupSizeInput;
@@ -15,6 +16,11 @@ public class CreateGroup : MonoBehaviour
     private bool menuActive;
 
     int groupSizeValue;
+
+    private void Awake()
+    {
+        i = this;
+    }
 
     void Start()
     {

@@ -1,52 +1,41 @@
-﻿using System.Linq;
+﻿using DLS.Core.Simulation;
+using Interaction.Signal.Display;
 using UnityEngine;
 
 // Provides input signal (0 or 1) to a chip.
 // When designing a chip, this input signal can be manually set to 0 or 1 by the player.
+[RequireComponent(typeof(SignalDisplay))]
 public class InputSignal : ChipSignal
 {
-
-
-    protected override void Start()
+    private void ToggleActive()
     {
-        base.Start();
-        SetCol();
+        if (wireType != Pin.WireType.Simple) return;
+
+        if (State[0] == PinState.HIGH)
+            State[0] = PinState.LOW;
+        else
+            State[0] = PinState.HIGH;
+        NotifyStateChange();
     }
 
-    public void ToggleActive()
+    public void SetState(PinStates pinState)
     {
-        currentState = 1 - currentState;
-        SetCol();
+        State = pinState;
+        NotifyStateChange();
     }
 
-    public void SetState(int state)
+    public void SendSignal(PinStates signal)
     {
-        currentState = state >= 1 ? 1 : 0;
-        SetCol();
-    }
-
-    public void SendSignal(int signal)
-    {
-        currentState = signal;
+        State = signal;
         outputPins[0].ReceiveSignal(signal);
-        SetCol();
-    }
-
-    public void SendOffSignal()
-    {
-        outputPins[0].ReceiveSignal(0);
-        SetCol();
+        NotifyStateChange();
     }
 
     public void SendSignal()
     {
-        outputPins[0].ReceiveSignal(currentState);
+        outputPins[0].ReceiveSignal(State);
     }
 
-    void SetCol()
-    {
-        SetDisplayState(currentState);
-    }
 
     public override void UpdateSignalName(string newName)
     {
@@ -54,10 +43,15 @@ public class InputSignal : ChipSignal
         outputPins[0].pinName = newName;
     }
 
-    void OnMouseDown()
+    protected override void Start()
     {
-        // Allow only to click on single wires, not on bus wires
-        if (outputPins.All(x => x.wireType == Pin.WireType.Simple))
-            ToggleActive();
+        base.Start();
+        GetComponentInChildren<SignalEvent>().MouseInteraction.LeftMouseDown += ToggleActive;
+    }
+
+    public void SetBusStatus(uint state)
+    {
+        State = new PinStates(state);
+        NotifyStateChange();
     }
 }
