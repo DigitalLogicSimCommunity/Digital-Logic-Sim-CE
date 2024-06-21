@@ -5,6 +5,7 @@ using DLS.Core.Simulation;
 using DLS.UI.ThemeSystem;
 using UI.ThemeSystem;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class WireDisplay : ThemeDisplay
 {
@@ -32,6 +33,7 @@ public class WireDisplay : ThemeDisplay
     {
         LineRenderer = GetComponent<LineRenderer>();
         WireCollider = GetComponentInParent<EdgeCollider2D>();
+        CurrentState = PinStates.AllLow(Pin.WireType.Simple);
 
         mat = LineRenderer.material;
         mat.color = Color.black;
@@ -92,10 +94,10 @@ public class WireDisplay : ThemeDisplay
     protected override void ApplyTheme()
     {
         mat.color = SimulationColor;
-        CurrentThemeNAme = CurrentTheme.Name;
+        CurrentThemeName = CurrentTheme.Name;
     }
 
-    public string CurrentThemeNAme;
+    public string CurrentThemeName;
 
 
     private Color SimulationColor =>

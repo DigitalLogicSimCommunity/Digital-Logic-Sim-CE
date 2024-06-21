@@ -68,13 +68,14 @@ namespace SebInput.Internal
 
 		public void OnMouseRelease(MouseEventSystem.MouseButton mouseButton)
 		{
-			if (mouseButton == MouseEventSystem.MouseButton.Left)
+			switch (mouseButton)
 			{
-				LeftMouseReleased?.Invoke();
-			}
-			else if (mouseButton == MouseEventSystem.MouseButton.Right)
-			{
-				RightMouseReleased?.Invoke();
+				case MouseEventSystem.MouseButton.Left:
+					LeftMouseReleased?.Invoke();
+					break;
+				case MouseEventSystem.MouseButton.Right:
+					RightMouseReleased?.Invoke();
+					break;
 			}
 		}
 

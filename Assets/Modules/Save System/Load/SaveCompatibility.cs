@@ -2,9 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
-using System.IO;
-using System.Text;
-using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Diagnostics;
@@ -466,11 +463,10 @@ public class SaveCompatibility : MonoBehaviour
         if (FolderJson.Property("0") == null)
             From038to039Folder(ref FolderJson);
 
-        if (FolderDirtyBit)
-        {
-            FolderFile = JsonConvert.SerializeObject(FolderJson);
-            WriteFileFolder(FolderFile);
-        }
+        if (!FolderDirtyBit) return;
+
+        FolderFile = JsonConvert.SerializeObject(FolderJson);
+        WriteFileFolder(FolderFile);
     }
 
     private static void WriteFileFolder(string FoldersJsonStr)

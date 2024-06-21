@@ -44,7 +44,9 @@ public class MenuManager : MonoBehaviour
     EEPROMMenu EEPROMMenu;
     EditChipMenu editChipMenu;
 
+    [HideInInspector]
     public SignalPropertiesMenu signalPropertiesMenu;
+    [HideInInspector]
     public ThemeChangerMenu themeChangerMenu;
 
 

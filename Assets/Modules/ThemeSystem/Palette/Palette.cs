@@ -49,6 +49,8 @@ public class Palette : ScriptableObject
         public Color GetColour(PinStates states, Pin.WireType wireType = Pin.WireType.Simple,
             bool useTriStateCol = true)
         {
+            if (states == null || states.Count == 0)
+                return Low;
             if (states.Count == 1)
                 return states[0] switch
                 {
@@ -57,8 +59,7 @@ public class Palette : ScriptableObject
                     _ => useTriStateCol ? Tristate : Low
                 };
 
-            var e = states.Where(x => x == PinState.HIGH).ToList();
-            return e.Count > 0 ? GetHigh(wireType) : Low;
+            return states.Any(x => x == PinState.HIGH) ? GetHigh(wireType) : Low;
         }
 
 

@@ -34,7 +34,9 @@
         //public const int Default = 1 << 31;
     }
 
-    public static class ProjectTags
+
+
+   public static class ProjectTags
     {
         public const string Untag = "Untagged";
         public const string Respawn = "Respawn";
@@ -46,3 +48,13 @@
         public const string ChipEditor = "ChipEditor";
         public const string InterfaceMask = "InterfaceMask";
     }
+
+   public static class GameConstant
+   {
+        private const string MAJOR= "0";
+        private const string MINOR= "40";
+        private const string REVISION= "2";
+        public static string GAMEVERSION =$"{MAJOR}.{MINOR}.{REVISION}";
+
+        public const string LASTEDIT= "20 Jan 2024";
+   }

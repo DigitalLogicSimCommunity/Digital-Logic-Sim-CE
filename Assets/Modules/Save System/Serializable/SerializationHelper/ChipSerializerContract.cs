@@ -6,7 +6,7 @@ namespace DLS.SaveSystem.Serializable.SerializationHelper
 {
     public class ChipSerializerContract : DefaultContractResolver
     {
-        public new static readonly ChipSerializerContract Instance = new ChipSerializerContract();
+        public static readonly ChipSerializerContract Instance = new ChipSerializerContract();
 
         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
         {

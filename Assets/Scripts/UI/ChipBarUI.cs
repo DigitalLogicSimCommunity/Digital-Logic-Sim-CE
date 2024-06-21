@@ -31,8 +31,7 @@ public class ChipBarUI : MonoBehaviour
 
     public List<CustomButton> customButton = new List<CustomButton>();
 
-    public Dictionary<int, (RectTransform Holder, int Value)> chipButtonHolders =
-        new Dictionary<int, (RectTransform Holder, int Value)>();
+    public Dictionary<int, (RectTransform Holder, int Value)> chipButtonHolders =new();
 
 
     public static int CurrentFolderIndex = 0;
@@ -222,7 +221,7 @@ public class ChipBarUI : MonoBehaviour
     public void AddFolderView(int FolderIndex, Sprite sprite)
     {
         var folderName = FolderSystem.GetFolderName(FolderIndex);
-        TMP_Dropdown.OptionData newOption = new TMP_Dropdown.OptionData(folderName, sprite);
+        TMP_Dropdown.OptionData newOption = new TMP_Dropdown.OptionData(folderName, sprite, Color.white);
 
 
         FolderDropdown.options.Remove(newFolderOption);

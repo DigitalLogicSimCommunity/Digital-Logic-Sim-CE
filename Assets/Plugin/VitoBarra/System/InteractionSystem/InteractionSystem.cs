@@ -11,12 +11,12 @@ namespace VitoBarra.System.Interaction
 
         private Interactable InteractableWhitFocus;
 
-        //CommandExecutes ExecutionComand;
+        //CommandExecutes ExecutionCommand;
 
         private void Awake()
         {
             Instance = this;
-            //ExecutionComand = new CommandExecutes();
+            //ExecutionCommand = new CommandExecutes();
         }
 
         private void Update()
@@ -63,7 +63,7 @@ namespace VitoBarra.System.Interaction
 
         private void OnDestroy()
         {
-           // ExecutionComand.UnregisterEvent();
+           // ExecutionCommand.UnregisterEvent();
         }
     }
 }

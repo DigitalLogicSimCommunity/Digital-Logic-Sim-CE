@@ -12,7 +12,7 @@ namespace VitoBarra.Utils.TextVerifier
             return t;
         }
 
-        public static Transform SetYlocalPos(this Transform t, float y)
+        public static Transform SetYLocalPos(this Transform t, float y)
         {
             t.localPosition = new Vector3(t.localPosition.x, y, t.localPosition.z);
             return t;
