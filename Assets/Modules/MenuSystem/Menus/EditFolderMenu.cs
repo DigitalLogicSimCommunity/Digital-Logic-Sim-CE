@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Modules.ProjectSettings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,7 +24,7 @@ public class EditFolderMenu : MonoBehaviour
         RenamingFolderField.SetTextWithoutNotify("");
         OKRenameFolder.interactable = false;
 
-        FolderSystem.RenameFolder(FolderName, newFolderName);
+        ProjectSettings.FolderSystem.RenameFolder(FolderName, newFolderName);
         chipBarUI.NotifyFolderNameChanged();
     }
 
@@ -39,7 +40,7 @@ public class EditFolderMenu : MonoBehaviour
 
     public void DeleteFolder()
     {
-        FolderSystem.DeleteFolder(FolderName);
+        ProjectSettings.FolderSystem.DeleteFolder(FolderName);
         chipBarUI.NotifyRemovedFolder(FolderName);
     }
 
@@ -54,7 +55,7 @@ public class EditFolderMenu : MonoBehaviour
     {
         var validName = FolderNameValidator.ValidateFolderName(RenamingFolderField.text, endEdit);
 
-        OKRenameFolder.interactable = validName.Length > 0 && FolderSystem.FolderNameAvailable(validName);
+        OKRenameFolder.interactable = validName.Length > 0 && ProjectSettings.FolderSystem.FolderNameAvailable(validName);
         RenamingFolderField.SetTextWithoutNotify(validName);
     }
 }

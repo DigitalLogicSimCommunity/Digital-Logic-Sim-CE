@@ -22,7 +22,7 @@ namespace Assets.Scripts.Chip
 			};
 			inputPins = new List<Pin>(1);
 			outputPins = new List<Pin>(4);
-			chipName = "4 BIT DECODER";
+			Name = "4 BIT DECODER";
 		}
 		protected override void ProcessOutput()
 		{

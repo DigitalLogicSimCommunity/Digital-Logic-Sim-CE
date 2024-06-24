@@ -20,7 +20,7 @@ public class Clock : BuiltinChip
         };
         inputPins = new List<Pin>(0);
         outputPins = new List<Pin>(1);
-        chipName = "CLOCK";
+        Name = "CLOCK";
     }
 
     

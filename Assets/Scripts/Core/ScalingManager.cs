@@ -184,7 +184,7 @@ public class ScalingManager : MonoBehaviour
 
     public void UpdateScale()
     {
-        ChipEditor chipEditor = Manager.ActiveChipEditor;
+        ChipEditor chipEditor = Manager.ActiveEditor;
         if (!chipEditor) return;
 
         CalcValues();

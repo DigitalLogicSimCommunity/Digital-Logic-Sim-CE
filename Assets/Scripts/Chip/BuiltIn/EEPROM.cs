@@ -24,7 +24,7 @@ public class EEPROM : BuiltinChip
 		};
 		inputPins = new List<Pin>(13);
 		outputPins = new List<Pin>(8);
-		chipName = "HARD DRIVE";
+		Name = "HARD DRIVE";
 	}
 
 	protected override void Awake()

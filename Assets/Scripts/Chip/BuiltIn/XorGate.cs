@@ -15,7 +15,7 @@ public class XorGate : BuiltinChip
         };
         inputPins = new List<Pin>(2);
         outputPins = new List<Pin>(1);
-        chipName = "XOR";
+        Name = "XOR";
     }
 
     protected override void ProcessOutput()

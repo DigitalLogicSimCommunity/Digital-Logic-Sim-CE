@@ -31,7 +31,7 @@ namespace Interaction.Signal
 
             foreach (var signalDisplay in signalDisplays)
             {
-                signalDisplay.SetTheme(ThemeManager.DefaultTheme);
+                signalDisplay.CurrentTheme= ThemeManager.DefaultTheme;
             }
         }
 
@@ -53,7 +53,7 @@ namespace Interaction.Signal
 
         public void AdjustYPosition()
         {
-            PreviewSignal.MoveCenterYPosition(InputHelper.MouseWorldPos.y);
+            PreviewSignal.SetGroupCenter(InputHelper.MouseWorldPos.y);
         }
 
         public void SetGroupSize(int desiredGroupSize)

@@ -25,7 +25,7 @@ namespace Interaction.Signal.Display
         private void Awake()
         {
             signalPalette = ThemeManager.Palette;
-            CurrentTheme = signalPalette.GetDefaultTheme();
+            //CurrentTheme = signalPalette.GetDefaultTheme();
 
             var e = GetComponent<ChipSignal>();
             e.OnStateChange += (wireType, state) => DrawSignals(state, wireType);

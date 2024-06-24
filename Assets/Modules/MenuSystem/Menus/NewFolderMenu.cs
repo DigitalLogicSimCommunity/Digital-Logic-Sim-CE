@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Modules.ProjectSettings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,7 +23,7 @@ public class NewFolderMenu : MonoBehaviour
         newFolderNameField.SetTextWithoutNotify("");
         SubmitNewFolder.interactable = false;
 
-        chipBarUI.AddFolderView(FolderSystem.AddFolder(newFolderName), chipBarUI.UserSprite);
+        chipBarUI.AddFolderView(ProjectSettings.FolderSystem.AddFolder(newFolderName), chipBarUI.UserSprite);
 
     }
 
@@ -32,7 +33,7 @@ public class NewFolderMenu : MonoBehaviour
     {
         var validName = FolderNameValidator.ValidateFolderName(newFolderNameField.text, endEdit);
 
-        SubmitNewFolder.interactable = validName.Length > 0 && FolderSystem.FolderNameAvailable(validName);
+        SubmitNewFolder.interactable = validName.Length > 0 && ProjectSettings.FolderSystem.FolderNameAvailable(validName);
         newFolderNameField.SetTextWithoutNotify(validName);
     }
 

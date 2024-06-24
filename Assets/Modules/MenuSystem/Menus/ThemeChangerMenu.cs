@@ -7,7 +7,7 @@ public class ThemeChangerMenu : MonoBehaviour
 {
     private RectTransform ThemeChangerMenuUI;
     private IThemeSettable ItemToSet;
-    private bool Inizialized = false;
+
 
     private void Awake()
     {
@@ -20,14 +20,12 @@ public class ThemeChangerMenu : MonoBehaviour
         ItemToSet = itemToSet;
         SetPosition(itemToSet);
         MenuManager.instance.OpenMenu(MenuType.ThemeChangerMenu);
-        Inizialized = true;
     }
 
     public void ChangeTheme(Palette.VoltageColour theme)
     {
-        ItemToSet.SetTheme(theme);
+        ItemToSet.CurrentTheme = theme;
         MenuManager.instance.CloseMenu();
-        Inizialized = false;
         ItemToSet = null;
     }
 
@@ -38,7 +36,7 @@ public class ThemeChangerMenu : MonoBehaviour
             case WireDisplay w:
                 SetPosition(w);
                 break;
-            case  SignalDisplay s:
+            case SignalDisplay s:
                 SetPosition(s);
                 break;
         }
@@ -47,13 +45,13 @@ public class ThemeChangerMenu : MonoBehaviour
 
     public void SetPosition(WireDisplay wireDisplay)
     {
-        ThemeChangerMenuUI.position = InputHelper.MouseWorldPos.Offset(0.2f,-1.8f);
+        ThemeChangerMenuUI.position = InputHelper.MouseWorldPos.Offset(0.2f, -1.8f);
     }
 
 
     public void SetPosition(SignalDisplay signalDisplay)
     {
         var e = InputHelper.MouseWorldPos;
-        ThemeChangerMenuUI.position = e.x<0 ? e.Offset(1.2f,-1.8f) : e.Offset(-1.2f,-1.8f);
+        ThemeChangerMenuUI.position = e.x < 0 ? e.Offset(1.2f, -1.8f) : e.Offset(-1.2f, -1.8f);
     }
 }

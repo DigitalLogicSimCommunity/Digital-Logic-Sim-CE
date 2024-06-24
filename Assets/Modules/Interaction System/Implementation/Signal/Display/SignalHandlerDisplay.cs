@@ -26,7 +26,7 @@ namespace Interaction.Signal.Display
         {
             Interaction = GetComponentInParent<SignalInteraction>();
             HandlerRender = GetComponent<Renderer>();
-            var Lissener = GetComponentInParent<HandleEvent>();
+            var Lissener = GetComponentInParent<HandlerEvent>();
             RegisterToHandleGroup(Lissener);
 
             if (Interaction == null) return;
@@ -80,13 +80,13 @@ namespace Interaction.Signal.Display
                 UpdateScale();
         }
 
-        public void RegisterToHandleGroup(HandleEvent Lissener)
+        public void RegisterToHandleGroup(HandlerEvent Lissener)
         {
             Lissener.OnHandleEnter += HandlerOnOnHandleEnter;
             Lissener.OnHandleExit += HandlerOnOnHandleExit;
         }
 
-        public void UnregisterToHandleGroup(HandleEvent Lissener)
+        public void UnregisterToHandleGroup(HandlerEvent Lissener)
         {
             Lissener.OnHandleEnter -= HandlerOnOnHandleEnter;
             Lissener.OnHandleExit -= HandlerOnOnHandleExit;

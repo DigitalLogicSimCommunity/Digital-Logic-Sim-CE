@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using Interaction.Signal;
+using Interaction.Signal.Display;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Interaction.Signal
 {
@@ -8,16 +11,20 @@ namespace Interaction.Signal
     {
         SignalInteraction SignalInteractablePref;
         Transform SignalHolder;
+        List<int> UsedGroupIDs = new List<int>();
+        Dictionary<int, int> RedirectedIDs = new Dictionary<int, int>();
         event Action<Chip> OnDeleteChip;
         float BoundsBottom;
         float BoundsTop;
         private float xContainer;
         private float zContainer;
-        
-        int NextGroupID = 0;
+
+
         EditorInterfaceType editorInterfaceType;
-        
-        public SignalInteractionBuilder(SignalInteraction signalInteractablePref, Transform signalHolder, Action<Chip> onDeleteChip,float boundsBottom,float boundsTop,float _xContainer,float _zContainer, EditorInterfaceType _editorInterfaceType)
+
+        public SignalInteractionBuilder(SignalInteraction signalInteractablePref, Transform signalHolder,
+            Action<Chip> onDeleteChip, float boundsBottom, float boundsTop, float _xContainer, float _zContainer,
+            EditorInterfaceType _editorInterfaceType)
         {
             SignalInteractablePref = signalInteractablePref;
             SignalHolder = signalHolder;
@@ -31,18 +38,41 @@ namespace Interaction.Signal
         }
 
 
-  
-
-        public (int id,SignalInteraction obj) Build(float  yPos, int desiredGroupSize,Pin.WireType wireType = Pin.WireType.Simple,bool RequiredFocus= true, bool DisplayEnabled = true)
+        public (int id, SignalInteraction obj) Build(float yPos, int desiredGroupSize,
+            Pin.WireType wireType = Pin.WireType.Simple, int id = -1
+            , bool requiredFocus = true, bool displayEnabled = true)
         {
-            var ContaierPosition = new Vector3(xContainer, yPos, zContainer);
-            var SignalInteractable = GameObject.Instantiate(SignalInteractablePref,SignalHolder);
-            SignalInteractable.transform.SetPositionAndRotation(ContaierPosition, SignalInteractable.transform.rotation);
-            SignalInteractable.Init(wireType, NextGroupID ,BoundsBottom,BoundsTop,editorInterfaceType,ContaierPosition,DisplayEnabled);
-            SignalInteractable.SetUpCreation(OnDeleteChip, desiredGroupSize, RequiredFocus);
+            int GroupID = SelectNewID(id);
 
-            NextGroupID++;
-            return (NextGroupID-1,SignalInteractable);
+
+            var ContaierPosition = new Vector3(xContainer, yPos, zContainer);
+            var SignalInteractable = GameObject.Instantiate(SignalInteractablePref, SignalHolder);
+            SignalInteractable.transform.SetPositionAndRotation(ContaierPosition,
+                SignalInteractable.transform.rotation);
+            SignalInteractable.Init(wireType, GroupID, BoundsBottom, BoundsTop, editorInterfaceType, ContaierPosition,
+                displayEnabled);
+            SignalInteractable.SetUpCreation(OnDeleteChip, desiredGroupSize, requiredFocus);
+
+
+            UsedGroupIDs.Add(GroupID);
+            return (GroupID, SignalInteractable);
+        }
+
+        private int SelectNewID(int Manualid)
+        {
+            if (Manualid < 0) return Random.Range(Int32.MinValue, Int32.MaxValue);
+
+            if (!UsedGroupIDs.Contains(Manualid))
+                return Manualid;
+            if (RedirectedIDs.TryGetValue(Manualid, out var redirectedId))
+                return redirectedId;
+
+            int newRedirectedId;
+            do newRedirectedId = Random.Range(1, Int32.MaxValue);
+            while (UsedGroupIDs.Contains(newRedirectedId));
+
+            RedirectedIDs.Add(Manualid, newRedirectedId);
+            return newRedirectedId;
         }
     }
 }

@@ -5,11 +5,12 @@ using Interaction;
 using UnityEngine;
 using VitoBarra.Utils.T;
 
-public class HandleEvent : MonoBehaviour
+public class HandlerEvent : MonoBehaviour
 {
     public event Action OnHandleEnter;
     public event Action OnHandleExit;
-    public event Action OnHandleClick;
+    public event Action OnHandleLeftDown;
+    public event Action OnHandleRightClick;
     public event Action<Vector3> OnStartDrag;
     public event Action OnDrag;
     public event Action OnStopDrag;
@@ -29,10 +30,20 @@ public class HandleEvent : MonoBehaviour
         OnHandleExit?.Invoke();
     }
 
+    private void Update()
+    {
+    }
+
+    private void OnMouseOver()
+    {
+        if (Input.GetMouseButtonDown(1))
+            OnHandleRightClick?.Invoke();
+    }
+
     private void OnMouseDown()
     {
         delayer.StartCount();
-        OnHandleClick?.Invoke();
+        OnHandleLeftDown?.Invoke();
     }
 
     private void OnMouseUp()

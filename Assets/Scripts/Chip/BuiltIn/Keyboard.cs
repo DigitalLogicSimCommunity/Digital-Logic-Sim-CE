@@ -18,7 +18,7 @@ namespace DLS.Chip.BuiltIn
             };
             inputPins = new List<Pin>(0);
             outputPins = new List<Pin>(0);
-            chipName = "KEYBOARD";
+            Name = "KEYBOARD";
         }
 
         public List<string> chars = new List<string>();

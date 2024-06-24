@@ -16,7 +16,7 @@ public class TriStateBuffer : BuiltinChip
         };
         inputPins = new List<Pin>(2);
         outputPins = new List<Pin>(1);
-        chipName = "TRI-STATE BUFFER";
+        Name = "TRI-STATE BUFFER";
     }
     
     protected override void ProcessOutput()

@@ -3,32 +3,38 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DLS.Core.Simulation;
+using UnityEngine.Serialization;
 
 public class Chip : MonoBehaviour
 {
-
-
-    public string chipName = "Untitled";
+    public string Name;
     public List<Pin> inputPins;
     public List<Pin> outputPins;
+
     public bool Editable = false;
+
     // Number of input signals received (on current simulation step)
     int numInputSignalsReceived;
     int lastSimulatedFrame;
     int lastSimulationInitFrame;
 
     // Cached components
-    [HideInInspector]
-    public BoxCollider2D bounds;
+    [HideInInspector] public BoxCollider2D bounds;
 
-    protected virtual void Awake() { bounds = GetComponent<BoxCollider2D>(); }
+    protected virtual void Awake()
+    {
+        bounds = GetComponent<BoxCollider2D>();
+    }
 
-    protected virtual void Start() { SetPinIndices(); }
+    protected virtual void Start()
+    {
+        SetPinIndices();
+    }
 
     public void InitSimulationFrame()
     {
         if (lastSimulationInitFrame == Simulation.simulationFrame) return;
-        
+
         lastSimulationInitFrame = Simulation.simulationFrame;
         ProcessCycleAndUnconnectedInputs();
     }
@@ -72,26 +78,23 @@ public class Chip : MonoBehaviour
 
     // Called once all inputs to the component are known.
     // Sends appropriate output signals t o output pins
-    protected virtual void ProcessOutput() { }
+    protected virtual void ProcessOutput()
+    {
+    }
 
     void SetPinIndices()
     {
         try
         {
             for (int i = 0; i < inputPins.Count; i++)
-            {
                 inputPins[i].index = i;
-            }
 
             for (int i = 0; i < outputPins.Count; i++)
-            {
                 outputPins[i].index = i;
-            }
-
         }
-        catch (Exception e)
+        catch
         {
-            Console.WriteLine(chipName);
+            Console.WriteLine(Name);
             throw;
         }
     }

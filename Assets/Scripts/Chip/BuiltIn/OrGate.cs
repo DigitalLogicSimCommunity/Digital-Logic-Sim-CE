@@ -15,7 +15,7 @@ public class OrGate : BuiltinChip {
 		};
 		inputPins = new List<Pin>(2);
 		outputPins = new List<Pin>(1);
-		chipName = "OR";
+		Name = "OR";
 	}
 
 	protected override void ProcessOutput () {

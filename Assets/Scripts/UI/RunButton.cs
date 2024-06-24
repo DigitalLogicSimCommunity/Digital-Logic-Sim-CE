@@ -14,13 +14,13 @@ public class RunButton : MonoBehaviour
     void Start()
     {
         _simulation = Simulation.instance;
-        button.targetGraphic.color = _simulation.active ? onCol : offCol;
+        button.targetGraphic.color = Simulation.IsSimulationActive ? onCol : offCol;
     }
 
     public void ToggleSimulationActive()
     {
         _simulation.ToggleActive();
-        button.targetGraphic.color = _simulation.active ? onCol : offCol;
+        button.targetGraphic.color = Simulation.IsSimulationActive ? onCol : offCol;
     }
 
     public void SetOff() { button.targetGraphic.color = offCol; }

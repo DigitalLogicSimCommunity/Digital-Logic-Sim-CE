@@ -18,10 +18,7 @@ public class Wire : Interactable
 
     bool wireConnected;
 
-    // [HideInInspector]
     public Pin startPin;
-
-    // [HideInInspector]  
     public Pin endPin;
 
     
@@ -29,7 +26,6 @@ public class Wire : Interactable
 
     
     public Pin ChipInputPin => (startPin.pinType == Pin.PinType.ChipInput) ? startPin : endPin;
-
     public Pin ChipOutputPin => (startPin.pinType == Pin.PinType.ChipOutput) ? startPin : endPin;
 
 

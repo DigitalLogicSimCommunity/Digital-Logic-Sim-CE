@@ -7,13 +7,12 @@ public class LoadProjectMenu : MonoBehaviour
 {
     public Button projectButtonPrefab;
     public Transform scrollHolder;
-    [SerializeField, HideInInspector]
-    List<Button> loadButtons;
+    [SerializeField, HideInInspector] List<Button> loadButtons;
 
     void OnEnable()
     {
         SaveSystem.MigrateSaves();
-        string[] projectNames = SaveSystem.GetSaveNames();
+        string[] projectNames = SaveSystem.GetProjectNames();
 
         for (int i = 0; i < projectNames.Length; i++)
         {
@@ -29,7 +28,7 @@ public class LoadProjectMenu : MonoBehaviour
 
     public void LoadProject(string projectName)
     {
-        SaveSystem.SetActiveProject(projectName);
+        SaveSystem.ActiveProjectName = projectName;
         UnityEngine.SceneManagement.SceneManager.LoadScene(1);
     }
 }

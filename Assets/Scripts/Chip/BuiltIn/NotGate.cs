@@ -16,7 +16,7 @@ public class NotGate : BuiltinChip
         };
         inputPins = new List<Pin>(1);
         outputPins = new List<Pin>(1);
-        chipName = "NOT";
+        Name = "NOT";
     }
 
     protected override void ProcessOutput()

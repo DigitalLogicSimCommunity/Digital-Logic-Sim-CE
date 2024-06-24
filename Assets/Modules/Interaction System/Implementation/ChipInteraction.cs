@@ -162,8 +162,7 @@ public class ChipInteraction : Interactable
     {
         Vector2 mousePos = InputHelper.MouseWorldPos;
 
-        // Left mouse down. Handle selecting a chip, or starting to draw a selection
-        // box.
+        // Left mouse down. Handle selecting a chip, or starting to draw a selection box.
         if (!Input.GetMouseButtonDown(0) || InputHelper.MouseOverUIObject() ||
             InputHelper.CompereTagObjectUnderMouse2D(ProjectTags.InterfaceMask, ProjectLayer.Default))
         {

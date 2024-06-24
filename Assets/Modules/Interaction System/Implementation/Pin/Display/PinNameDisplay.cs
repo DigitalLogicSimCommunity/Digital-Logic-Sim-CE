@@ -14,8 +14,8 @@ public class PinNameDisplay : MonoBehaviour
     private PinNameDisplayMode Mode;
     private Pin pin;
     private PinEvent PinEvent;
+    private SignalInteraction Interaction;
 
-    bool over = false;
     private bool IsInteraction = false;
 
     private bool ShouldBeDisplayed => Mode == PinNameDisplayMode.AlwaysAll ||
@@ -26,8 +26,9 @@ public class PinNameDisplay : MonoBehaviour
         var interaction = GetComponentInParent<SignalInteraction>();
         if (interaction)
         {
+            Interaction =interaction;
             IsInteraction = true;
-            interaction.OnPropertyChange += NameChanged;
+            Interaction.OnPropertyChange += NameChanged;
         }
 
         pin = GetComponentInParent<Pin>();
@@ -68,6 +69,8 @@ public class PinNameDisplay : MonoBehaviour
     {
         ScalingManager.i.OnScaleChange -= UpdateScale;
         ChipEditorOptions.instance.OnPinDisplayActionChange -= SetMode;
+        if (IsInteraction)
+            Interaction.OnPropertyChange -= NameChanged;
     }
 
     private void SetMode(PinNameDisplayMode newMode)

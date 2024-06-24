@@ -163,12 +163,11 @@ namespace SebInput.Internal
 			{
 				MouseInteractionListener listener = listenersWithMouseOver[i];
 				// Only consider mouse as exitting the listener if it's not entering another collider that belongs to the listener
-				if (enterTransform == null || !Belongs(enterTransform, listener))
-				{
-					listener.OnMouseExit();
-					listenersWithoutMouseOver.Add(listener);
-					listenersWithMouseOver.RemoveAt(i);
-				}
+				if (enterTransform != null && Belongs(enterTransform, listener)) continue;
+
+				listener.OnMouseExit();
+				listenersWithoutMouseOver.Add(listener);
+				listenersWithMouseOver.RemoveAt(i);
 			}
 		}
 

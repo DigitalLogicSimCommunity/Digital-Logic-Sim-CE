@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class ChipEditor : MonoBehaviour
 {
@@ -11,12 +14,15 @@ public class ChipEditor : MonoBehaviour
     public ChipInteraction chipInteraction;
     public PinAndWireInteraction pinAndWireInteraction;
 
+    public List<InputSignal> InputSignals => inputsEditor.GetAllSignals().Cast<InputSignal>().ToList();
+    public List<OutputSignal> OutputSignals => outputsEditor.GetAllSignals().Cast<OutputSignal>().ToList();
 
-    public ChipData Data;
+
+    public ChipInfo CurrentChip;
 
     void Awake()
     {
-        Data = new ChipData()
+        CurrentChip = new ChipInfo()
         {
             FolderIndex = 0,
             scale = 1
@@ -43,17 +49,28 @@ public class ChipEditor : MonoBehaviour
         CycleDetector.MarkAllCycles(this);
     }
 
-    public Chip LoadInstanceData(Chip chipData, Vector3 pos, Quaternion rot)
+    public Chip LoadInstanceData(Chip chipData, SavedComponentChip subComponentDescriptor)
     {
+        Vector2 pos = new Vector2(subComponentDescriptor.posX, subComponentDescriptor.posY);
         // Load component chips
         switch (chipData)
         {
-            case InputSignal inp:
-                inp.wireType = inp.outputPins[0].wireType;
-                return inputsEditor.LoadSignal(inp, pos.y, inp.GroupId);
-            case OutputSignal outp:
-                outp.wireType = outp.inputPins[0].wireType;
-                return outputsEditor.LoadSignal(outp, pos.y, outp.GroupId);
+            case ChipSignal signal:
+            {
+                Palette.VoltageColour theme = ThemeManager.instance.GetTheme(subComponentDescriptor.ThemeName);
+                signal.GroupId = subComponentDescriptor.signalGroupId;
+                switch (signal)
+                {
+                    case InputSignal input:
+                        input.wireType = subComponentDescriptor.outputPins[0].wireType;
+                        return inputsEditor.LoadSignal(input, pos.y,theme);
+                    case OutputSignal output:
+                        output.wireType = subComponentDescriptor.inputPins[0].wireType;
+                        return outputsEditor.LoadSignal(output, pos.y,theme);
+                    default:
+                        return null;
+                }
+            }
             default:
                 return chipInteraction.LoadChip(chipData, pos);
         }
@@ -62,5 +79,11 @@ public class ChipEditor : MonoBehaviour
     public Wire LoadWire(Pin connectedPin, Pin pin)
     {
         return pinAndWireInteraction.CreateAndLoadWire(connectedPin, pin);
+    }
+
+    public void SetSignalCenter(Dictionary<int, float> signalGroupCenter)
+    {
+        inputsEditor.SetSignalCenter(signalGroupCenter);
+        outputsEditor.SetSignalCenter(signalGroupCenter);
     }
 }

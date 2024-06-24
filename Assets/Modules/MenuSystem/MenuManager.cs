@@ -27,7 +27,8 @@ public class MenuManager : MonoBehaviour
 {
     public static MenuManager instance;
 
-    [Header("References")] public GameObject createButton;
+    [Header("References")]
+    public GameObject createButton;
     public GameObject updateButton;
     public GameObject outsideMenuArea;
     public TMP_Text ChipName;
@@ -110,6 +111,7 @@ public class MenuManager : MonoBehaviour
 
         outsideMenuArea.SetActive(false);
         SetActiveInteraction(true);
+
     }
 
     private void SetActiveInteraction(bool IsActive)
@@ -198,7 +200,7 @@ public class MenuManager : MonoBehaviour
 
     public void RegisterFinalizer(MenuType menuType, Action action)
     {
-        Menus[menuType].RegisterFinalizer(action);
+        Menus[menuType].RegisterOnUIClose(action);
     }
 
     private void OnDestroy()

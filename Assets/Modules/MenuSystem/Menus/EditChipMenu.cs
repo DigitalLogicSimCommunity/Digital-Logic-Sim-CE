@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using System;
 using SFB;
 using System.Linq;
+using Modules.ProjectSettings;
 using Modules.Save_System.Save;
 
 public class EditChipMenu : MonoBehaviour
@@ -37,7 +38,7 @@ public class EditChipMenu : MonoBehaviour
         nameBeforeChanging = chipName;
         doneButton.interactable = true;
         var IsSafeToDelate = ChipSaver.IsSafeToDelete(nameBeforeChanging);
-        chipNameField.interactable = IsSafeToDelate;
+        chipNameField.interactable = true;
         deleteButton.interactable = IsSafeToDelate;
 
         currentChip = Manager.GetChipByName(chipName);
@@ -49,59 +50,54 @@ public class EditChipMenu : MonoBehaviour
         folderDropdown.AddOptions(FolderOption.GetRange(1, FolderOption.Count - 2));
 
 
-        if (currentChip is CustomChip customChip)
+        if (currentChip is not CustomChip customChip) return;
+        for (int i = 0; i < folderDropdown.options.Count; i++)
         {
-            for (int i = 0; i < folderDropdown.options.Count; i++)
-            {
-
-                if (FolderSystem.CompareValue(customChip.FolderIndex, folderDropdown.options[i].text))
-                {
-                    folderDropdown.value = i;
-                    break;
-                }
-            }
+            if (!ProjectSettings.FolderSystem.CompareValue(customChip.FolderIndex, folderDropdown.options[i].text)) continue;
+            folderDropdown.value = i;
+            break;
         }
 
     }
 
-    public void ChipNameFieldChanged(string value)
+    private void ChipNameFieldChanged(string value)
     {
         string formattedName = value.ToUpper();
-        doneButton.interactable = IsValidChipName(formattedName.Trim());
+        doneButton.interactable = IsValidRename(formattedName.Trim());
         chipNameField.text = formattedName;
     }
 
 
-    public bool IsValidRename(string chipName)
+    private bool IsValidRename(string chipName)
     {
         // Name has not changed
         if (string.Equals(nameBeforeChanging, chipName))
             return true;
-        // Name is either empty or in builtin chips
-        if (!IsValidChipName(chipName))
+        if (string.IsNullOrEmpty(chipName))
             return false;
 
-        SavedChip[] savedChips = SaveSystem.GetAllSavedChips();
-        for (int i = 0; i < savedChips.Length; i++)
-        {
-            // Name already exists in custom chips
-            if (savedChips[i].Data.name == chipName)
-                return false;
-        }
-        return true;
+        // chipName not present in either builtin chips nor custom chips
+        return !IsChipNameBuiltIn(chipName) && !IsChipNameCustom(chipName);
     }
 
-    public bool IsValidChipName(string chipName)
+    private bool IsChipNameBuiltIn(string chipName)
     {
-        // If chipName is not in list of builtin chips then is a valid name
-        return !Manager.instance.AllChipNames(builtin: true, custom: false)
-                    .Contains(chipName) && chipName.Length > 0;
+        return Manager.instance.AllChipNames(builtin: true, custom: false)
+                    .Contains(chipName);
     }
+
+    private bool IsChipNameCustom(string chipName)
+    {
+        return Manager.instance.AllChipNames(builtin: false, custom: true)
+                    .Contains(chipName);
+    }
+
+
 
     public void SubmitDeleteChip()
     {
         MenuManager.NewSubmitMenu(header: "Delete Chip",
-                                text: $"Are you sure you want to delete the chip '{currentChip.chipName}'? \nIt will be lost forever!",
+                                text: $"Are you sure you want to delete the chip '{currentChip.Name}'? \nIt will be lost forever!",
                                 onSubmit: DeleteChip);
     }
 
@@ -114,7 +110,7 @@ public class EditChipMenu : MonoBehaviour
         ReloadChipBar();
 
 
-        DLSLogger.Log($"Successfully deleted chip '{currentChip.chipName}'");
+        DLSLogger.Log($"Successfully deleted chip '{currentChip.Name}'");
         currentChip = null;
     }
 
@@ -137,7 +133,7 @@ public class EditChipMenu : MonoBehaviour
         if (currentChip is CustomChip customChip)
         {
 
-            var index = FolderSystem.ReverseIndex(CurrentFolderText);
+            var index = ProjectSettings.FolderSystem.ReverseIndex(CurrentFolderText);
             if (index != customChip.FolderIndex)
             {
                 Manager.instance.ChangeFolderToChip(customChip.name, index);

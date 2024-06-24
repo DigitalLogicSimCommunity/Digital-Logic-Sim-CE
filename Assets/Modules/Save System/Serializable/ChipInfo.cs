@@ -1,14 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [System.Serializable]
-public struct ChipData
+public struct ChipInfo
 {
     public string name;
-    public int creationIndex;
-    public Color Colour;
-    public Color NameColour;
+    public Color PackColor;
+    public Color PackNameColor;
     public int FolderIndex;
     public float scale;
 
@@ -19,4 +19,6 @@ public struct ChipData
         if (float.IsNaN(scale))
             scale = 1f;
     }
+
+
 }

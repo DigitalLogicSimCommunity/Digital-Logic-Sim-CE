@@ -26,7 +26,7 @@ public class DisplayScreen : BuiltinChip
         };
         inputPins = new List<Pin>(12);
         outputPins = new List<Pin>();
-        chipName = "DISP8";
+        Name = "DISP8";
         
     }
     

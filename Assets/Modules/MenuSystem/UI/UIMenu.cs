@@ -9,7 +9,7 @@ public class UIMenu : MonoBehaviour
     public UnityEvent onClickBG;
     [HideInInspector]
     public bool isActive = false;
-    event Action Finalizer;
+    event Action OnMenuUIClose;
 
     public void Open()
     {
@@ -21,12 +21,12 @@ public class UIMenu : MonoBehaviour
     {
         isActive = false;
         gameObject.SetActive(isActive);
-        Finalizer?.Invoke();
+        OnMenuUIClose?.Invoke();
     }
 
-    public void RegisterFinalizer(Action action)
+    public void RegisterOnUIClose(Action action)
     {
-        Finalizer += action;
+        OnMenuUIClose += action;
     }
 
 }

@@ -6,36 +6,26 @@ namespace DLS.UI.ThemeSystem
 {
     public abstract class ThemeDisplay : MonoBehaviour, IThemeSettable
     {
-        protected Palette.VoltageColour CurrentTheme;
-
-
-        protected virtual void Start()
+        private Palette.VoltageColour _currentTheme;
+        public Palette.VoltageColour CurrentTheme
         {
-            CurrentTheme = ThemeManager.Palette.GetDefaultTheme();
+            get
+            {
+                return _currentTheme ??= ThemeManager.Palette.GetDefaultTheme();
+            }
+            set
+            {
+                _currentTheme = value;
+                ApplyTheme();
+            }
         }
 
-        public string GetCurrentThemeName()
-        {
-            return CurrentTheme.Name;
-        }
 
-        public virtual void SetTheme(Palette.VoltageColour voltageColour)
-        {
-            CurrentTheme = voltageColour;
-            ApplyTheme();
-        }
-        
-        public virtual void SetTheme(string themeName)
+        public virtual void SetThemeByName(string themeName)
         {
             CurrentTheme = ThemeManager.instance.GetTheme(themeName);
-            ApplyTheme();
         }
 
-        protected virtual void CheckedApplyTheme()
-        {
-            CurrentTheme ??= ThemeManager.DefaultTheme;
-            ApplyTheme();
-        }
         protected abstract void ApplyTheme();
     }
 }

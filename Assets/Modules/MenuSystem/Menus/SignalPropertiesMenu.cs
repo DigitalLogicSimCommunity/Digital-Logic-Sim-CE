@@ -16,7 +16,7 @@ public class SignalPropertiesMenu : MonoBehaviour
     //reference
     public TMPro.TMP_InputField nameField;
     public UnityEngine.UI.Button deleteButton;
-    public UnityEngine.UI.Toggle twosComplementToggle;
+    [FormerlySerializedAs("twosComplementToggle")] public UnityEngine.UI.Toggle SignToggle;
     public TMPro.TMP_Dropdown WireTypeDropdown;
     public TMPro.TMP_InputField BusValueField;
     public TMPro.TMP_InputField GroupSizeField;
@@ -26,7 +26,7 @@ public class SignalPropertiesMenu : MonoBehaviour
     private bool UnDone = false;
     private Pin.WireType StartWireType;
 
-    private Delayer delayer = new Delayer(0.1f);
+    private Delayer delayer = new (0.1f);
 
     private void Awake()
     {
@@ -61,7 +61,7 @@ public class SignalPropertiesMenu : MonoBehaviour
         if (SignalInteraction == null) return;
         var selectedInput = GetSelectedInputField();
 
-        void UpdateWithValue(int t)
+        void ChangeGroupDimensionBy(int t)
         {
             selectedInput.text = (int.Parse(selectedInput.text) + t).ToString();
             delayer.StartCount();
@@ -70,9 +70,9 @@ public class SignalPropertiesMenu : MonoBehaviour
         if (selectedInput != null)
         {
             if (Input.GetKey(KeyCode.UpArrow) && delayer.IsDelayPassed)
-                UpdateWithValue(1);
+                ChangeGroupDimensionBy(1);
             else if (Input.GetKey(KeyCode.DownArrow) && delayer.IsDelayPassed)
-                UpdateWithValue(-1);
+                ChangeGroupDimensionBy(-1);
         }
 
         if (!nameField.isFocused && InputHelper.AnyOfTheseKeysDown(KeyCode.Return, KeyCode.Space))
@@ -95,7 +95,7 @@ public class SignalPropertiesMenu : MonoBehaviour
     private void OnGroupInputValueChanged(string newValue)
     {
         if (SignalInteraction.WireType != Pin.WireType.Simple) return;
-        InputFieldMaxValue(GroupSizeField, newValue, SignalInteraction.MaxGroupSize);
+        InputFieldMaxValue(GroupSizeField, newValue, 1,SignalInteraction.MaxGroupSize);
     }
 
 
@@ -104,29 +104,31 @@ public class SignalPropertiesMenu : MonoBehaviour
         if (SignalInteraction.WireType == Pin.WireType.Simple) return;
 
         var maxValue = Math.Pow(2, SignalInteraction.Signals[0].ChipSignal.State.Count) - 1;
-        InputFieldMaxValue(BusValueField, newValue, maxValue);
+        var minValue = 0;
+        InputFieldMaxValue(BusValueField, newValue, minValue, maxValue);
     }
 
-    private void InputFieldMaxValue(TMP_InputField inputField, string newValue, double maxValue)
+    private void InputFieldMaxValue(TMP_InputField inputField, string newValue, double minValue, double maxValue)
     {
-        if (!int.TryParse(newValue, out var intValue) || intValue < 0)
-            inputField.text = 0.ToString();
+        if (!int.TryParse(newValue, out var intValue) || intValue < minValue)
+            inputField.text = minValue.ToString();
         else if (intValue > maxValue)
             inputField.text = maxValue.ToString();
     }
 
 
-    public void SetUpUI(SignalInteraction signalInteraction)
+    public void SetUpSignalPropertyUI(SignalInteraction signalInteraction)
     {
         propertiesUI.gameObject.SetActive(true);
         SignalInteraction = signalInteraction;
         StartWireType = signalInteraction.WireType;
+        EnableDeleteCommand();
 
         nameField.text = SignalInteraction.SignalName;
         nameField.caretPosition = nameField.text.Length;
 
-        twosComplementToggle.gameObject.SetActive(signalInteraction.IsGroup);
-        twosComplementToggle.isOn = signalInteraction.UseTwosComplement;
+        SignToggle.gameObject.SetActive(signalInteraction.IsGroup);
+        SignToggle.isOn = signalInteraction.UseTwosComplement;
         WireTypeDropdown.gameObject.SetActive(!signalInteraction.IsGroup);
         WireTypeDropdown.SetValueWithoutNotify((int)signalInteraction.WireType);
 
@@ -193,7 +195,7 @@ public class SignalPropertiesMenu : MonoBehaviour
         }
         else
         {
-            SignalInteraction.UpdateGroupProperty(nameField.text, twosComplementToggle.isOn);
+            SignalInteraction.UpdateGroupProperty(nameField.text, SignToggle.isOn);
 
             if ((Pin.WireType)WireTypeDropdown.value != Pin.WireType.Simple)
                 SignalInteraction.SetBusValue(int.Parse(BusValueField.text));
@@ -231,6 +233,7 @@ public class SignalPropertiesMenu : MonoBehaviour
 
     private void UnregisterSignalGroup(SignalInteraction signalInteraction)
     {
+        if(signalInteraction is null) return;
         signalInteraction.OnDragging -= SetPosition;
         signalInteraction.OnDeleteInteraction -= DeleteFinalizer;
     }

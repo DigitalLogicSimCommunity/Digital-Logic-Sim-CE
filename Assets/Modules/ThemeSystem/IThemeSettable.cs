@@ -2,6 +2,7 @@
 {
     public interface IThemeSettable
     {
-        void SetTheme(Palette.VoltageColour voltageColour);
+        public Palette.VoltageColour CurrentTheme {get; set;}
+
     }
 }

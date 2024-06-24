@@ -15,7 +15,7 @@ public class AndGate : BuiltinChip
         };
         inputPins = new List<Pin>(2);
         outputPins = new List<Pin>(1);
-        chipName = "AND";
+        Name = "AND";
     }
 
     protected override void ProcessOutput()

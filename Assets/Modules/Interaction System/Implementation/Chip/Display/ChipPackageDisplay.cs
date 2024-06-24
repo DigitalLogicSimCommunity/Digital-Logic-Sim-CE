@@ -41,12 +41,12 @@ public class ChipPackageDisplay : MonoBehaviour
         nameText.fontSize = ScalingManager.PackageFontSize;
     }
 
-    public void SetUpForCustomPackageChip(ChipData data)
+    public void SetUpForCustomPackageChip(ChipInfo info)
     {
-        gameObject.name = data.name;
-        nameText.text = data.name;
-        nameText.color = data.NameColour;
-        SetColour(data.Colour);
+        gameObject.name = info.name;
+        nameText.text = info.name;
+        nameText.color = info.PackNameColor;
+        SetColour(info.PackColor);
     }
 
     private void SetColour(Color dataColour)

@@ -9,11 +9,12 @@ using UnityEngine.Serialization;
 
 public class WireDisplay : ThemeDisplay
 {
+    private Color SimulationColor => Simulation.IsSimulationActive ? CurrentTheme.GetColour(CurrentState, CurrentWireType) : CurrentTheme.Low;
     LineRenderer LineRenderer;
     EdgeCollider2D WireCollider;
 
 
-    const float thicknessMultiplier = 0.1f;
+    const float thicknessMultiplier = 0.12f;
     Material mat;
     bool selected;
 
@@ -26,7 +27,6 @@ public class WireDisplay : ThemeDisplay
     float depth;
 
 
-    bool IsSimulationActive => Simulation.instance.active;
 
 
     private void Awake()
@@ -41,23 +41,22 @@ public class WireDisplay : ThemeDisplay
     }
 
 
-    protected override void Start()
+    protected void Start()
     {
-        base.Start();
         NormalAppearance();
     }
 
     private void RegisterEvent()
     {
-        var wireEvent = GetComponentInParent<WireEvent>();
-        var wire = wireEvent.MouseInteraction.Context;
+        var wireEventMouse = GetComponentInParent<WireEvent>();
+        var wire = wireEventMouse.wire;
 
-        wireEvent.MouseInteraction.MouseEntered += (_) =>
+        wireEventMouse.OnWireEnter += () =>
         {
             wire.RequestFocus();
             SelectAppearance();
         };
-        wireEvent.MouseInteraction.MouseExitted += (_) =>
+        wireEventMouse.OnWireExit += () =>
         {
             wire.ReleaseFocus();
             NormalAppearance();
@@ -65,7 +64,7 @@ public class WireDisplay : ThemeDisplay
         wire.OnWireChange += UpdateSmoothedLine;
         wire.OnPlacing += () =>
         {
-            CheckedApplyTheme();
+            ApplyTheme();
             Placed = true;
             NormalAppearance();
             wire.startPin.OnStateChange += SetStatusColor;
@@ -94,14 +93,10 @@ public class WireDisplay : ThemeDisplay
     protected override void ApplyTheme()
     {
         mat.color = SimulationColor;
-        CurrentThemeName = CurrentTheme.Name;
     }
 
-    public string CurrentThemeName;
 
 
-    private Color SimulationColor =>
-        IsSimulationActive ? CurrentTheme.GetColour(CurrentState, CurrentWireType) : CurrentTheme.Low;
 
     void SetStatusColor(PinStates pinState, Pin.WireType wireType)
     {
@@ -164,9 +159,6 @@ public class WireDisplay : ThemeDisplay
             Vector2 localPos = transform.parent.InverseTransformPoint(drawPoints[i]);
             LineRenderer.SetPosition(i, new Vector3(localPos.x, localPos.y, -0.01f));
         }
-        //
-        // float depthOffset = 5;
-        // transform.localPosition = Vector3.forward * (depth + depthOffset);
 
         UpdateCollider();
     }

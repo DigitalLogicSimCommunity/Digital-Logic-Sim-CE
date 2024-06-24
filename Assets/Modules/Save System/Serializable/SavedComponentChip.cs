@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Interaction.Signal.Display;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -13,14 +14,15 @@ public class SavedComponentChip {
 	public SavedOutputPin[] outputPins;
 
 	public int signalGroupId =-1;
-	public bool isInGroup = false;
+
+	public string ThemeName;
 
 	public SavedComponentChip()
 	{
 	}
 
 	public SavedComponentChip (ChipInstanceHolder chipInstanceHolder, Chip chip) {
-		chipName = chip.chipName;
+		chipName = chip.Name;
 
         posX = chip.transform.position.x ;
         posY = chip.transform.position.y ;
@@ -28,7 +30,7 @@ public class SavedComponentChip {
         if (chip is ChipSignal s)
         {
 	        signalGroupId = s.GroupId;
-	        isInGroup = s.isInGroup;
+	        ThemeName = s.GetComponentInChildren<SignalDisplay>().CurrentTheme.Name;
         }
 
         // Input pins

@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class ChipInstanceHolder
 {
 
-    public ChipData Data;
+    public ChipInfo Info;
 
-    // All chips used as components in this new chip (including input and output
-    // signals)
+    // All chips used as components in this new chip (including input and output signals)
     public Chip[] componentChips;
     // All wires in the chip (in case saving of wire layout is desired)
     public Wire[] wires;
@@ -18,10 +18,10 @@ public class ChipInstanceHolder
     {
         List<Chip> componentChipList = new List<Chip>();
 
-        var sortedInputs = chipEditor.inputsEditor.GetAllSignals();
-        var sortedOutputs = chipEditor.outputsEditor.GetAllSignals();
-        SortSignalsByYPosition(sortedInputs);
-        SortSignalsByYPosition(sortedOutputs);
+        var sortedInputs = chipEditor.InputSignals;
+        sortedInputs.Sort((a, b) => b.transform.position.y.CompareTo(a.transform.position.y));
+        var sortedOutputs = chipEditor.OutputSignals;
+        sortedInputs.Sort((a, b) => b.transform.position.y.CompareTo(a.transform.position.y));
 
         componentChipList.AddRange(sortedInputs);
         componentChipList.AddRange(sortedOutputs);
@@ -30,15 +30,10 @@ public class ChipInstanceHolder
         componentChips = componentChipList.ToArray();
 
         wires = chipEditor.pinAndWireInteraction.allWires.ToArray();
-        Data = chipEditor.Data;
+        Info = chipEditor.CurrentChip;
     }
     
-    private void SortSignalsByYPosition(List<ChipSignal> signals)
-    {
-        signals.RemoveAll(x => x == null);
 
-        signals.Sort((a, b) => b.transform.position.y.CompareTo(a.transform.position.y));
-    }
 
     public int ComponentChipIndex(Chip componentChip)
     {

@@ -18,12 +18,11 @@ public class ImportButton : MonoBehaviour
         };
 
 
-        StandaloneFileBrowser.OpenFilePanelAsync("Import chip design", "", extensions, true, (string[] paths) => {
-            if (paths[0] != null && paths[0] != "") {
-
-                ChipLoader.Import(paths[0]);
-                EditChipBar();
-            }
+        StandaloneFileBrowser.OpenFilePanelAsync("Import chip design", "", extensions, true, (string[] paths) =>
+        {
+            if (paths[0] == null || paths[0] == "") return;
+            ChipLoader.Import(paths[0]);
+            EditChipBar();
         });
         
     }

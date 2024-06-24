@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Interaction.Signal;
+using Interaction.Signal.Display;
 using UnityEngine;
 
 // Allows player to add/remove/move/rename inputs or outputs of a chip.
@@ -37,7 +39,7 @@ public class ChipInterfaceEditor : MonoBehaviour
 
     public ChipEditor CurrentEditor
     {
-        set => currentEditorName = value.Data.name;
+        set => currentEditorName = value.CurrentChip.name;
     }
 
     public SignalInteraction selectedSignals { get; private set; }
@@ -77,7 +79,7 @@ public class ChipInterfaceEditor : MonoBehaviour
     {
         PreviewSignal =
             new SignalInteractionPreview(
-                SignalBuilder.Build(InputHelper.MouseWorldPos.y, 1, Pin.WireType.Simple, false).obj, transform);
+                SignalBuilder.Build(InputHelper.MouseWorldPos.y, 1, Pin.WireType.Simple, -1,false).obj, transform);
         DesiredGroupSize = 1;
         ScalingManager.i.OnScaleChange += UpdateScale;
         CreateGroup.i.onGroupSizeSettingPressed += OnGroupSizeSettingPressed;
@@ -88,7 +90,7 @@ public class ChipInterfaceEditor : MonoBehaviour
     {
         CreateGroup.i.onGroupSizeSettingPressed -= OnGroupSizeSettingPressed;
         ScalingManager.i.OnScaleChange -= UpdateScale;
-        PreviewSignal.UnregisterEvent();
+        PreviewSignal?.UnregisterEvent();
     }
 
 
@@ -97,15 +99,19 @@ public class ChipInterfaceEditor : MonoBehaviour
         DesiredGroupSize = x;
     }
 
-    public ChipSignal LoadSignal(ChipSignal signal, float y, int groupID)
+    public ChipSignal LoadSignal(ChipSignal signal, float y, Palette.VoltageColour theme)
     {
-        var e = SignalsByID.GetValueOrDefault(groupID);
-        ChipSignal chip;
-        if (e != null) return e.AddOneSignal().ChipSignal;
-        
-        chip = CreateSignalInteractionGroup(y, 1, signal.wireType, false).Signals.ChipSignals[0];
-        return chip;
+        var signalInteraction = SignalsByID.GetValueOrDefault(signal.GroupId);
+        ChipSignal chipSignal;
 
+        if (signalInteraction is not null)
+            chipSignal = signalInteraction.AddOneSignal().ChipSignal;
+        else
+            chipSignal = CreateSignalInteractionGroup(y, 1, signal.wireType,signal.GroupId, false).Signals.ChipSignals[0];
+
+
+        chipSignal.GetComponentInChildren<SignalDisplay>().CurrentTheme = theme;
+        return chipSignal;
     }
 
 
@@ -155,10 +161,11 @@ public class ChipInterfaceEditor : MonoBehaviour
         OnChipsAddedOrDeleted?.Invoke();
     }
 
-    private SignalInteraction CreateSignalInteractionGroup(float yPos, int groupSize, Pin.WireType wireType = Pin.WireType.Simple,
+    private SignalInteraction CreateSignalInteractionGroup(float yPos, int groupSize,
+        Pin.WireType wireType = Pin.WireType.Simple, int id = -1,
         bool focusRequired = true)
     {
-        var Interactable = SignalBuilder.Build(yPos, groupSize, wireType, focusRequired);
+        var Interactable = SignalBuilder.Build(yPos, groupSize, wireType,id ,focusRequired);
         SignalsByID.Add(Interactable.id, Interactable.obj);
         return Interactable.obj;
     }
@@ -184,11 +191,19 @@ public class ChipInterfaceEditor : MonoBehaviour
     public List<ChipSignal> GetAllSignals()
     {
         var res = new List<ChipSignal>();
-        foreach (var e in SignalsByID.Values)
-        {
+        foreach (var e in SignalsByID.Values.Where(e => e != null))
             res.AddRange(e.Signals.ChipSignals);
-        }
 
         return res;
+    }
+
+    public void SetSignalCenter(Dictionary<int, float> signalGroupCenter)
+    {
+
+        foreach (var centerById in signalGroupCenter)
+        {
+            if (SignalsByID.TryGetValue(centerById.Key, out var signalInteraction))
+                signalInteraction.SetGroupCenter(centerById.Value);
+        }
     }
 }

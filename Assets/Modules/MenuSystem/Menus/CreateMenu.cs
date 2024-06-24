@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Modules.ProjectSettings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -43,7 +44,7 @@ public class CreateMenu : MonoBehaviour
     public void SelectFolder()
     {
         string DropDownTextValue = folderDropdown.options[folderDropdown.value].text;
-        Manager.ActiveChipEditor.Data.FolderIndex = FolderSystem.ReverseIndex(DropDownTextValue);
+        Manager.ActiveEditor.CurrentChip.FolderIndex = ProjectSettings.FolderSystem.ReverseIndex(DropDownTextValue);
     }
 
     public void ColourSliderChanged()
@@ -68,7 +69,7 @@ public class CreateMenu : MonoBehaviour
 
         if (IsAvailableName(validName) && validName.Length > 0)
         {
-            Manager.ActiveChipEditor.Data.name = validName;
+            Manager.ActiveEditor.CurrentChip.name = validName;
             doneButton.interactable = true;
         }
         else
@@ -96,8 +97,8 @@ public class CreateMenu : MonoBehaviour
 
     public void FinishCreation()
     {
-        Manager.ActiveChipEditor.Data.FolderIndex = FolderSystem.ReverseIndex(folderDropdown.options[folderDropdown.value].text);
-        Manager.ActiveChipEditor.Data.scale = ScalingManager.Scale;
+        Manager.ActiveEditor.CurrentChip.FolderIndex = ProjectSettings.FolderSystem.ReverseIndex(folderDropdown.options[folderDropdown.value].text);
+        Manager.ActiveEditor.CurrentChip.scale = ScalingManager.Scale;
         Manager.instance.SaveAndPackageChip();
     }
 
@@ -128,8 +129,8 @@ public class CreateMenu : MonoBehaviour
         Color chipNameCol = (luma > textColThreshold) ? Color.black : Color.white;
         chipNameField.textComponent.color = chipNameCol;
 
-        Manager.ActiveChipEditor.Data.Colour = chipCol;
-        Manager.ActiveChipEditor.Data.NameColour = chipNameField.textComponent.color;
+        Manager.ActiveEditor.CurrentChip.PackColor = chipCol;
+        Manager.ActiveEditor.CurrentChip.PackNameColor = chipNameField.textComponent.color;
     }
 }
 

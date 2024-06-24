@@ -16,7 +16,7 @@ public class ImportExport : MonoBehaviour
     public void ExportChip(Chip chip)
     {
         string path = StandaloneFileBrowser.SaveFilePanel(
-            "Export chip design", "", chip.chipName + ".dls", "dls");
+            "Export chip design", "", chip.Name + ".dls", "dls");
         if (path.Length != 0)
             ChipSaver.Export(chip, path);
     }

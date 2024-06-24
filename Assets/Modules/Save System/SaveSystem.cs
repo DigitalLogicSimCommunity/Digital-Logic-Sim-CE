@@ -2,118 +2,87 @@
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
+using System.Xml.Linq;
+using DLS.SaveSystem.Serializable.SerializationHelper;
+using Modules.ProjectSettings;
+using Modules.ProjectSettings.Serializable;
 using UnityEngine;
 using Newtonsoft.Json;
 
-public static class SaveSystem
+public static partial class SaveSystem
 {
-    static string activeProjectName = "Untitled";
-    static string FileExtension = ".txt";
-    static string CustomFoldersFileName = "CustomFolders";
+    public static string ActiveProjectName { get; set; } = "Untitled";
+    public static string FileExtension { get; set; } = ".json";
+    public static string ProjectSettingsFileName { get; private set; } = "CustomFolders";
+    public static string ChipFolder { get; set; } = "Chips";
 
-    private static string FoldersFilePath =>
-        Path.Combine(CurrentSaveProfileDirectoryPath, CustomFoldersFileName + ".json");
+    private static string ProjectSettingsPath =>
+        Path.Combine(ActiveProjectPath, ProjectSettingsFileName + FileExtension);
 
-    static string CurrentSaveProfileDirectoryPath => Path.Combine(SaveDataDirectoryPath, activeProjectName);
+    static string ActiveProjectPath => Path.Combine(SaveDataDirectoryPath, ActiveProjectName);
+    static string ChipPath => Path.Combine(ActiveProjectPath, ChipFolder);
 
     public static string SaveDataDirectoryPath => Path.Combine(Application.persistentDataPath, "SaveData");
 
-    static string CurrentSaveProfileWireLayoutDirectoryPath =>
-        Path.Combine(CurrentSaveProfileDirectoryPath, "WireLayout");
 
-    static string EEPROMSaveFilePath => Path.Combine(CurrentSaveProfileDirectoryPath, "EEPROMContents.json");
+    static string EEPROMSaveFilePath => Path.Combine(ActiveProjectPath, "EEPROMContents.json");
 
-    public static string GetPathToSaveFile(string saveFileName, string ExtraPath = "") =>
-        Path.Combine(CurrentSaveProfileDirectoryPath + ExtraPath, saveFileName + FileExtension);
+    public static string GetPathToChip(string chipName, string ExtraPath = "") =>
+        Path.Combine(ChipPath + ExtraPath, chipName + FileExtension);
 
-    public static string GetPathToWireSaveFile(string saveFileName, string ExatraPath = "") =>
-        Path.Combine(CurrentSaveProfileWireLayoutDirectoryPath + ExatraPath, saveFileName + FileExtension);
-
-
-    public static void SetActiveProject(string projectName)
-    {
-        activeProjectName = projectName;
-    }
 
     public static void Init()
     {
         // Create save directory (if doesn't exist already)
-        Directory.CreateDirectory(CurrentSaveProfileDirectoryPath);
-        Directory.CreateDirectory(CurrentSaveProfileWireLayoutDirectoryPath);
-        FolderLoader.CreateDefault(FoldersFilePath);
+        Directory.CreateDirectory(ActiveProjectPath);
+        Directory.CreateDirectory(ChipPath);
+        if (!File.Exists(ProjectSettingsPath))
+            ProjectSettings.CreateDefault();
+        UpdateProject();
     }
 
-    public static string[] GetChipSavePaths()
+    public static FileInfo[] GetChipSavePaths()
     {
-        DirectoryInfo directory =
-            new DirectoryInfo(CurrentSaveProfileDirectoryPath);
+        DirectoryInfo directory = new DirectoryInfo(ChipPath);
         FileInfo[] files = directory.GetFiles("*" + FileExtension);
-        var filtered =
-            files.Where(f => !f.Attributes.HasFlag(FileAttributes.Hidden));
-        return filtered.Select(f => f.ToString()).ToArray();
-        // return Directory.GetFiles(CurrentSaveProfileDirectoryPath, "*" +
-        // fileExtension);
+        var filtered = files.Where(f => !f.Attributes.HasFlag(FileAttributes.Hidden));
+        return filtered.ToArray();
     }
 
     public static void LoadAllChips(Manager manager)
     {
+        ChipFolder = "Chips";
+        FileExtension = ".json";
         // Load any saved chips
-        ChipLoader.LoadAllChips(GetChipSavePaths(), manager);
+        ChipLoader.LoadAllChips(GetAllSavedChipsDic(), manager);
     }
 
     public static SavedChip[] GetAllSavedChips()
     {
-        // Load any saved chips
-        return ChipLoader.GetAllSavedChips(GetChipSavePaths());
+        var chipPaths = GetChipSavePaths();
+        var savedChips = new SavedChip[chipPaths.Length];
+
+        // Read saved chips from file
+        for (var i = 0; i < chipPaths.Length; i++)
+        {
+            var chipPath = chipPaths[i].FullName;
+            var chipName = Path.GetFileNameWithoutExtension(chipPaths[i].Name);
+            if (chipName.Equals(ProjectSettingsFileName)) continue;
+
+            var chipSaveString = ReadFile(chipPath);
+            savedChips[i] = DeserializeChip(chipSaveString);
+        }
+
+        foreach (var chip in savedChips)
+            chip.ValidateDefaultData();
+
+        return savedChips;
     }
 
     public static IDictionary<string, SavedChip> GetAllSavedChipsDic()
     {
         // Load any saved chips but is Dic
-        return ChipLoader.GetAllSavedChipsDic(GetChipSavePaths());
-    }
-
-    public static void MigrateSaves()
-    {
-        //old appdata path is at ../../Sebastian Lague/Digital Logic Sim
-
-        string oldAppDataPath = Path.Combine(new string[]
-        {
-            Directory.GetParent(Application.persistentDataPath).Parent.FullName, "Sebastian Lague", "Digital Logic Sim"
-        });
-        if (!Directory.Exists(oldAppDataPath)) return;
-
-        string oldSaveDataPath = Path.Combine(oldAppDataPath, "SaveData");
-        string[] savedProjectPaths = Directory.GetDirectories(oldSaveDataPath);
-        foreach (string path in savedProjectPaths)
-        {
-            string folderName = Path.Combine(SaveDataDirectoryPath, Path.GetFileName(path));
-            if (Directory.Exists(folderName))
-                folderName = Path.Combine(SaveDataDirectoryPath, Path.GetFileName(path) + " - Copy");
-            Directory.Move(path, folderName);
-        }
-
-        Directory.Delete(
-            Path.Combine(Directory.GetParent(Application.persistentDataPath)?.Parent?.FullName ?? string.Empty,
-                "Sebastian Lague"), true);
-    }
-
-    public static string[] GetSaveNames()
-    {
-        string[] savedProjectPaths = Array.Empty<string>();
-        if (Directory.Exists(SaveDataDirectoryPath))
-        {
-            savedProjectPaths = Directory.GetDirectories(SaveDataDirectoryPath);
-        }
-
-        for (int i = 0; i < savedProjectPaths.Length; i++)
-        {
-            string[] pathSections =
-                savedProjectPaths[i].Split(Path.DirectorySeparatorChar);
-            savedProjectPaths[i] = pathSections[^1];
-        }
-
-        return savedProjectPaths;
+        return GetAllSavedChips()?.ToDictionary(chip => chip.Info.name);
     }
 
 
@@ -132,18 +101,6 @@ public static class SaveSystem
         WriteFile(EEPROMSaveFilePath, jsonStr);
     }
 
-
-    public static Dictionary<int, string> LoadCustomFolders()
-    {
-        return FolderLoader.LoadCustomFolders(FoldersFilePath);
-    }
-
-    public static void SaveCustomFolders(Dictionary<int, string> folders)
-    {
-        FolderLoader.SaveCustomFolders(FoldersFilePath, folders);
-    }
-
-
     public static string ReadFile(string path)
     {
         using StreamReader reader = new StreamReader(path);
@@ -157,24 +114,136 @@ public static class SaveSystem
         File.WriteAllText(path, content);
     }
 
+    private static string SerializeProjectSettings(SavedProjectSettings settings) => JsonConvert.SerializeObject(settings, Formatting.Indented);
+    private static SavedProjectSettings DeserializeProjectSettings(string settingsStr) => JsonConvert.DeserializeObject<SavedProjectSettings>(settingsStr);
 
-    public static SavedChip ReadChip(string chipName) =>
-        JsonUtility.FromJson<SavedChip>(ReadFile(GetPathToSaveFile(chipName)));
-
-    public static SavedWireLayout ReadWire(string wireFile) =>
-        JsonUtility.FromJson<SavedWireLayout>(ReadFile(GetPathToWireSaveFile(wireFile)));
-
-
-    public static void WriteChip(string chipName, string saveString, string ExatraPath = "") =>
-        WriteFile(GetPathToSaveFile(chipName, ExatraPath), saveString);
-
-    public static void WriteWire(string chipName, string saveContent, string ExatraPath = "") =>
-        WriteFile(GetPathToWireSaveFile(chipName, ExatraPath), saveContent);
-
-    public static void SetExtension(string _fileExension)
+    public static SavedProjectSettings LoadProjectSettings()
     {
-        FileExtension = _fileExension;
+        return ProjectSettings.LoadProjectSettings(ProjectSettingsPath);
     }
 
-    public static void WriteFoldersFile(string FolderFileStr) => WriteFile(FoldersFilePath, FolderFileStr);
+    public static void SaveProjectSettings(Dictionary<int, string> folders)
+    {
+        ProjectSettings.SaveProjectSettings(folders);
+    }
+
+
+
+
+
+    public static SavedChip DeserializeChip(string ChipSave) =>
+        JsonConvert.DeserializeObject<SavedChip>(ChipSave, ColorConverterHEX.GenerateSerializerSettings());
+
+    public static string SerializeChip(SavedChip chipSave) =>
+        JsonConvert.SerializeObject(chipSave, Formatting.Indented, ColorConverterHEX.GenerateSerializerSettings());
+
+    public static SavedChip ReadChip(string chipName) =>
+        DeserializeChip((ReadFile(GetPathToChip(chipName))));
+
+    public static void DeleteChip(string chipName) => File.Delete(GetPathToChip(chipName));
+
+
+    public static void SaveChip(string chipName, SavedChip saveString, string ExatraPath = "") =>
+        WriteFile(GetPathToChip(chipName, ExatraPath), SerializeChip(saveString));
+
+
+    public static void WriteProjectSettings(string projectSettings) => WriteFile(ProjectSettingsPath, projectSettings);
+
+
+    public static string[] GetProjectNames()
+    {
+        string[] savedProjectPaths = Array.Empty<string>();
+        if (Directory.Exists(SaveDataDirectoryPath))
+        {
+            savedProjectPaths = Directory.GetDirectories(SaveDataDirectoryPath);
+        }
+
+        for (int i = 0; i < savedProjectPaths.Length; i++)
+        {
+            string[] pathSections =
+                savedProjectPaths[i].Split(Path.DirectorySeparatorChar);
+            savedProjectPaths[i] = pathSections[^1];
+        }
+
+        return savedProjectPaths;
+    }
+
+    public static void MigrateSaves()
+    {
+        //old appdata path is at ../../Sebastian Lague/Digital Logic Sim
+
+        string oldAppDataPath = Path.Combine(new string[]
+        {
+            Directory.GetParent(Application.persistentDataPath).Parent.FullName, "Sebastian Lague", "Digital Logic Sim"
+        });
+        if (!Directory.Exists(oldAppDataPath)) return;
+
+        string oldSaveDataPath = Path.Combine(oldAppDataPath, "SaveData");
+        if (!Directory.Exists(oldSaveDataPath))
+        {
+            DLSLogger.LogWarning("Failed migrating OldSave, the folder saveData was not found.");
+            return;
+        }
+
+        string[] savedProjectPaths = Directory.GetDirectories(oldSaveDataPath);
+        foreach (string path in savedProjectPaths)
+        {
+            string folderName = Path.Combine(SaveDataDirectoryPath, Path.GetFileName(path));
+            if (Directory.Exists(folderName))
+                folderName = Path.Combine(SaveDataDirectoryPath, Path.GetFileName(path) + " - Copy");
+            Directory.Move(path, folderName);
+        }
+
+        Directory.Delete(
+            Path.Combine(Directory.GetParent(Application.persistentDataPath)?.Parent?.FullName ?? string.Empty,
+                "Sebastian Lague"), true);
+    }
+
+    public static void ResetToDefaultSettings()
+    {
+        ChipFolder = "Chips";
+        FileExtension = ".json";
+    }
+
+
+    public static void UpdateProject()
+    {
+        FileExtension = ".txt";
+        ChipFolder = "";
+        FileInfo[] chipPaths = GetChipSavePaths();
+
+
+        // Read saved chips from file
+        foreach (var chipPat in chipPaths)
+        {
+            var chipPath = chipPat.FullName;
+            var chipName = Path.GetFileNameWithoutExtension(chipPat.Name);
+            if (chipName.Equals(ProjectSettingsFileName)) continue;
+
+            var chipSaveString = ReadFile(chipPath);
+
+            var updateSaveFile = SaveCompatibility.FixSaveCompatibility(chipSaveString, chipName);
+
+            if (!SaveCompatibility.CanWriteFile) continue;
+            SaveChip(chipName, updateSaveFile);
+            File.Delete(chipPath);
+            File.Delete(Legacy.GetPathToWireSaveFile(chipName));
+        }
+
+        if (Directory.Exists(Legacy.WireLayoutPath))
+        {
+            try
+            {
+                Directory.Delete(Legacy.WireLayoutPath);
+            }
+            catch (Exception e)
+            {
+                DLSLogger.LogWarning(e.Message);
+            }
+
+        }
+
+
+        ResetToDefaultSettings();
+    }
 }

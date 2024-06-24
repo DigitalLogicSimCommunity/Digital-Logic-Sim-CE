@@ -15,6 +15,8 @@ public class SavedWire
 
     public SavedWire(ChipInstanceHolder chipInstanceHolder, Wire wire)
     {
+        if (chipInstanceHolder == null|| wire == null)return;
+
         Pin parentPin = wire.startPin;
         Pin childPin = wire.endPin;
 
@@ -26,6 +28,6 @@ public class SavedWire
 
         anchorPoints = wire.anchorPoints.ToArray();
 
-        ColourThemeName = wire.GetComponentInChildren<WireDisplay>().GetCurrentThemeName();
+        ColourThemeName = wire.GetComponentInChildren<WireDisplay>().CurrentTheme.Name;
     }
 }

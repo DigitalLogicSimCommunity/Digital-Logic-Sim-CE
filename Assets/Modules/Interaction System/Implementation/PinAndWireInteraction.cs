@@ -102,10 +102,10 @@ public class PinAndWireInteraction : Interactable
 
     public Wire CreateAndLoadWire(Pin connectedPin, Pin pin)
     {
-        var e = Instantiate(wirePrefab);
-        e.Connect(connectedPin, pin);
-        LoadWire(e);
-        return e;
+        var wire = Instantiate(wirePrefab);
+        wire.Connect(connectedPin, pin);
+        LoadWire(wire);
+        return wire;
     }
 
     public void LoadWire(Wire wire)

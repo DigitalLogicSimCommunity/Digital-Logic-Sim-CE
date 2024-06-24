@@ -41,12 +41,12 @@ namespace Core
 
         private void PackageBuiltinChip<T>() where T : BuiltinChip
         {
-            ChipEditor chipEditor = Manager.ActiveChipEditor;
-            var chipName = chipEditor.Data.name;
+            ChipEditor chipEditor = Manager.ActiveEditor;
+            var chipName = chipEditor.CurrentChip.name;
             // Add and set up the custom chip component
             var chip = gameObject.AddComponent<T>();
 
-            chip.chipName = chipName;
+            chip.Name = chipName;
 
             // Create pins and set set package size
             SpawnPins(chip);
@@ -101,28 +101,18 @@ namespace Core
 
         private CustomChip PackageCustomChip(ChipPackageDisplay packageDisplay)
         {
-            ChipEditor chipEditor = Manager.ActiveChipEditor;
+            ChipEditor chipEditor = Manager.ActiveEditor;
             
             // Add and set up the custom chip component
-            var chip = SetUpChip(packageDisplay, chipEditor.Data);
+            var chip = SetUpChip(packageDisplay, chipEditor.CurrentChip);
 
 
-            List<T> GetAllSignals<T>(ChipInterfaceEditor InterfaceEditor) where T : ChipSignal
-            {
-                var result = new List<T>();
-                foreach (var signal in InterfaceEditor.GetAllSignals())
-                {
-                    if (signal is T ele)
-                        result.Add(ele);
-                }
 
-                return result;
-            }
 
             // Set input signals
-            chip.inputSignals = GetAllSignals<InputSignal>(chipEditor.inputsEditor).ToArray();
+            chip.inputSignals = chipEditor.InputSignals.ToArray();
             // Set output signals
-            chip.outputSignals = GetAllSignals<OutputSignal>(chipEditor.outputsEditor).ToArray();
+            chip.outputSignals = chipEditor.OutputSignals.ToArray();
 
 
             // Create pins
@@ -134,18 +124,18 @@ namespace Core
             return chip;
         }
 
-        private static CustomChip SetUpChip(ChipPackageDisplay packageDisplay, ChipData ChipData)
+        private static CustomChip SetUpChip(ChipPackageDisplay packageDisplay, ChipInfo chipInfo)
         {
             var chip = packageDisplay.gameObject.AddComponent<CustomChip>();
 
-            chip.chipName = ChipData.name;
-            chip.FolderIndex = ChipData.FolderIndex;
+            chip.Name = chipInfo.name;
+            chip.FolderIndex = chipInfo.FolderIndex;
             chip.PackageGraphicData = new PackageGraphicData()
             {
-                PackageColour = ChipData.Colour,
-                NameTextColor = ChipData.NameColour
+                PackageColour = chipInfo.PackColor,
+                NameTextColor = chipInfo.PackNameColor
             };
-            packageDisplay.SetUpForCustomPackageChip(ChipData);
+            packageDisplay.SetUpForCustomPackageChip(chipInfo);
             return chip;
         }
 
@@ -180,14 +170,13 @@ namespace Core
         public SpawnableChip TryPackageAndReplaceChip(List<SpawnableChip> SpawnableCustomChips ,string original)
         {
             ChipPackageDisplay oldPackageDisplay =GetComponentsInChildren<ChipPackageDisplay>(true).First( cp => cp.name == original);
-            if (oldPackageDisplay != null)
-            {
+            if (oldPackageDisplay is not null)
                 Destroy(oldPackageDisplay.gameObject);
-            }
+
 
             var customChip = GenerateCustomPackageAndChip();
 
-            int index = SpawnableCustomChips.FindIndex(c => c.chipName == original);
+            int index = SpawnableCustomChips.FindIndex(c => c.Name == original);
 
             if (index < 0) return customChip;
 

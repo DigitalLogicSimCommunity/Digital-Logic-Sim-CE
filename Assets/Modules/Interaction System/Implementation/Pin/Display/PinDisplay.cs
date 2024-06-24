@@ -6,12 +6,11 @@ using UnityEngine;
 
 public class PinDisplay : MonoBehaviour
 {
-    private Renderer renderer;
+    private new Renderer renderer;
 
     // Appearance
     private PinInteractionPalette InteractionPalette;
 
-    bool IsSimActive => Simulation.instance.active;
     public static float radius => ScalingManager.PinSize;
 
     public static float IteractionFactor => 1.1f;
@@ -20,8 +19,6 @@ public class PinDisplay : MonoBehaviour
     private void Awake()
     {
         renderer = GetComponent<Renderer>();
-
-
     }
     
 
@@ -50,26 +47,6 @@ public class PinDisplay : MonoBehaviour
     {
         transform.localScale = Vector3.one * (radius * 2);
     }
-
-    // private void UpdateColor(PinState state, Pin.WireType wireType)
-    // {
-    //     if (renderer == null) return;
-    //     var material = renderer.material;
-    //     if (!material) return;
-    //
-    //     Color newColor;
-    //
-    //     if (IsSimActive && state == PinState.HIGH)
-    //     {
-    //         newColor = _Palette.GetDefaultTheme().GetHigh(wireType);
-    //     }
-    //     else
-    //     {
-    //         newColor = defaultCol;
-    //     }
-    //
-    //     SetColor(newColor);
-    // }
 
     private void SetColor(Color newColor)
     {

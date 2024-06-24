@@ -11,7 +11,6 @@ using static Pin;
 public class ChipSignal : Chip
 {
     public int GroupId = -1;
-    public bool isInGroup;
     public event Action<WireType, PinStates> OnStateChange;
     public event Action<bool> OnInteractableSet;
 
@@ -45,7 +44,7 @@ public class ChipSignal : Chip
 
     public virtual void UpdateSignalName(string newName) => signalName = newName;
 
-    public void NotifyStateChange()
+    protected void NotifyStateChange()
     {
         if (!interactable) return;
         OnStateChange?.Invoke(wireType, State);
