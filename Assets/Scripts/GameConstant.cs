@@ -57,5 +57,5 @@
         public static string GAMEVERSION =$"{MAJOR}.{MINOR}.{REVISION}";
         public static string GAMEVERSION_SAVE =$"{MAJOR}.{MINOR}-CE";
 
-        public const string LASTEDIT= "20 Jan 2024";
+        public const string LASTEDIT= "28 Jun 2024";
    }

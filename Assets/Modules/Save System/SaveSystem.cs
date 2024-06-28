@@ -206,6 +206,48 @@ public static partial class SaveSystem
     }
 
 
+    private static void CopyFilesRecursively(string sourcePath, string targetPath)
+    {
+        //Now Create all of the directories
+        foreach (string dirPath in Directory.GetDirectories(sourcePath, "*", SearchOption.AllDirectories))
+        {
+            Directory.CreateDirectory(dirPath.Replace(sourcePath, targetPath));
+        }
+
+        //Copy all the files & Replaces any files with the same name
+        foreach (string newPath in Directory.GetFiles(sourcePath, "*.*",SearchOption.AllDirectories))
+        {
+            File.Copy(newPath, newPath.Replace(sourcePath, targetPath), true);
+        }
+    }
+
+    public static void DeleteProject(string PorjectName)
+    {
+        ActiveProjectName = PorjectName;
+
+        if (Directory.Exists(ActiveProjectPath))
+           Directory.Delete(ActiveProjectPath, true);
+        ActiveProjectName ="Untitled";
+    }
+    public static void MoveProject(string selectedProjectName, string newProjectName, bool keepOld = false)
+    {
+        ActiveProjectName = selectedProjectName;
+
+        if (Directory.Exists(ActiveProjectPath))
+        {
+            var oldDirectory = ActiveProjectPath;
+            ActiveProjectName = newProjectName;
+            var newDirectory = ActiveProjectPath;
+            if (keepOld)
+                CopyFilesRecursively(oldDirectory, newDirectory);
+            else
+                Directory.Move(oldDirectory, newDirectory);
+
+        }
+        ActiveProjectName ="Untitled";
+
+    }
+
     public static void UpdateProject()
     {
         FileExtension = ".txt";
