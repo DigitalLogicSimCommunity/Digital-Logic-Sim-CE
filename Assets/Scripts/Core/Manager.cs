@@ -127,7 +127,7 @@ public class Manager : MonoBehaviour
         ChipInstanceHolder chipInstanceHolder = ChipLoader.GetChipInstanceData(chip.Name, activeEditor);
         ActiveEditor.CurrentChip = chipInstanceHolder.Info;
 
-       // ChipBarUI.instance.DeactivateDependecyChip(chipInstanceHolder.componentChips.Select(x => x.Name).ToList());
+       ChipBarUI.instance.DeactivateUnsafeToPalaceChip(chip.Name);
 
 
         menuManager.SetEditingChipName(chipInstanceHolder.Info.name);
@@ -151,7 +151,6 @@ public class Manager : MonoBehaviour
         ChipEditorMode = ChipEditorMode.Create;
         ClearEditor();
         menuManager.SetEditingChipName("");
-        ChipBarUI.instance.ReactivateDependecyChip();
     }
 
     internal void DeleteChip(string nameBeforeChanging)
@@ -208,6 +207,7 @@ public class Manager : MonoBehaviour
 
         OnEditorClear?.Invoke();
         ChipEditorOptions.instance.SetUIValues(activeEditor);
+        ChipBarUI.instance.ActivateAllButton();
 
     }
 
@@ -220,7 +220,7 @@ public class Manager : MonoBehaviour
         activeEditor.chipInteraction.ChipButtonInteraction(chip);
     }
 
-    public void LoadMainMenu()
+    public void ExitButton()
     {
         if (ChipEditorMode == ChipEditorMode.Update)
         {

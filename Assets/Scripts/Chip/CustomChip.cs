@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using DLS.Core.Simulation;
+using UnityEngine.Serialization;
 
 public class CustomChip : SpawnableChip
 {
@@ -13,6 +14,8 @@ public class CustomChip : SpawnableChip
 
     [HideInInspector]
     public List<Pin> unconnectedInputs = new List<Pin>();
+
+    public List<string> FullDependencies = new List<string>();
 
     public override void Init()
     {
@@ -52,5 +55,10 @@ public class CustomChip : SpawnableChip
         {
             outputPins[i].ReceiveSignal(outputSignals[i].inputPins[0].State);
         }
+    }
+
+    public bool IsDependentOn(string chipName)
+    {
+        return FullDependencies.Contains(chipName);
     }
 }

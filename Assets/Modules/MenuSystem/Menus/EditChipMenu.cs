@@ -37,7 +37,7 @@ public class EditChipMenu : MonoBehaviour
         chipNameField.text = chipName;
         nameBeforeChanging = chipName;
         doneButton.interactable = true;
-        var IsSafeToDelate = ChipSaver.IsSafeToDelete(nameBeforeChanging);
+        var IsSafeToDelate = ChipSaver.IsChipSafeToDelete(nameBeforeChanging);
         chipNameField.interactable = true;
         deleteButton.interactable = IsSafeToDelate;
 

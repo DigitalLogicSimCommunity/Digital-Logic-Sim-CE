@@ -126,15 +126,25 @@ public class ChipBarUI : MonoBehaviour
         bar.localPosition = new Vector3(0, barPosY, 0);
     }
 
-    public void DeactivateDependecyChip(List<string> dependecy)
+    public void DeactivateUnsafeToPalaceChip(string chipName)
     {
-        foreach (var chip in dependecy)
+        var custom =Manager.instance.SpawnableCustomChips;
+        foreach (var chip in custom)
         {
-            if (ChipButtons.TryGetValue(chip, out var button))
-                button.interactable = false;
+            if (chip.Name == chipName)
+            {
+                ChipButtons[chip.Name].interactable = false;
+                continue;
+            }
+
+            if (chip is not CustomChip customChip) continue;
+
+            if (customChip.IsDependentOn(chipName))
+                ChipButtons[chip.Name].interactable = false;
         }
     }
-    public void ReactivateDependecyChip()
+
+    public void ActivateAllButton()
     {
         foreach (var chip in ChipButtons)
             chip.Value.interactable = true;

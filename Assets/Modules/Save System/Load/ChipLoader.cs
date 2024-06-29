@@ -11,12 +11,42 @@ using Newtonsoft.Json.Linq;
 public static class ChipLoader
 {
 
+    public static IDictionary<string, List<string>> ConstructFullDependencyList(IDictionary<string, SavedChip> chipsToConstruct , List<string> builtinChips )
+    {
+        var dependencyDic = new Dictionary<string, List<string>>();
+        foreach (var chip in chipsToConstruct)
+        {
+            var dependencyList = new List<string>();
+
+            ConstructDependencyList(chip.Value);
+            void ConstructDependencyList(SavedChip chip)
+            {
+                foreach (var dependency in chip.ChipDependencies)
+                {
+                    if (dependencyList.Contains(dependency)) continue;
+
+                    dependencyList.Add(dependency);
+                    if (chipsToConstruct.TryGetValue(dependency, out var value))
+                        ConstructDependencyList(value);
+                    else if (!builtinChips.Contains(dependency))
+                        DLSLogger.LogWarning($"Dependency {dependency} not found for {chip.Info.name}");
+
+                }
+            }
+            dependencyDic.Add(chip.Key,dependencyList);
+        }
+
+
+        return dependencyDic;
+    }
 
     public static async void LoadAllChips( IDictionary<string, SavedChip> chipsToLoadDic, Manager manager)
     {
         var builtinChips = manager.SpawnableBuiltinChips;
 
         var sw = System.Diagnostics.Stopwatch.StartNew();
+
+        var dependencyDic = ConstructFullDependencyList(chipsToLoadDic,builtinChips.Select(x => x.Name).ToList());
 
         var progressBar = ProgressBar.New("Loading All Chips...", wholeNumbers: true);
         progressBar.Open(0, chipsToLoadDic.Count + builtinChips.Length);
@@ -71,10 +101,15 @@ public static class ChipLoader
             if (loadedChips.ContainsKey(chip.Info.name)) return;
             var instanceChip =LoadChip(chip, loadedChips);
             Chip loadedChip = manager.LoadCustomChip(instanceChip);
+
             if (loadedChip is null)
             {
                 DLSLogger.LogError($"failed to load dependency {chip.Info.name}");
                 return;
+            }
+            if (loadedChip is CustomChip customChip)
+            {
+                customChip.FullDependencies = dependencyDic[chip.Info.name];
             }
             loadedChips.Add(loadedChip.Name, loadedChip);
         }

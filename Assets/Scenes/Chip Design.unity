@@ -923,7 +923,6 @@ MonoBehaviour:
   BuiltInSprite: {fileID: 21300000, guid: dfb74d79fdbe34b8aa11d91618d47724, type: 3}
   UserSprite: {fileID: 21300000, guid: 6132167f492c54ccea9b959782133d50, type: 3}
   newFolderIcon: {fileID: 21300000, guid: 6b56fb03b2680463fa34f5b81e0d22e0, type: 3}
-  customButton: []
 --- !u!1 &66328890
 GameObject:
   m_ObjectHideFlags: 0
@@ -11936,7 +11935,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1830893908}
         m_TargetAssemblyTypeName: Manager, Assembly-CSharp
-        m_MethodName: LoadMainMenu
+        m_MethodName: ExitButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -11944,7 +11943,7 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
-          m_BoolArgument: 1
+          m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &674862361
 MonoBehaviour:
@@ -17500,9 +17499,9 @@ Camera:
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
-    y: 0.015674919
+    y: 0.020352304
     width: 1
-    height: 0.96865016
+    height: 0.9592954
   near clip plane: 0.3
   far clip plane: 1500
   field of view: 60

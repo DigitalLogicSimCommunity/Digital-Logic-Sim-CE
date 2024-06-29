@@ -83,7 +83,7 @@ namespace Modules.Save_System.Save
         }
 
 
-        public static bool IsSafeToDelete(string chipName)
+        public static bool IsChipSafeToDelete(string chipName)
         {
             if (Manager.instance.AllChipNames(true, false).Contains(chipName))
                 return false;
