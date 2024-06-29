@@ -141,7 +141,7 @@ public class EEPROM : BuiltinChip
 		  });
 	}
 
-	protected override void ProcessOutput()
+	public override void ProcessOutput()
 	{
 		PinStates address = inputPins[1].State;
 		uint index = address.ToUInt() * 2;

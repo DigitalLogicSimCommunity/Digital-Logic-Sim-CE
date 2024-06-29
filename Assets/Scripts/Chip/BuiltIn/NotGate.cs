@@ -19,7 +19,7 @@ public class NotGate : BuiltinChip
         Name = "NOT";
     }
 
-    protected override void ProcessOutput()
+    public override void ProcessOutput()
     {
         PinState outputSignal;
         switch (inputPins[0].State[0])
@@ -34,7 +34,7 @@ public class NotGate : BuiltinChip
                 outputSignal = PinState.FLOATING;
                 break;
             default:
-                outputSignal = PinState.FLOATING;
+                outputSignal = PinState.HIGH;
                 break;
         }
 

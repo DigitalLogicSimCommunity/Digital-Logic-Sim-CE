@@ -26,7 +26,7 @@ namespace Core
 
         public SpawnableChip GenerateBuiltInPackageAndChip<T>() where T : BuiltinChip
         {
-            ChipPackageDisplay packageDisplay = IstansiatePackageTemplate();
+            ChipPackageDisplay packageDisplay = InstantiatePackageTemplate();
 
             PackageBuiltinChip<T>();
             packageDisplay.gameObject.SetActive(false);
@@ -82,7 +82,7 @@ namespace Core
 
         public SpawnableChip GenerateCustomPackageAndChip()
         {
-            ChipPackageDisplay packageDisplay = IstansiatePackageTemplate();
+            ChipPackageDisplay packageDisplay = InstantiatePackageTemplate();
             packageDisplay.gameObject.SetActive(false);
 
             var customChip =  PackageCustomChip(packageDisplay);
@@ -91,7 +91,7 @@ namespace Core
             return customChip;
         }
 
-        private ChipPackageDisplay IstansiatePackageTemplate()
+        private ChipPackageDisplay InstantiatePackageTemplate()
         {
             var package = Instantiate(chipPackageDisplayTemplate, transform);
             PinHolder = package.transform.GetChild(0);
@@ -106,17 +106,13 @@ namespace Core
             // Add and set up the custom chip component
             var chip = SetUpChip(packageDisplay, chipEditor.CurrentChip);
 
-
-
-
-            // Set input signals
             chip.inputSignals = chipEditor.InputSignals.ToArray();
-            // Set output signals
             chip.outputSignals = chipEditor.OutputSignals.ToArray();
-
+            chip.InternalUnconnectedInput = chipEditor.chipInteraction.UnconnectedInputPins;
+            chip.InternalChipNoInput = chipEditor.chipInteraction.ChipWithNoInput;
 
             // Create pins
-            SpawnPins(chip);
+            SpawnPackagePins(chip);
             chipEditor.chipImplementationHolder.SetParent(packageDisplay.transform);
             chipEditor.chipImplementationHolder.gameObject.SetActive(false);
             packageDisplay.Init();
@@ -140,7 +136,7 @@ namespace Core
         }
 
 
-        private void SpawnPins(CustomChip chip)
+        private void SpawnPackagePins(CustomChip chip)
         {
             chip.inputPins = new List<Pin>(chip.inputSignals.Length);
             chip.outputPins = new List<Pin>(chip.outputSignals.Length);

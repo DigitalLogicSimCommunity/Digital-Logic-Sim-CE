@@ -7,7 +7,7 @@ namespace DLS.Core.Simulation
 {
     public class Simulation : MonoBehaviour
     {
-        public static bool IsSimulationActive =>   instance.active;
+        public static bool IsSimulationActive => instance.active;
 
         public event Action<bool> OnSimulationToggle;
         public static Simulation instance;
@@ -22,7 +22,7 @@ namespace DLS.Core.Simulation
         public float minStepTime = 0.075f;
         float lastStepTime;
 
-        
+
         public void ToggleActive()
         {
             // Method called by the "Run/Stop" button that toggles simulation
@@ -102,9 +102,18 @@ namespace DLS.Core.Simulation
             var allChips = chipEditor.chipInteraction.allChips;
 
             foreach (global::Chip chip in allChips)
+            {
                 chip.InitSimulationFrame();
+
+                if (chip is BuiltinChip { AnyInput: false } buildInChip)
+                {
+                    buildInChip.ProcessOutput();
+                }
+                else if (chip is CustomChip customChip && customChip.AnyUnconnectedPin)
+                {
+                    customChip.ProcessOutput();
+                }
+            }
         }
-
-
     }
 }

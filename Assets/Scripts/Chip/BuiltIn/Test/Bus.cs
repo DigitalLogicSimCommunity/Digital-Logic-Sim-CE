@@ -9,7 +9,7 @@ public class Bus : Chip
     public MeshRenderer meshRenderer;
     public Palette signalPalette;
 
-    protected override void ProcessOutput()
+    public override void ProcessOutput()
     {
         var outputSignal = PinState.FLOATING;
         foreach (var t in inputPins)

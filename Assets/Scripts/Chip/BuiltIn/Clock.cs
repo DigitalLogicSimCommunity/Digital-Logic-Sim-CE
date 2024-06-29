@@ -44,16 +44,22 @@ public class Clock : BuiltinChip
     private TMP_Text HzThext;
     [SerializeField]
     private GameObject HzEditor;
+
+    public bool beginned = false;
     protected override void Start()
     {
         base.Start();
+        beginned = true;
         HzThext.text = $"{_hz}Hz";
         StartCoroutine(ClockTick());
         Waiter = new WaitForSeconds((1 / Hz) / 2);
     }
-    protected override void ProcessOutput()
-    {
 
+    public override void ProcessOutput()
+    {
+        if (beginned) return;
+        Start();
+        beginned = true;
     }
     private IEnumerator ClockTick()
     {

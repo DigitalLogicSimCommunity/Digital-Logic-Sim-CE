@@ -59,7 +59,7 @@ public class DisplayScreen : BuiltinChip
 	}
 
     //update display here
-	protected override void ProcessOutput() {
+    public override void ProcessOutput() {
         editCoords = "";
         for(int i = 6; i < 12; i++) {
             editCoords += inputPins[i].State.ToString();

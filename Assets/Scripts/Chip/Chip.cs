@@ -11,6 +11,9 @@ public class Chip : MonoBehaviour
     public List<Pin> inputPins;
     public List<Pin> outputPins;
 
+    public bool AnyInput => inputPins.Count > 0;
+    public bool AnyOutput => outputPins.Count > 0;
+
     public bool Editable = false;
 
     // Number of input signals received (on current simulation step)
@@ -65,20 +68,15 @@ public class Chip : MonoBehaviour
         foreach (var pin in inputPins)
         {
             if (pin.cyclic)
-            {
                 ReceiveInputSignal(pin);
-            }
             else if (!pin.HasParent)
-            {
                 pin.ReceiveZero();
-                // ReceiveInputSignal (inputPins[i]);
-            }
         }
     }
 
     // Called once all inputs to the component are known.
     // Sends appropriate output signals t o output pins
-    protected virtual void ProcessOutput()
+    public virtual void ProcessOutput()
     {
     }
 

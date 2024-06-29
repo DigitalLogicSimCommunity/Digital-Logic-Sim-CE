@@ -89,8 +89,9 @@ public class ChipInteraction : Interactable
         where pin.wireType == Pin.WireType.Simple && !pin.HasParent
         select pin).ToArray();
 
-    public Pin[] UnconnectedOutputPins =>
-        (from chip in allChips from pin in chip.outputPins where pin.childPins.Count == 0 select pin).ToArray();
+    public Pin[] UnconnectedOutputPins =>(from chip in allChips from pin in chip.outputPins where pin.childPins.Count == 0 select pin).ToArray();
+
+    public SpawnableChip[] ChipWithNoInput =>(allChips.Where(chip => chip.inputPins.Count == 0).Select(x=>(SpawnableChip)x)).ToArray();
 
     public Chip LoadChip(Chip chipPref, Vector2 pos)
     {
@@ -157,6 +158,8 @@ public class ChipInteraction : Interactable
     }
 
     public bool IsSelecting;
+
+
 
     void HandleSelection()
     {

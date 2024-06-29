@@ -24,7 +24,8 @@ namespace Assets.Scripts.Chip
 			outputPins = new List<Pin>(4);
 			Name = "4 BIT DECODER";
 		}
-		protected override void ProcessOutput()
+
+		public override void ProcessOutput()
 		{
 			var inputSignal = inputPins[0].State.ToUInt();
 			outputPins.Reverse();

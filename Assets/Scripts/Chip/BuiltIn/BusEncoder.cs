@@ -26,7 +26,7 @@ namespace Assets.Scripts.Chip
         }
 
 
-        protected override void ProcessOutput()
+        public override void ProcessOutput()
         {
             uint outputSignal = 0;
             foreach (var inputState in inputPins.Select(x => x.State))

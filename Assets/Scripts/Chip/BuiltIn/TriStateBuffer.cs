@@ -18,8 +18,8 @@ public class TriStateBuffer : BuiltinChip
         outputPins = new List<Pin>(1);
         Name = "TRI-STATE BUFFER";
     }
-    
-    protected override void ProcessOutput()
+
+    public override void ProcessOutput()
     {
         var data = inputPins[0].State[0];
         var enable = inputPins[1].State[0];

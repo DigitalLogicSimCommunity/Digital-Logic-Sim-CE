@@ -37,7 +37,7 @@ public class ChipBarUI : MonoBehaviour
 
 
     public static int CurrentFolderIndex = 0;
-    TMP_Dropdown.OptionData newFolderOption = new TMP_Dropdown.OptionData("New Folder");
+    TMP_Dropdown.OptionData newFolderOption = new ("New Folder");
 
     void Awake()
     {

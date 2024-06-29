@@ -95,7 +95,6 @@ public class Pin : MonoBehaviour
             {
                 foreach (var t in childPins)
                     t.ReceiveSignal(State);
-
                 break;
             }
         }

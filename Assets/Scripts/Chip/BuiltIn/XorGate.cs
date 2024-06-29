@@ -18,7 +18,7 @@ public class XorGate : BuiltinChip
         Name = "XOR";
     }
 
-    protected override void ProcessOutput()
+    public override void ProcessOutput()
     {
         PinState outputSignal = inputPins[0].State[0] ^ inputPins[1].State[0];
         outputPins[0].ReceiveSignal(PinStates.Getstates((outputSignal)));

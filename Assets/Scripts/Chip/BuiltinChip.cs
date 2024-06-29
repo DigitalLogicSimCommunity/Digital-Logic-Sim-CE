@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class BuiltinChip : SpawnableChip
 {
-
     public bool DefaultEnabled = true;
+
+
 }
