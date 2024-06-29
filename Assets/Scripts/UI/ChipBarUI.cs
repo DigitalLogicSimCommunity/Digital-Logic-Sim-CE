@@ -31,7 +31,7 @@ public class ChipBarUI : MonoBehaviour
     public Sprite UserSprite;
     public Sprite newFolderIcon;
 
-    public List<CustomButton> customButton = new List<CustomButton>();
+    public Dictionary<string,CustomButton> ChipButtons = new();
 
     public Dictionary<int, (RectTransform Holder, int Value)> chipButtonHolders =new();
 
@@ -63,13 +63,12 @@ public class ChipBarUI : MonoBehaviour
 
     public void ReloadChipButton()
     {
-        foreach (var button in customButton)
+        foreach (var chipKeyValue in ChipButtons)
         {
-            if (button != null)
-                Destroy(button.gameObject);
+            Destroy(chipKeyValue.Value.gameObject);
         }
 
-        customButton.Clear();
+        ChipButtons.Clear();
 
         foreach (var BuiltInChip in manager.SpawnableBuiltinChips)
             if (BuiltInChip is SpawnableChip spawnableChip)
@@ -127,6 +126,20 @@ public class ChipBarUI : MonoBehaviour
         bar.localPosition = new Vector3(0, barPosY, 0);
     }
 
+    public void DeactivateDependecyChip(List<string> dependecy)
+    {
+        foreach (var chip in dependecy)
+        {
+            if (ChipButtons.TryGetValue(chip, out var button))
+                button.interactable = false;
+        }
+    }
+    public void ReactivateDependecyChip()
+    {
+        foreach (var chip in ChipButtons)
+            chip.Value.interactable = true;
+    }
+
 
     Transform GetFolderUI(SpawnableChip chip)
     {
@@ -181,9 +194,9 @@ public class ChipBarUI : MonoBehaviour
         buttonRect.SetParent(GetFolderUI(chip), false);
 
         // Set button event
-        button.AddListener(() => manager.ChipButtonHanderl(chip));
+        button.AddListener(() => manager.ChipButtonHandler(chip));
 
-        customButton.Add(button);
+        ChipButtons.Add(chip.Name,button);
     }
 
     void UpdateChipButton(Chip chip)
@@ -191,12 +204,11 @@ public class ChipBarUI : MonoBehaviour
         if (hideList.Contains(chip.Name))
             return;
 
-        CustomButton button =
-            customButton.Find(g => g.name == "Create (" + chip.Name + ")");
+        CustomButton button =ChipButtons[chip.Name];
         if (button == null) return;
 
         button.ClearEvents();
-        button.AddListener(() => manager.ChipButtonHanderl(chip));
+        button.AddListener(() => manager.ChipButtonHandler(chip));
     }
 
     public void SelectFolder()

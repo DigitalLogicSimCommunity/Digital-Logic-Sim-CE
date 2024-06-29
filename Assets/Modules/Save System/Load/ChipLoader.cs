@@ -69,7 +69,13 @@ public static class ChipLoader
 
 
             if (loadedChips.ContainsKey(chip.Info.name)) return;
-            Chip loadedChip = manager.LoadCustomChip(LoadChip(chip, loadedChips));
+            var instanceChip =LoadChip(chip, loadedChips);
+            Chip loadedChip = manager.LoadCustomChip(instanceChip);
+            if (loadedChip is null)
+            {
+                DLSLogger.LogError($"failed to load dependency {chip.Info.name}");
+                return;
+            }
             loadedChips.Add(loadedChip.Name, loadedChip);
         }
     }

@@ -27,12 +27,12 @@ public class Manager : MonoBehaviour
         set
         {
             _chipEditorMode = value;
-            OnEditorModeChage?.Invoke(_chipEditorMode);
+            OnEditorModeChange?.Invoke(_chipEditorMode);
         }
     }
 
     //Event
-    public event Action<ChipEditorMode> OnEditorModeChage;
+    public event Action<ChipEditorMode> OnEditorModeChange;
     public event Action<SpawnableChip> customChipCreated;
     public event Action<SpawnableChip> customChipUpdated;
     public event Action OnEditorClear; 
@@ -127,6 +127,9 @@ public class Manager : MonoBehaviour
         ChipInstanceHolder chipInstanceHolder = ChipLoader.GetChipInstanceData(chip.Name, activeEditor);
         ActiveEditor.CurrentChip = chipInstanceHolder.Info;
 
+       // ChipBarUI.instance.DeactivateDependecyChip(chipInstanceHolder.componentChips.Select(x => x.Name).ToList());
+
+
         menuManager.SetEditingChipName(chipInstanceHolder.Info.name);
         ScalingManager.i.SetScale(chipInstanceHolder.Info.scale);
         ChipEditorOptions.instance.SetUIValues(activeEditor);
@@ -148,6 +151,7 @@ public class Manager : MonoBehaviour
         ChipEditorMode = ChipEditorMode.Create;
         ClearEditor();
         menuManager.SetEditingChipName("");
+        ChipBarUI.instance.ReactivateDependecyChip();
     }
 
     internal void DeleteChip(string nameBeforeChanging)
@@ -208,7 +212,7 @@ public class Manager : MonoBehaviour
     }
 
 
-    public void ChipButtonHanderl(Chip chip)
+    public void ChipButtonHandler(Chip chip)
     {
         if (chip is CustomChip custom)
             custom.ApplyWireModes();

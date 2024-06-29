@@ -68,7 +68,7 @@ public class MenuManager : MonoBehaviour
 
     private void Start()
     {
-        Manager.instance.OnEditorModeChage += SetEditorMode;
+        Manager.instance.OnEditorModeChange += SetEditorMode;
         Manager.instance.OnEditorClear += CloseMenu;
     }
 
@@ -84,6 +84,7 @@ public class MenuManager : MonoBehaviour
 
 
     public void OpenCreateChipMenu() => OpenMenu(MenuType.CreateChipMenu);
+    public void OpenLogger() => OpenMenu(MenuType.LoggingMenu);
 
     public void OpenMenu(MenuType menuType)
     {

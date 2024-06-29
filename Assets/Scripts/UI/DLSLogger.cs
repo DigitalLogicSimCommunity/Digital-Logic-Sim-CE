@@ -188,6 +188,7 @@ public class DLSLogger : MonoBehaviour
 
     public static void LogWarning(string message, string details = "")
     {
+
         Debug.LogWarning(!String.IsNullOrEmpty(details)
             ? message + ": " + details
             : message);

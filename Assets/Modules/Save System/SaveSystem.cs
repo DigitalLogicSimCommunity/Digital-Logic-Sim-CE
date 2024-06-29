@@ -181,7 +181,7 @@ public static partial class SaveSystem
         string oldSaveDataPath = Path.Combine(oldAppDataPath, "SaveData");
         if (!Directory.Exists(oldSaveDataPath))
         {
-            DLSLogger.LogWarning("Failed migrating OldSave, the folder saveData was not found.");
+            Debug.LogWarning("Failed migrating OldSave, the folder saveData was not found.");
             return;
         }
 
