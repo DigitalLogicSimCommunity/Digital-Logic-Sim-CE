@@ -17,14 +17,14 @@ public class SavedWire
     {
         if (chipInstanceHolder == null|| wire == null)return;
 
-        Pin parentPin = wire.startPin;
-        Pin childPin = wire.endPin;
+        Pin sourcePin = wire.SourcePin;
+        Pin targetPin = wire.TargetPin;
 
-        parentChipIndex = chipInstanceHolder.ComponentChipIndex(parentPin.chip);
-        parentChipOutputIndex = parentPin.index;
+        parentChipIndex = chipInstanceHolder.ComponentChipIndex(sourcePin.chip);
+        parentChipOutputIndex = sourcePin.index;
 
-        childChipIndex = chipInstanceHolder.ComponentChipIndex(childPin.chip);
-        childChipInputIndex = childPin.index;
+        childChipIndex = chipInstanceHolder.ComponentChipIndex(targetPin.chip);
+        childChipInputIndex = targetPin.index;
 
         anchorPoints = wire.anchorPoints.ToArray();
 

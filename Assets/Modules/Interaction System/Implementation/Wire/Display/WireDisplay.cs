@@ -67,7 +67,7 @@ public class WireDisplay : ThemeDisplay
             ApplyTheme();
             Placed = true;
             NormalAppearance();
-            wire.startPin.OnStateChange += SetStatusColor;
+            wire.SourcePin.OnStateChange += SetStatusColor;
         };
         wire.OnFocusObtained += () => Focused = true;
         wire.OnFocusLost += () => Focused = false;

@@ -90,8 +90,8 @@ public class PinAndWireInteraction : Interactable
                 chips[wire.startChipIndex].outputPins[wire.startChipPinIndex],
                 chips[wire.endChipIndex].inputPins[wire.endChipPinIndex]);
             newWire.SetAnchorPoints(wire.anchorPoints);
-            newWire.endPin.parentPin = newWire.startPin;
-            newWire.startPin.childPins.Add(newWire.endPin);
+            newWire.TargetPin.parentPin = newWire.SourcePin;
+            newWire.SourcePin.childPins.Add(newWire.TargetPin);
             wiresByChipInputPin.Add(newWire.ChipInputPin, newWire);
             wiresToPaste.Add(newWire);
         }
@@ -171,7 +171,7 @@ public class PinAndWireInteraction : Interactable
     public void DestroyConnectedWires(Pin pin)
     {
         List<Wire> allWiresStatic = new(allWires);
-        foreach (var w in allWiresStatic.Where(w => w.startPin == pin || w.endPin == pin))
+        foreach (var w in allWiresStatic.Where(w => w.SourcePin == pin || w.TargetPin == pin))
         {
             DestroyWire(w);
         }

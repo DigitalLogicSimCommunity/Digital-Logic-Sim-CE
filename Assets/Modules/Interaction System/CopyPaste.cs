@@ -92,7 +92,7 @@ public class CopyPaste : MonoBehaviour
             outputs.AddRange(chip.outputPins);
         }
 
-        if (!inputs.Contains(wire.endPin) || !outputs.Contains(wire.startPin)) return null;
+        if (!inputs.Contains(wire.TargetPin) || !outputs.Contains(wire.SourcePin)) return null;
 
         WireInformation info = new WireInformation();
 
@@ -100,11 +100,11 @@ public class CopyPaste : MonoBehaviour
 
         info.anchorPoints = Enumerable.ToArray(wire.anchorPoints);
 
-        info.endChipIndex = chips.IndexOf(wire.endPin.chip);
-        info.startChipIndex = chips.IndexOf(wire.startPin.chip);
+        info.endChipIndex = chips.IndexOf(wire.TargetPin.chip);
+        info.startChipIndex = chips.IndexOf(wire.SourcePin.chip);
 
-        info.endChipPinIndex = chips[info.endChipIndex].inputPins.FindIndex(x => x == wire.endPin);
-        info.startChipPinIndex = chips[info.startChipIndex].outputPins.FindIndex(x => x == wire.startPin);
+        info.endChipPinIndex = chips[info.endChipIndex].inputPins.FindIndex(x => x == wire.TargetPin);
+        info.startChipPinIndex = chips[info.startChipIndex].outputPins.FindIndex(x => x == wire.SourcePin);
 
         return info;
     }

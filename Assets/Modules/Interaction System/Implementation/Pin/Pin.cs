@@ -50,6 +50,11 @@ public class Pin : MonoBehaviour
     public PinStates State => currentState ??= PinStates.AllLow(wireType);
 
 
+    private void Awake()
+    {
+        chip = GetComponentInParent<Chip>();
+    }
+
     public static int NumBits(WireType type)
     {
         return type switch

@@ -18,15 +18,15 @@ public class Wire : Interactable
 
     bool wireConnected;
 
-    public Pin startPin;
-    public Pin endPin;
+    [FormerlySerializedAs("startPin")] public Pin SourcePin;
+    [FormerlySerializedAs("targetPin")] [FormerlySerializedAs("endPin")] public Pin TargetPin;
 
     
     public List<Vector2> anchorPoints { get; private set; }
 
     
-    public Pin ChipInputPin => (startPin.pinType == Pin.PinType.ChipInput) ? startPin : endPin;
-    public Pin ChipOutputPin => (startPin.pinType == Pin.PinType.ChipOutput) ? startPin : endPin;
+    public Pin ChipInputPin => (SourcePin.pinType == Pin.PinType.ChipInput) ? SourcePin : TargetPin;
+    public Pin ChipOutputPin => (SourcePin.pinType == Pin.PinType.ChipOutput) ? SourcePin : TargetPin;
 
 
     private void OnEnable()
@@ -55,8 +55,8 @@ public class Wire : Interactable
         // How far are start and end points from the pins they're connected to (chip
         // has been moved)
         Vector2 startPointError =
-            (Vector2)startPin.transform.position - anchorPoints[0];
-        Vector2 endPointError = (Vector2)endPin.transform.position -
+            (Vector2)SourcePin.transform.position - anchorPoints[0];
+        Vector2 endPointError = (Vector2)TargetPin.transform.position -
                                 anchorPoints[^1];
 
         if (!(startPointError.sqrMagnitude > maxSqrError) && !(endPointError.sqrMagnitude > maxSqrError)) return;
@@ -72,8 +72,8 @@ public class Wire : Interactable
             }
         }
 
-        anchorPoints[0] = startPin.transform.position;
-        anchorPoints[^1] = endPin.transform.position;
+        anchorPoints[0] = SourcePin.transform.position;
+        anchorPoints[^1] = TargetPin.transform.position;
         NotifyWireChange();
     }
 
@@ -87,7 +87,7 @@ public class Wire : Interactable
 
     public void ConnectToFirstPin(Pin startPin)
     {
-        this.startPin = startPin;
+        this.SourcePin = startPin;
 
 
         transform.localPosition = new Vector3(0, 0, transform.localPosition.z);
@@ -105,7 +105,7 @@ public class Wire : Interactable
         anchorPoints = new List<Vector2>();
 
         
-        this.startPin = startPin;
+        this.SourcePin = startPin;
         transform.localPosition = new Vector3(0, 0, transform.localPosition.z);
 
 
@@ -146,7 +146,7 @@ public class Wire : Interactable
     // Connect the input pin to the output pin
     public void Place(Pin endPin)
     {
-        this.endPin = endPin;
+        this.TargetPin = endPin;
         anchorPoints[^1] = endPin.transform.position;
 
         wireConnected = true;
@@ -160,15 +160,15 @@ public class Wire : Interactable
 
     public void DestroyWire()
     {
-        Pin.RemoveConnection(startPin, endPin);
-        endPin.ReceiveZero();
+        Pin.RemoveConnection(SourcePin, TargetPin);
+        TargetPin.ReceiveZero();
         Destroy(gameObject);
         OnWireDestroy?.Invoke(this);
     }
 
     void SwapStartEndPoints()
     {
-        (startPin, endPin) = (endPin, startPin);
+        (SourcePin, TargetPin) = (TargetPin, SourcePin);
         anchorPoints.Reverse();
         NotifyWireChange();
     }

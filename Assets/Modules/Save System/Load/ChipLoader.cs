@@ -10,8 +10,8 @@ using Newtonsoft.Json.Linq;
 
 public static class ChipLoader
 {
-
-    public static IDictionary<string, List<string>> ConstructFullDependencyList(IDictionary<string, SavedChip> chipsToConstruct , List<string> builtinChips )
+    public static IDictionary<string, List<string>> ConstructFullDependencyList(
+        IDictionary<string, SavedChip> chipsToConstruct, List<string> builtinChips)
     {
         var dependencyDic = new Dictionary<string, List<string>>();
         foreach (var chip in chipsToConstruct)
@@ -19,6 +19,7 @@ public static class ChipLoader
             var dependencyList = new List<string>();
 
             ConstructDependencyList(chip.Value);
+
             void ConstructDependencyList(SavedChip chip)
             {
                 foreach (var dependency in chip.ChipDependencies)
@@ -30,23 +31,23 @@ public static class ChipLoader
                         ConstructDependencyList(value);
                     else if (!builtinChips.Contains(dependency))
                         DLSLogger.LogWarning($"Dependency {dependency} not found for {chip.Info.name}");
-
                 }
             }
-            dependencyDic.Add(chip.Key,dependencyList);
+
+            dependencyDic.Add(chip.Key, dependencyList);
         }
 
 
         return dependencyDic;
     }
 
-    public static async void LoadAllChips( IDictionary<string, SavedChip> chipsToLoadDic, Manager manager)
+    public static async void LoadAllChips(IDictionary<string, SavedChip> chipsToLoadDic, Manager manager)
     {
         var builtinChips = manager.SpawnableBuiltinChips;
 
         var sw = System.Diagnostics.Stopwatch.StartNew();
 
-        var dependencyDic = ConstructFullDependencyList(chipsToLoadDic,builtinChips.Select(x => x.Name).ToList());
+        var dependencyDic = ConstructFullDependencyList(chipsToLoadDic, builtinChips.Select(x => x.Name).ToList());
 
         var progressBar = ProgressBar.New("Loading All Chips...", wholeNumbers: true);
         progressBar.Open(0, chipsToLoadDic.Count + builtinChips.Length);
@@ -99,7 +100,7 @@ public static class ChipLoader
 
 
             if (loadedChips.ContainsKey(chip.Info.name)) return;
-            var instanceChip =LoadChip(chip, loadedChips);
+            var instanceChip = LoadChip(chip, loadedChips);
             Chip loadedChip = manager.LoadCustomChip(instanceChip);
 
             if (loadedChip is null)
@@ -107,10 +108,12 @@ public static class ChipLoader
                 DLSLogger.LogError($"failed to load dependency {chip.Info.name}");
                 return;
             }
+
             if (loadedChip is CustomChip customChip)
             {
                 customChip.FullDependencies = dependencyDic[chip.Info.name];
             }
+
             loadedChips.Add(loadedChip.Name, loadedChip);
         }
     }
@@ -149,11 +152,12 @@ public static class ChipLoader
     }
 
 
-    private static Dictionary<int,float> CalculateSignalGroupCenter(SavedChip chipToLoad)
+    private static Dictionary<int, float> CalculateSignalGroupCenter(SavedChip chipToLoad)
     {
-        var signalGroupCenter = new Dictionary<int,float>();
+        var signalGroupCenter = new Dictionary<int, float>();
 
-        var signal = chipToLoad.savedComponentChips.Where(x => x.chipName.Equals("SIGNAL IN")|| x.chipName.Equals("SIGNAL OUT")).ToList();
+        var signal = chipToLoad.savedComponentChips
+            .Where(x => x.chipName.Equals("SIGNAL IN") || x.chipName.Equals("SIGNAL OUT")).ToList();
 
         foreach (var id in signal.Select(x => x.signalGroupId).Distinct())
         {
@@ -167,7 +171,8 @@ public static class ChipLoader
         return signalGroupCenter;
     }
 
-    static ChipInstanceHolder LoadChipWithWires(SavedChip chipToLoad, Dictionary<string, Chip> loadedChips,ChipEditor chipEditor = null)
+    static ChipInstanceHolder LoadChipWithWires(SavedChip chipToLoad, Dictionary<string, Chip> loadedChips,
+        ChipEditor chipEditor = null)
     {
         if (chipEditor is null)
             chipEditor = Manager.ActiveEditor;
@@ -193,7 +198,7 @@ public static class ChipLoader
                     $"Failed to load sub component: {componentName} While loading {chipToLoad.Info.name}");
 
 
-            Chip instanceComponent = chipEditor.LoadInstanceData(loadedChips[componentName],savedComponentToLoad);
+            Chip instanceComponent = chipEditor.LoadInstanceData(loadedChips[componentName], savedComponentToLoad);
             instanceComponent.gameObject.SetActive(true);
 
             // Load input pin names
@@ -202,10 +207,11 @@ public static class ChipLoader
                  inputIndex < instanceComponent.inputPins.Count;
                  inputIndex++)
             {
-                instanceComponent.inputPins[inputIndex].pinName =
-                    savedComponentToLoad.inputPins[inputIndex].name;
-                instanceComponent.inputPins[inputIndex].wireType =
-                    savedComponentToLoad.inputPins[inputIndex].wireType;
+                var instanceComponentInputPin = instanceComponent.inputPins[inputIndex];
+                var savedInputPin = savedComponentToLoad.inputPins[inputIndex];
+
+                instanceComponentInputPin.pinName = savedInputPin.name;
+                instanceComponentInputPin.wireType = savedInputPin.wireType;
             }
 
             // Load output pin names
@@ -214,10 +220,11 @@ public static class ChipLoader
                  ouputIndex < instanceComponent.outputPins.Count;
                  ouputIndex++)
             {
-                instanceComponent.outputPins[ouputIndex].pinName =
-                    savedComponentToLoad.outputPins[ouputIndex].name;
-                instanceComponent.outputPins[ouputIndex].wireType =
-                    savedComponentToLoad.outputPins[ouputIndex].wireType;
+                var instanceComponentOutputPin = instanceComponent.outputPins[ouputIndex];
+                var savedOutputPin = savedComponentToLoad.outputPins[ouputIndex];
+
+                instanceComponentOutputPin.pinName = savedOutputPin.name;
+                instanceComponentOutputPin.wireType = savedOutputPin.wireType;
             }
 
             loadedChipData.componentChips[i] = instanceComponent;
@@ -242,9 +249,7 @@ public static class ChipLoader
                 // If this pin should receive input from somewhere, then wire it up to
                 // that pin
                 if (savedPin.parentChipIndex == -1) continue;
-                Pin connectedPin =
-                    loadedChipData.componentChips[savedPin.parentChipIndex]
-                        .outputPins[savedPin.parentChipOutputIndex];
+                Pin connectedPin =loadedChipData.componentChips[savedPin.parentChipIndex].outputPins[savedPin.parentChipOutputIndex];
                 pin.cyclic = savedPin.isCylic;
 
                 if (!Pin.TryConnect(connectedPin, pin)) continue;
@@ -254,7 +259,6 @@ public static class ChipLoader
         }
 
         loadedChipData.wires = loadedWires.ToArray();
-
 
 
         chipEditor.SetSignalCenter(CalculateSignalGroupCenter(chipToLoad));
@@ -276,7 +280,8 @@ public static class ChipLoader
         if (chipToTryLoad == null)
             return null;
 
-        ChipInstanceHolder loadedChipData =LoadChipWithWires(chipToTryLoad, Manager.instance.AllSpawnableChipDic(), chipEditor);
+        ChipInstanceHolder loadedChipData =
+            LoadChipWithWires(chipToTryLoad, Manager.instance.AllSpawnableChipDic(), chipEditor);
 
         SetAnchorPoint(loadedChipData, chipToTryLoad.Connections);
 
@@ -290,7 +295,7 @@ public static class ChipLoader
         for (int i = 0; i < loadedChipData.wires.Length; i++)
         {
             Wire wire = loadedChipData.wires[i];
-            wire.endPin.pinName += i;
+            wire.TargetPin.pinName += i;
         }
 
         // Set wires anchor points
@@ -322,7 +327,7 @@ public static class ChipLoader
             }
 
             var wireIndex = Array.FindIndex(loadedChipData.wires,
-                w => w.startPin.pinName == startPinName && w.endPin.pinName == endPinName);
+                w => w.SourcePin.pinName == startPinName && w.TargetPin.pinName == endPinName);
             if (wireIndex < 0) continue;
             loadedChipData.wires[wireIndex].SetAnchorPoints(wire.anchorPoints);
             var wireDisplay = loadedChipData.wires[wireIndex].GetComponentInChildren<WireDisplay>();
@@ -332,8 +337,7 @@ public static class ChipLoader
         }
 
         foreach (var wire in loadedChipData.wires)
-            wire.endPin.pinName = wire.endPin.pinName.Remove(wire.endPin.pinName.Length - 1);
-
+            wire.TargetPin.pinName = wire.TargetPin.pinName.Remove(wire.TargetPin.pinName.Length - 1);
     }
 
     public static void Import(string path)
