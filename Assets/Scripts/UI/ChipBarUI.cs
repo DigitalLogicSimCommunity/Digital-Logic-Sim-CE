@@ -63,9 +63,9 @@ public class ChipBarUI : MonoBehaviour
 
     public void ReloadChipButton()
     {
-        foreach (var chipKeyValue in ChipButtons)
+        foreach (var chipButton in ChipButtons.Where(chipButton => chipButton.Value?.gameObject is not null))
         {
-            Destroy(chipKeyValue.Value.gameObject);
+            Destroy(chipButton.Value.gameObject);
         }
 
         ChipButtons.Clear();
@@ -85,7 +85,7 @@ public class ChipBarUI : MonoBehaviour
     private void ReloadFolder()
     {
         foreach (var Holder in chipButtonHolders)
-            DestroyImmediate(Holder.Value.Holder.gameObject);
+            Destroy(Holder.Value.Holder.gameObject);
         chipButtonHolders.Clear();
 
         FolderDropdown.options.Clear();

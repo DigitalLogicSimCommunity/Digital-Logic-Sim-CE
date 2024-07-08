@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using Modules.ProjectSettings;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class EditFolderMenu : MonoBehaviour
 {
     ChipBarUI chipBarUI;
-    public TMP_InputField RenamingFolderField;
-    public TMP_Text RenamingTextLabel;
+    [SerializeField]
+    private TMP_InputField RenamingFolderField;
+    [SerializeField]
+    private TMP_Text FolderToRenameLabel;
     public Button OKRenameFolder;
     private string FolderName = "";
 
@@ -44,12 +47,6 @@ public class EditFolderMenu : MonoBehaviour
         chipBarUI.NotifyRemovedFolder(FolderName);
     }
 
-    public void InitMenu(string name) // call from Editor
-    {
-        FolderName = name;
-        RenamingTextLabel.text = name;
-        RenamingFolderField.Select();
-    }
 
     public void CheckFolderName(bool endEdit = false)
     {
@@ -57,6 +54,14 @@ public class EditFolderMenu : MonoBehaviour
 
         OKRenameFolder.interactable = validName.Length > 0 && ProjectSettings.FolderSystem.FolderNameAvailable(validName);
         RenamingFolderField.SetTextWithoutNotify(validName);
+    }
+
+    public void SetFolderToBeRenamed(string folderName)
+    {
+        FolderName = folderName;
+        RenamingFolderField.text = folderName;
+        FolderToRenameLabel.text = folderName;
+        RenamingFolderField.Select();
     }
 }
 

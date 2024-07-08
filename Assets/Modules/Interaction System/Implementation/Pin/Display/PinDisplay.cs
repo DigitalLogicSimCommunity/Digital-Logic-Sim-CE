@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class PinDisplay : MonoBehaviour
 {
-    private new Renderer renderer;
+    private Renderer PinRenderer;
 
     // Appearance
     private PinInteractionPalette InteractionPalette;
@@ -18,7 +18,7 @@ public class PinDisplay : MonoBehaviour
 
     private void Awake()
     {
-        renderer = GetComponent<Renderer>();
+        PinRenderer = GetComponent<Renderer>();
     }
     
 
@@ -38,7 +38,7 @@ public class PinDisplay : MonoBehaviour
         ScalingManager.i.OnScaleChange += UpdateScale;
         
         
-        renderer.material.color = InteractionPalette.PinDefaultColor;
+        PinRenderer.material.color = InteractionPalette.PinDefaultColor;
         UpdateScale();
     }
 
@@ -50,7 +50,7 @@ public class PinDisplay : MonoBehaviour
 
     private void SetColor(Color newColor)
     {
-        var material = renderer.material;
+        var material = PinRenderer.material;
         if (material.color != newColor)
         {
             material.color = newColor;

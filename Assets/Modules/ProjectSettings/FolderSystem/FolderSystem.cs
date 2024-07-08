@@ -88,6 +88,7 @@ namespace Modules.ProjectSettings
             {
                 if (!Inizialized) return;
                 Folders.Remove(Index);
+                SaveSystem.SaveProjectSettings(Folders);
             }
 
             public static bool FolderNameAvailable(string name)

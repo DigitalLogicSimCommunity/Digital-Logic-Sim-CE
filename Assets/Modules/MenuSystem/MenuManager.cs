@@ -100,7 +100,7 @@ public class MenuManager : MonoBehaviour
         OpenedMenu.Open();
 
         SetActiveInteraction(false);
-    }
+   }
 
     public void CloseMenu()
     {

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using SFB;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -84,7 +85,8 @@ public class LoadProjectMenu : MonoBehaviour
 
     public void OpenProjectFolder()
     {
-        EditorUtility.RevealInFinder(SaveSystem.SaveDataDirectoryPath);
+        ///TODO: this code work in editor mode but won't in build
+        //EditorUtility.RevealInFinder(SaveSystem.SaveDataDirectoryPath);
     }
 
 }
