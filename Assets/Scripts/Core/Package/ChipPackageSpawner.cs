@@ -48,7 +48,7 @@ namespace Core
 
             chip.Name = chipName;
 
-            // Create pins and set set package size
+            // Create pins and set package size
             SpawnPins(chip);
         }
         

@@ -10,8 +10,6 @@ using UnityEngine.Serialization;
 public class WireEvent : MonoBehaviour
 {
     public Wire wire;
-    public event Action OnWireEnter;
-    public event Action OnWireExit;
     public MouseInteraction<Wire> MouseInteraction;
 
     private void Awake()
@@ -26,13 +24,5 @@ public class WireEvent : MonoBehaviour
     }
 
 
-    private void OnMouseEnter()
-    {
-        OnWireEnter?.Invoke();
-    }
 
-    private void OnMouseExit()
-    {
-        OnWireExit?.Invoke();
-    }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class WireInformation
 {
@@ -29,10 +30,12 @@ public class CopyPaste : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKey(KeyCode.LeftCommand) && Input.GetKeyDown(KeyCode.C))
+        var keyboard = Keyboard.current;
+        var commandAlternate = keyboard.leftCommandKey.isPressed || keyboard.leftCtrlKey.isPressed;
+        if (commandAlternate && keyboard.cKey.wasPressedThisFrame)
             Copy();
 
-        if (Input.GetKey(KeyCode.LeftCommand) && Input.GetKeyDown(KeyCode.V))
+        if (commandAlternate && keyboard.vKey.wasPressedThisFrame)
             Paste();
     }
 

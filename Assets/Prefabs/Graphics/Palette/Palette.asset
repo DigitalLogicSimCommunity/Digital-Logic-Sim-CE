@@ -12,9 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d5e11a72a4bd445797f29b9f3d9a6fa, type: 3}
   m_Name: Palette
   m_EditorClassIdentifier: 
-  PinInteractionPalette: {fileID: 11400000, guid: a19c5975e33af2047a5e9e929dfc3d5b,
-    type: 2}
-  nonInteractableCol: {r: 0.37254903, g: 0.37254903, b: 0.37254903, a: 1}
+  interactionPalette: {fileID: 11400000, guid: a19c5975e33af2047a5e9e929dfc3d5b, type: 2}
   defaultIndex: 0
   voltageColours:
   - Name: Red

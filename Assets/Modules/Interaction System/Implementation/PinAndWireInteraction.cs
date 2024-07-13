@@ -33,9 +33,6 @@ public class PinAndWireInteraction : Interactable
     public State CurrentState => _currentState;
 
 
-    float PinRadius => PinDisplay.radius / 4;
-    float PinInteraction => PinRadius * PinDisplay.IteractionFactor;
-
     void Awake()
     {
         allWires = new List<Wire>();
@@ -54,10 +51,6 @@ public class PinAndWireInteraction : Interactable
 
     public override void OrderedUpdate()
     {
-        var mouseOverUI = InputHelper.MouseOverUIObject();
-
-        if (mouseOverUI) return;
-
         switch (_currentState)
         {
             case State.None:

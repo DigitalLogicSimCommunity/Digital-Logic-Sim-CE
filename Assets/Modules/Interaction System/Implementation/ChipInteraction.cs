@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -45,7 +44,7 @@ public class ChipInteraction : Interactable
     List<Chip> chipsToPaste;
 
     float PinRadius => PinDisplay.radius / 4;
-    float PinInteraction => PinRadius * PinDisplay.IteractionFactor;
+
 
     void Awake()
     {
@@ -89,9 +88,11 @@ public class ChipInteraction : Interactable
         where pin.wireType == Pin.WireType.Simple && !pin.HasParent
         select pin).ToArray();
 
-    public Pin[] UnconnectedOutputPins =>(from chip in allChips from pin in chip.outputPins where pin.childPins.Count == 0 select pin).ToArray();
+    public Pin[] UnconnectedOutputPins =>
+        (from chip in allChips from pin in chip.outputPins where pin.childPins.Count == 0 select pin).ToArray();
 
-    public SpawnableChip[] ChipWithNoInput =>(allChips.Where(chip => chip.inputPins.Count == 0).Select(x=>(SpawnableChip)x)).ToArray();
+    public SpawnableChip[] ChipWithNoInput =>
+        (allChips.Where(chip => chip.inputPins.Count == 0).Select(x => (SpawnableChip)x)).ToArray();
 
     public Chip LoadChip(Chip chipPref, Vector2 pos)
     {
@@ -116,8 +117,7 @@ public class ChipInteraction : Interactable
         currentState = State.PasteNewChips;
         if (newChipsToPaste.Count == 0)
             selectedChips.Clear();
-        // newChipsToPaste.Clear();
-        // chipsToPaste.Clear();
+
 
         foreach (KeyValuePair<Chip, Vector3> clipboardItem in clipboard)
         {
@@ -137,7 +137,7 @@ public class ChipInteraction : Interactable
     {
         if (!RequestFocus()) return;
 
-        if (Input.GetMouseButtonDown(0))
+        if (Mouse.current.leftButton.wasPressedThisFrame)
         {
             // Spawn chip
             currentState = State.PlacingNewChips;
@@ -151,7 +151,7 @@ public class ChipInteraction : Interactable
             selectedChips.Add(newChip);
             newChipsToPlace.Add(newChip);
         }
-        else if (Input.GetMouseButtonDown(1) && chip.Editable)
+        else if (Mouse.current.rightButton.wasPressedThisFrame && chip.Editable)
         {
             MenuManager.instance.OpenMenu(MenuType.EditChipMenu);
         }
@@ -166,7 +166,7 @@ public class ChipInteraction : Interactable
         Vector2 mousePos = InputHelper.MouseWorldPos;
 
         // Left mouse down. Handle selecting a chip, or starting to draw a selection box.
-        if (!Input.GetMouseButtonDown(0) || InputHelper.MouseOverUIObject() ||
+        if (!Mouse.current.leftButton.wasPressedThisFrame||InputHelper.MouseOverUIObject() ||
             InputHelper.CompereTagObjectUnderMouse2D(ProjectTags.InterfaceMask, ProjectLayer.Default))
         {
             IsSelecting = false;
@@ -193,7 +193,7 @@ public class ChipInteraction : Interactable
             currentState = State.MovingOldChips;
             Chip chipUnderMouse = objectUnderMouse.GetComponent<Chip>();
             // If object is already selected, then selection of any other chips
-            // should be maintained so they can be moved as a group. But if object
+            // should be maintained, so they can be moved as a group. But if object
             // is not already selected, then any currently selected chips should
             // be deselected.
             if (!selectedChips.Contains(chipUnderMouse))
@@ -229,7 +229,7 @@ public class ChipInteraction : Interactable
     {
         Vector2 mousePos = InputHelper.MouseWorldPos;
         // While holding mouse down, keep drawing selection box
-        if (Input.GetMouseButton(0))
+        if (Mouse.current.leftButton.isPressed)
         {
             var pos =
                 (Vector3)(selectionBoxStartPos + mousePos) / 2 + Vector3.back * 0.5f;
@@ -243,7 +243,7 @@ public class ChipInteraction : Interactable
         }
 
         // Mouse released, so selected all chips inside the selection box
-        if (Input.GetMouseButtonUp(0))
+        if (Mouse.current.leftButton.wasReleasedThisFrame)
         {
             currentState = State.None;
 
@@ -251,15 +251,14 @@ public class ChipInteraction : Interactable
             Vector2 boxSize =
                 new Vector2(Mathf.Abs(mousePos.x - selectionBoxStartPos.x),
                     Mathf.Abs(mousePos.y - selectionBoxStartPos.y));
-            var allObjectsInBox = Physics2D.OverlapBoxAll(
-                (selectionBoxStartPos + mousePos) / 2, boxSize, 0, chipMask);
+            Collider2D[] results = new Collider2D[50];
+            var size = Physics2D.OverlapBoxNonAlloc((selectionBoxStartPos + mousePos) / 2, boxSize, 0, results, chipMask);
             selectedChips.Clear();
-            foreach (var item in allObjectsInBox)
+            for (var i = 0; i < size; i++)
             {
-                if (item.GetComponent<Chip>())
-                {
-                    selectedChips.Add(item.GetComponent<Chip>());
-                }
+                var chip = results[i].GetComponent<Chip>();
+                if (chip == null) continue;
+                selectedChips.Add(chip);
             }
         }
     }
@@ -268,7 +267,7 @@ public class ChipInteraction : Interactable
     {
         var mousePos = InputHelper.MouseWorldPos;
 
-        if (Input.GetMouseButton(0))
+        if (Mouse.current.leftButton.isPressed)
         {
             // Move selected objects
             Vector2 deltaMouse = mousePos - selectionBoxStartPos;
@@ -283,7 +282,7 @@ public class ChipInteraction : Interactable
         }
 
         // Mouse released, so stop moving chips
-        if (!Input.GetMouseButtonUp(0)) return;
+        if (!Mouse.current.leftButton.wasReleasedThisFrame) return;
 
 
         currentState = State.None;
@@ -299,11 +298,12 @@ public class ChipInteraction : Interactable
                 deltaMouse.magnitude < chipMoveThreshold)
             {
                 var objectUnderMouse = InputHelper.GetObjectUnderMouse2D(chipMask);
-
-                if (!objectUnderMouse?.GetComponent<Chip>()) return;
+                if (objectUnderMouse == null) return;
+                var chip = objectUnderMouse.GetComponent<Chip>();
+                if (chip == null) return;
 
                 selectedChips.Clear();
-                selectedChips.Add(objectUnderMouse.GetComponent<Chip>());
+                selectedChips.Add(chip);
             }
             else
             {
@@ -328,8 +328,7 @@ public class ChipInteraction : Interactable
     void HandleNewChipPlacement()
     {
         // Cancel placement if esc or right mouse down
-        if (InputHelper.AnyOfTheseKeysDown(KeyCode.Escape, KeyCode.Backspace, KeyCode.Delete) ||
-            Input.GetMouseButtonDown(1))
+        if (InputHelper.AnyOfTheseKeysDown(KeyCode.Escape, KeyCode.Backspace, KeyCode.Delete) ||Mouse.current.rightButton.wasPressedThisFrame)
         {
             CancelPlacement(newChipsToPlace.ToArray());
             newChipsToPlace.Clear();
@@ -348,8 +347,7 @@ public class ChipInteraction : Interactable
             }
 
             // Place object
-            if (!Input.GetMouseButtonDown(0) || !SelectedChipsWithinPlacementArea() ||
-                InputHelper.MouseOverUIObject()) return;
+            if (!Mouse.current.leftButton.wasPressedThisFrame || !SelectedChipsWithinPlacementArea()||InputHelper.MouseOverUIObject()) return;
 
             PlaceNewChips(newChipsToPlace.ToArray());
             newChipsToPlace.Clear();
@@ -361,7 +359,7 @@ public class ChipInteraction : Interactable
         // Cancel placement if esc or right mouse down
         if (InputHelper.AnyOfTheseKeysDown(KeyCode.Escape, KeyCode.Backspace,
                 KeyCode.Delete) ||
-            Input.GetMouseButtonDown(1))
+            Mouse.current.rightButton.wasPressedThisFrame)
         {
             CancelPlacement(chipsToPaste.ToArray());
             newChipsToPaste.Clear();
@@ -380,8 +378,7 @@ public class ChipInteraction : Interactable
             }
 
             // Place object
-            if (Input.GetMouseButtonDown(0) && SelectedChipsWithinPlacementArea() &&
-                !InputHelper.MouseOverUIObject())
+            if (Mouse.current.leftButton.wasPressedThisFrame && SelectedChipsWithinPlacementArea() && !InputHelper.MouseOverUIObject())
             {
                 PlaceNewChips(chipsToPaste.ToArray());
                 newChipsToPaste.Clear();
@@ -450,9 +447,8 @@ public class ChipInteraction : Interactable
         float bufferY = ScalingManager.ChipInteractionBoundsBorder;
         Bounds area = chipArea.bounds;
 
-        for (int i = 0; i < selectedChips.Count; i++)
+        foreach (var chip in selectedChips)
         {
-            Chip chip = selectedChips[i];
             float left = chip.transform.position.x - (chip.BoundsSize.x + bufferX) / 2;
             float right =
                 chip.transform.position.x + (chip.BoundsSize.x + bufferX) / 2;
@@ -490,8 +486,8 @@ public class ChipInteraction : Interactable
         if (MenuManager.instance.IsAnyMenuOpen) return;
 
         // Delete any selected chips
-        foreach (var SelectedChip in selectedChips)
-            DeleteChip(SelectedChip);
+        foreach (var selectedChip in selectedChips)
+            DeleteChip(selectedChip);
 
         selectedChips.Clear();
         newChipsToPlace.Clear();

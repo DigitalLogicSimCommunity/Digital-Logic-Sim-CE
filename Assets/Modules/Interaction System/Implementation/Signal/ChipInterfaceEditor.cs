@@ -18,6 +18,7 @@ public class ChipInterfaceEditor : MonoBehaviour
 
     [SerializeField] private SignalInteraction SignalInteractablePref;
 
+    ChipInterfaceEvent InterfaceEvent;
     public event Action<Chip> OnDeleteChip;
     public event Action OnChipsAddedOrDeleted;
 
@@ -72,6 +73,8 @@ public class ChipInterfaceEditor : MonoBehaviour
 
         SignalBuilder = new SignalInteractionBuilder(SignalInteractablePref, signalHolder, OnDeleteChip, BoundsBottom,
             BoundsTop, containerX, chipContainer.position.z, editorInterfaceType);
+
+        InterfaceEvent = GetComponent<ChipInterfaceEvent>();
     }
 
 
@@ -79,10 +82,23 @@ public class ChipInterfaceEditor : MonoBehaviour
     {
         PreviewSignal =
             new SignalInteractionPreview(
-                SignalBuilder.Build(InputHelper.MouseWorldPos.y, 1, Pin.WireType.Simple, -1,false).obj, transform);
+                SignalBuilder.Build(InputHelper.MouseWorldPos.y, 1, Pin.WireType.Simple, -1, false).obj, transform);
         DesiredGroupSize = 1;
         ScalingManager.i.OnScaleChange += UpdateScale;
         CreateGroup.i.onGroupSizeSettingPressed += OnGroupSizeSettingPressed;
+        InterfaceEvent.mouseInteraction.MouseEntered += (_) => ShowPreviewSignal(true);
+        InterfaceEvent.mouseInteraction.MouseExitted += (_) => ShowPreviewSignal(false);
+        InterfaceEvent.mouseInteraction.LeftMouseDown += (_) => SpawnSignal();
+
+
+    }
+
+    private void ShowPreviewSignal(bool show = true)
+    {
+        if (show)
+            PreviewSignal?.Enable();
+        else
+            PreviewSignal?.Disable();
     }
 
 
@@ -107,18 +123,14 @@ public class ChipInterfaceEditor : MonoBehaviour
         if (signalInteraction is not null)
             chipSignal = signalInteraction.AddOneSignal().ChipSignal;
         else
-            chipSignal = CreateSignalInteractionGroup(y, 1, signal.wireType,signal.GroupId, false).Signals.ChipSignals[0];
+            chipSignal = CreateSignalInteractionGroup(y, 1, signal.wireType, signal.GroupId, false).Signals
+                .ChipSignals[0];
 
 
         chipSignal.GetComponentInChildren<SignalDisplay>().CurrentTheme = theme;
         return chipSignal;
     }
 
-
-    private void OnMouseEnter()
-    {
-        PreviewSignal?.Enable();
-    }
 
     private void OnMouseOver()
     {
@@ -130,26 +142,9 @@ public class ChipInterfaceEditor : MonoBehaviour
         PreviewSignal.AdjustYPosition();
     }
 
-    private void OnMouseExit()
+
+    void SpawnSignal()
     {
-        PreviewSignal?.Disable();
-    }
-
-    private void OnMouseDown()
-    {
-        if (InputHelper.MouseOverUIObject()) return;
-
-        HandleSpawning();
-    }
-
-    void HandleSpawning()
-    {
-        if (InputHelper.MouseOverUIObject())
-            return;
-
-
-        // Spawn on mouse down
-        if (!Input.GetMouseButtonDown(0)) return;
 
         if (InputHelper.CompereTagObjectUnderMouse2D(ProjectTags.InterfaceMask, ProjectLayer.Default)) return;
 
@@ -165,7 +160,7 @@ public class ChipInterfaceEditor : MonoBehaviour
         Pin.WireType wireType = Pin.WireType.Simple, int id = -1,
         bool focusRequired = true)
     {
-        var Interactable = SignalBuilder.Build(yPos, groupSize, wireType,id ,focusRequired);
+        var Interactable = SignalBuilder.Build(yPos, groupSize, wireType, id, focusRequired);
         SignalsByID.Add(Interactable.id, Interactable.obj);
         return Interactable.obj;
     }
@@ -199,7 +194,6 @@ public class ChipInterfaceEditor : MonoBehaviour
 
     public void SetSignalCenter(Dictionary<int, float> signalGroupCenter)
     {
-
         foreach (var centerById in signalGroupCenter)
         {
             if (SignalsByID.TryGetValue(centerById.Key, out var signalInteraction))

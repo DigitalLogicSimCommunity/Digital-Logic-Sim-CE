@@ -31,6 +31,7 @@ public class CreateMenu : MonoBehaviour
 
     void Update()
     {
+        if (MenuManager.instance == null) return;
         if (!MenuManager.instance.Menus[MenuType.CreateChipMenu].isActive) return;
         // Force name input field to remain focused
         if (chipNameField.isFocused) return;

@@ -1,18 +1,18 @@
 ﻿using UnityEngine;
 using UnityEngine.Serialization;
 
-[CreateAssetMenu(menuName = "Palette/PinInteractionPalette")]
-public class PinInteractionPalette : ScriptableObject
+[CreateAssetMenu(menuName = "Palette/InteractionPalette")]
+public class InteractionPalette : ScriptableObject
 {
     [Header("Signal Handler")]
     public Color handleCol;
-    [FormerlySerializedAs("highlightedHandleCol")] public Color HighlightedHandleCol;
+    public Color HighlightedHandleCol;
     public Color FocusedHandleCol;
 
     
     [Header("PIN")]
     public Color PinHighlighte;
-    [FormerlySerializedAs("Pindefault")] public Color PinDefaultColor;
+    public Color PinDefaultColor;
     
     
     [Header("Wire")]

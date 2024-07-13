@@ -9,12 +9,16 @@ using UnityEngine.Serialization;
 
 public class WireDisplay : ThemeDisplay
 {
-    private Color SimulationColor => Simulation.IsSimulationActive ? CurrentTheme.GetColour(CurrentState, CurrentWireType) : CurrentTheme.Low;
+    private Color SimulationColor => Simulation.IsSimulationActive
+        ? CurrentTheme.GetColour(CurrentState, CurrentWireType)
+        : CurrentTheme.Low;
+
     LineRenderer LineRenderer;
     EdgeCollider2D WireCollider;
 
 
-    const float thicknessMultiplier = 0.12f;
+    [SerializeField] private float thicknessMultiplier = 0.12f;
+    [SerializeField] private float ColliderThicknessMultiplier = 0.25f;
     Material mat;
     bool selected;
 
@@ -25,8 +29,6 @@ public class WireDisplay : ThemeDisplay
     public int resolution = 20;
     public bool Placed;
     float depth;
-
-
 
 
     private void Awake()
@@ -51,12 +53,12 @@ public class WireDisplay : ThemeDisplay
         var wireEventMouse = GetComponentInParent<WireEvent>();
         var wire = wireEventMouse.wire;
 
-        wireEventMouse.OnWireEnter += () =>
+        wireEventMouse.MouseInteraction.MouseEntered += (_) =>
         {
             wire.RequestFocus();
             SelectAppearance();
         };
-        wireEventMouse.OnWireExit += () =>
+        wireEventMouse.MouseInteraction.MouseExitted += (_) =>
         {
             wire.ReleaseFocus();
             NormalAppearance();
@@ -96,14 +98,13 @@ public class WireDisplay : ThemeDisplay
     }
 
 
-
-
     void SetStatusColor(PinStates pinState, Pin.WireType wireType)
     {
         if (!Placed) return;
 
         CurrentState = pinState;
         CurrentWireType = wireType;
+        if (Focused) return;
         ApplyTheme();
     }
 
@@ -116,7 +117,7 @@ public class WireDisplay : ThemeDisplay
     {
         if (!Focused) return;
         SetUpThickness(ScalingManager.WireSelectedThickness * thicknessMultiplier);
-        mat.color = ThemeManager.Palette.PinInteractionPalette.WireHighlighte;
+        mat.color = ThemeManager.Palette.interactionPalette.WireHighlighte;
     }
 
     private void NormalAppearance()
@@ -145,8 +146,7 @@ public class WireDisplay : ThemeDisplay
     void UpdateCollider()
     {
         WireCollider.points = drawPoints.ToArray();
-        WireCollider.edgeRadius =
-            ScalingManager.WireThickness * thicknessMultiplier;
+        WireCollider.edgeRadius = ScalingManager.WireThickness * ColliderThicknessMultiplier;
     }
 
     void UpdateSmoothedLine(List<Vector2> anchorPoints)
@@ -214,5 +214,12 @@ public class WireDisplay : ThemeDisplay
     {
         // depth = Depth * 0.01f;
         transform.localPosition = Vector3.forward * Depth;
+    }
+
+    private void OnValidate()
+    {
+        if (!Application.isPlaying) return;
+        SetUpThickness(ScalingManager.WireThickness * thicknessMultiplier);
+        UpdateCollider();
     }
 }

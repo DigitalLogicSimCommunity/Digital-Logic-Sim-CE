@@ -31,6 +31,12 @@ public class ChipEditorOptions : MonoBehaviour
         instance = this;
     }
 
+    void Start()
+    {
+        mouseWheelSensitivitySlider.maxValue = 1f;
+        mouseWheelSensitivitySlider.minValue = 0.1f;
+    }
+
     public void SetUIValues(ChipEditor editor)
     {
         OnDisplayPinNamesChanged(PlayerPrefs.GetInt("PinNameDisplayMode", 3));

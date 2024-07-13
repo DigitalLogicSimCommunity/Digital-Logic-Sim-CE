@@ -14,17 +14,19 @@ public class Wire : Interactable
     public event Action OnPlacing;
 
     public event Action<Wire> OnWireDestroy;
-    
+
 
     bool wireConnected;
 
     [FormerlySerializedAs("startPin")] public Pin SourcePin;
-    [FormerlySerializedAs("targetPin")] [FormerlySerializedAs("endPin")] public Pin TargetPin;
 
-    
+    [FormerlySerializedAs("targetPin")] [FormerlySerializedAs("endPin")]
+    public Pin TargetPin;
+
+
     public List<Vector2> anchorPoints { get; private set; }
 
-    
+
     public Pin ChipInputPin => (SourcePin.pinType == Pin.PinType.ChipInput) ? SourcePin : TargetPin;
     public Pin ChipOutputPin => (SourcePin.pinType == Pin.PinType.ChipOutput) ? SourcePin : TargetPin;
 
@@ -50,7 +52,7 @@ public class Wire : Interactable
     private void UpdateWirePos()
     {
         if (!wireConnected) return;
-        
+
         const float maxSqrError = 0.00001f;
         // How far are start and end points from the pins they're connected to (chip
         // has been moved)
@@ -60,7 +62,7 @@ public class Wire : Interactable
                                 anchorPoints[^1];
 
         if (!(startPointError.sqrMagnitude > maxSqrError) && !(endPointError.sqrMagnitude > maxSqrError)) return;
-        
+
         // If start and end points are both same offset from where they should be,
         // can move all anchor points (entire wire)
         if ((startPointError - endPointError).sqrMagnitude < maxSqrError &&
@@ -93,10 +95,10 @@ public class Wire : Interactable
         transform.localPosition = new Vector3(0, 0, transform.localPosition.z);
 
         anchorPoints = new List<Vector2>();
-        
+
         anchorPoints.Add(startPin.transform.position);
         anchorPoints.Add(startPin.transform.position);
-        
+
         NotifyWireChange();
     }
 
@@ -104,7 +106,7 @@ public class Wire : Interactable
     {
         anchorPoints = new List<Vector2>();
 
-        
+
         this.SourcePin = startPin;
         transform.localPosition = new Vector3(0, 0, transform.localPosition.z);
 
@@ -150,7 +152,7 @@ public class Wire : Interactable
         anchorPoints[^1] = endPin.transform.position;
 
         wireConnected = true;
-        
+
         OnPlacing?.Invoke();
         NotifyWireChange();
 
@@ -197,24 +199,12 @@ public class Wire : Interactable
 
     Vector2 ProcessPoint(Vector2 endPointWorldSpace)
     {
-        if (Input.GetKey(KeyCode.LeftShift))
-        {
-            Vector2 a = anchorPoints[^2];
-            Vector2 b = endPointWorldSpace;
-            Vector2 mid = (a + b) / 2;
+        if (!Input.GetKey(KeyCode.LeftShift)) return endPointWorldSpace;
+        Vector2 a = anchorPoints[^2];
+        Vector2 b = endPointWorldSpace;
 
-            bool xAxisLonger = (Mathf.Abs(a.x - b.x) > Mathf.Abs(a.y - b.y));
-            if (xAxisLonger)
-            {
-                return new Vector2(b.x, a.y);
-            }
-            else
-            {
-                return new Vector2(a.x, b.y);
-            }
-        }
-
-        return endPointWorldSpace;
+        bool xAxisLonger = (Mathf.Abs(a.x - b.x) > Mathf.Abs(a.y - b.y));
+        return xAxisLonger ? new Vector2(b.x, a.y) : new Vector2(a.x, b.y);
     }
 
 

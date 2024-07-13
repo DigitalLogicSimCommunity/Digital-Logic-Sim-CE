@@ -9,10 +9,10 @@ using UnityEngine.Serialization;
 [CreateAssetMenu(menuName = "Palette")]
 public class Palette : ScriptableObject
 {
-    public PinInteractionPalette PinInteractionPalette;
+     public InteractionPalette interactionPalette;
 
 
-    public Color nonInteractableCol;
+
     [SerializeField] int defaultIndex;
 
 

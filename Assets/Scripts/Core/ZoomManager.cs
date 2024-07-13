@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class ZoomManager : MonoBehaviour
 {
@@ -17,7 +18,8 @@ public class ZoomManager : MonoBehaviour
     public bool showZoomHelper = true;
 
     [Header("Mouse Zoom Settings")]
-    public float mouseWheelSensitivity = 1f;
+    [Range(0.1f,1)]
+    public float mouseWheelSensitivity = 0.1f;
     public float mouseWheelDeadzone = 0.01f;
     public float mouseZoomSpeed = 12f;
     public float camMoveSpeed = 12f;
@@ -39,69 +41,71 @@ public class ZoomManager : MonoBehaviour
 
     void Awake() { instance = this; }
 
+    void Start()
+    {
+        Mouse.current.scroll.up.normalize = true;
+        Mouse.current.scroll.down.normalize = true;
+    }
+
     void Update()
     {
-        if (!InputHelper.MouseOverUIObject())
+        if (InputHelper.MouseOverUIObject()) return;
+
+        if (Input.GetKey(KeyCode.F))
         {
-            if (Input.GetKey(KeyCode.F))
+            if (ChipInteraction.selectedChips.Count > 0)
             {
-                if (ChipInteraction.selectedChips.Count > 0)
+                List<Vector3> chipPositions = new List<Vector3>();
+                foreach (Chip chip in ChipInteraction.selectedChips)
                 {
-                    List<Vector3> chipPositions = new List<Vector3>();
-                    foreach (Chip chip in ChipInteraction.selectedChips)
-                    {
-                        chipPositions.Add(chip.transform.position);
-                    }
-                    targetCamPosition = MathUtility.Center(chipPositions) + focusOffset;
-
-                    // TODO: set target zoom based on selection world size
-                    targetZoom = 1;
+                    chipPositions.Add(chip.transform.position);
                 }
-                else
-                {
-                    targetCamPosition = InputHelper.MouseWorldPos;
-                }
+                targetCamPosition = MathUtility.Center(chipPositions) + focusOffset;
 
+                // TODO: set target zoom based on selection world size
+                targetZoom = 1;
             }
             else
             {
-                Vector3 moveVec = new Vector3();
-                moveVec.x +=
-                    InputHelper.AnyOfTheseKeysHeld(KeyCode.RightArrow, KeyCode.D) ? 1
-                                                                                  : 0;
-                moveVec.x -=
-                    InputHelper.AnyOfTheseKeysHeld(KeyCode.LeftArrow, KeyCode.A) ? 1
-                                                                                 : 0;
-                moveVec.y +=
-                    InputHelper.AnyOfTheseKeysHeld(KeyCode.UpArrow, KeyCode.W) ? 1 : 0;
-                moveVec.y -=
-                    InputHelper.AnyOfTheseKeysHeld(KeyCode.DownArrow, KeyCode.S) ? 1
-                                                                                 : 0;
-                targetCamPosition =
-                    targetCamPosition + moveVec * (camMoveSpeed * 0.01f);
+                targetCamPosition = InputHelper.MouseWorldPos;
             }
 
-            if (Input.GetKeyDown(KeyCode.G))
-            {
-                targetZoom = 0;
-                targetCamPosition = Vector3.zero;
-            }
-
-            float scrollAmount = Input.GetAxis("Mouse ScrollWheel");
-            if ((scrollAmount > mouseWheelDeadzone || scrollAmount <
-                                                         -mouseWheelDeadzone) &&
-                !InputHelper.MouseOverUIObject())
-            {
-                // targetCamPosition = InputHelper.MouseWorldPos;
-                targetZoom = Mathf.Clamp01(zoom + scrollAmount * mouseWheelSensitivity);
-                if (ChipInteraction.selectedChips.Count > 0)
-                {
-                    List<Vector3> chipPositions = ChipInteraction.selectedChips.Select(chip => chip.transform.position).ToList();
-                    targetCamPosition = MathUtility.Center(chipPositions) + focusOffset;
-                }
-            }
-            zoom = Mathf.Lerp(zoom, targetZoom, mouseZoomSpeed * Time.deltaTime);
         }
+        else
+        {
+            Vector3 moveVec = new Vector3();
+            moveVec.x +=
+                InputHelper.AnyOfTheseKeysHeld(KeyCode.RightArrow, KeyCode.D) ? 1
+                    : 0;
+            moveVec.x -=
+                InputHelper.AnyOfTheseKeysHeld(KeyCode.LeftArrow, KeyCode.A) ? 1
+                    : 0;
+            moveVec.y +=
+                InputHelper.AnyOfTheseKeysHeld(KeyCode.UpArrow, KeyCode.W) ? 1 : 0;
+            moveVec.y -=
+                InputHelper.AnyOfTheseKeysHeld(KeyCode.DownArrow, KeyCode.S) ? 1
+                    : 0;
+            targetCamPosition =
+                targetCamPosition + moveVec * (camMoveSpeed * 0.01f);
+        }
+
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            targetZoom = 0;
+            targetCamPosition = Vector3.zero;
+        }
+
+        float scrollAmount = (Mouse.current.scroll.y.value)/120;//normalized scroll value
+        if ((scrollAmount > mouseWheelDeadzone || scrollAmount <-mouseWheelDeadzone)&&!InputHelper.MouseOverUIObject())
+        {
+            targetZoom = Mathf.Clamp01(zoom + scrollAmount * mouseWheelSensitivity);
+            if (ChipInteraction.selectedChips.Count > 0)
+            {
+                List<Vector3> chipPositions = ChipInteraction.selectedChips.Select(chip => chip.transform.position).ToList();
+                targetCamPosition = MathUtility.Center(chipPositions) + focusOffset;
+            }
+        }
+        zoom = Mathf.Lerp(zoom, targetZoom, mouseZoomSpeed * Time.deltaTime);
     }
 
     void LateUpdate()

@@ -9,7 +9,7 @@ public class PinDisplay : MonoBehaviour
     private Renderer PinRenderer;
 
     // Appearance
-    private PinInteractionPalette InteractionPalette;
+    private InteractionPalette InteractionPalette;
 
     public static float radius => ScalingManager.PinSize;
 
@@ -29,7 +29,7 @@ public class PinDisplay : MonoBehaviour
 
     private void Start()
     {
-        InteractionPalette = ThemeManager.Palette.PinInteractionPalette;
+        InteractionPalette = ThemeManager.Palette.interactionPalette;
         
         var Pin = GetComponent<PinEvent>();
         // Pin.OnStateChange += UpdateColor;
@@ -51,10 +51,8 @@ public class PinDisplay : MonoBehaviour
     private void SetColor(Color newColor)
     {
         var material = PinRenderer.material;
-        if (material.color != newColor)
-        {
-            material.color = newColor;
-        }
+        material.color = newColor;
+
     }
 
     private void SelectionAppearance()

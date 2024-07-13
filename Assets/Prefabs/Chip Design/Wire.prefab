@@ -45,6 +45,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5260fcc80e374ef48a8032fd9b988412, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  thicknessMultiplier: 0.12
+  ColliderThicknessMultiplier: 0.25
   curveSize: 0.3
   resolution: 20
   Placed: 0
@@ -163,7 +165,6 @@ GameObject:
   - component: {fileID: 7166264749732938016}
   - component: {fileID: 761973689955804731}
   - component: {fileID: 1097338780065620042}
-  - component: {fileID: 343893924873185766}
   - component: {fileID: 700869350664539241}
   m_Layer: 9
   m_Name: Wire
@@ -200,8 +201,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ebdca5816a0f64de49dfb5974430306c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startPin: {fileID: 0}
-  endPin: {fileID: 0}
+  SourcePin: {fileID: 0}
+  TargetPin: {fileID: 0}
 --- !u!68 &1097338780065620042
 EdgeCollider2D:
   m_ObjectHideFlags: 0
@@ -243,18 +244,6 @@ EdgeCollider2D:
   m_AdjacentEndPoint: {x: 0, y: 0}
   m_UseAdjacentStartPoint: 0
   m_UseAdjacentEndPoint: 0
---- !u!114 &343893924873185766
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2681663008006153501}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c4380ec95d6cd144aa8e68804a2fdacc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &700869350664539241
 MonoBehaviour:
   m_ObjectHideFlags: 0

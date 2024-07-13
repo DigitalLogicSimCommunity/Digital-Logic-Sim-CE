@@ -111,7 +111,7 @@ namespace Interaction.Signal.Display
 
         private void ChangeHandleColor(HandleState handleState = HandleState.Default)
         {
-            var materialReference = ThemeManager.Palette.PinInteractionPalette;
+            var materialReference = ThemeManager.Palette.interactionPalette;
             HandlerRender.material.color = handleState switch
             {
                 HandleState.Highlighted => materialReference.HighlightedHandleCol,

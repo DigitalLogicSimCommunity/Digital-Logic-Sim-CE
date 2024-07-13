@@ -777,7 +777,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetZoom: 0
   showZoomHelper: 1
-  mouseWheelSensitivity: 1
+  mouseWheelSensitivity: 0.1
   mouseWheelDeadzone: 0.01
   mouseZoomSpeed: 12
   camMoveSpeed: 12
@@ -870,7 +870,7 @@ GameObject:
   m_Component:
   - component: {fileID: 56665578}
   - component: {fileID: 56665579}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Chip Bar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1284,8 +1284,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 370903164}
   m_HandleRect: {fileID: 370903163}
   m_Direction: 2
-  m_Value: 0
-  m_Size: 0.73333323
+  m_Value: 1
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -6035,7 +6035,7 @@ GameObject:
   m_Component:
   - component: {fileID: 352790890}
   - component: {fileID: 352790891}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Logger Menu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7100,7 +7100,7 @@ GameObject:
   m_Component:
   - component: {fileID: 384884166}
   - component: {fileID: 384884167}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Editor Display Options
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12979,7 +12979,7 @@ GameObject:
   m_Component:
   - component: {fileID: 730160630}
   - component: {fileID: 730160631}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Edit Chip Menu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13398,7 +13398,7 @@ MonoBehaviour:
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 32
 --- !u!114 &748670168
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13457,7 +13457,6 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2136271420}
   - {fileID: 250673981}
   - {fileID: 1275747750}
   - {fileID: 387844911}
@@ -16468,7 +16467,7 @@ GameObject:
   m_Component:
   - component: {fileID: 917051044}
   - component: {fileID: 917051045}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Edit Folder Menu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17456,6 +17455,8 @@ GameObject:
   - component: {fileID: 963194227}
   - component: {fileID: 963194226}
   - component: {fileID: 963194229}
+  - component: {fileID: 963194230}
+  - component: {fileID: 963194232}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -17499,9 +17500,9 @@ Camera:
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
-    y: 0.01028356
+    y: 0.01073283
     width: 1
-    height: 0.9794329
+    height: 0.97853434
   near clip plane: 0.3
   far clip plane: 1500
   field of view: 60
@@ -17522,22 +17523,26 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!4 &963194228
-Transform:
+--- !u!224 &963194228
+RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.2, z: -1000}
+  m_LocalPosition: {x: 0, y: 0, z: -1000}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 721268439}
   m_Father: {fileID: 46255062}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0.2}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &963194229
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17553,6 +17558,45 @@ MonoBehaviour:
   targetWidth: 1920
   targetHeight: 1080
   type: 0
+--- !u!114 &963194230
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963194225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56666c5a40171f54783dd416a44f42bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EventMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_MaxRayIntersections: 0
+--- !u!223 &963194232
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963194225}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 0
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+  m_TargetDisplay: 0
 --- !u!1 &972959903
 GameObject:
   m_ObjectHideFlags: 0
@@ -17897,7 +17941,7 @@ GameObject:
   m_Component:
   - component: {fileID: 993450510}
   - component: {fileID: 993450511}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: New Folder Menu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17996,7 +18040,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1003546926}
   - component: {fileID: 1003546927}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: EEPROM Menu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28117,7 +28161,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.000034332275}
+  m_AnchoredPosition: {x: 0, y: -0.00005340576}
   m_SizeDelta: {x: 0, y: 40}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1595882598
@@ -30201,7 +30245,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1696536007}
   - component: {fileID: 1696536008}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: CopyPaste
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31175,7 +31219,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1737033741}
   - component: {fileID: 1737033742}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Create/Update Menu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31516,7 +31560,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1766994373}
   - component: {fileID: 1766994374}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: ProgressBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -32711,7 +32755,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1835902533}
   - component: {fileID: 1835902534}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Clock Menu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34084,7 +34128,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1922798758}
   - component: {fileID: 1922798757}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: ImportExport
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -38131,7 +38175,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2136271420}
   - component: {fileID: 2136271422}
-  - component: {fileID: 2136271421}
+  - component: {fileID: 2136271423}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -38148,32 +38192,12 @@ Transform:
   m_GameObject: {fileID: 2136271419}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -22.978725, z: 114836.18}
-  m_LocalScale: {x: 114.89362, y: 114.89362, z: 114.89362}
+  m_LocalPosition: {x: 0, y: 0, z: 0.00012207031}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 748670170}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2136271421
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2136271419}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SendPointerHoverToParent: 1
-  m_HorizontalAxis: Horizontal
-  m_VerticalAxis: Vertical
-  m_SubmitButton: Submit
-  m_CancelButton: Cancel
-  m_InputActionsPerSecond: 10
-  m_RepeatDelay: 0.5
-  m_ForceModuleActive: 0
 --- !u!114 &2136271422
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -38189,6 +38213,47 @@ MonoBehaviour:
   m_FirstSelected: {fileID: 0}
   m_sendNavigationEvents: 1
   m_DragThreshold: 10
+--- !u!114 &2136271423
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2136271419}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01614664b831546d2ae94a42149d80ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SendPointerHoverToParent: 1
+  m_MoveRepeatDelay: 0.5
+  m_MoveRepeatRate: 0.1
+  m_XRTrackingOrigin: {fileID: 0}
+  m_ActionsAsset: {fileID: -944628639613478452, guid: ca9f5fa95ffab41fb9a615ab714db018,
+    type: 3}
+  m_PointAction: {fileID: -1654692200621890270, guid: ca9f5fa95ffab41fb9a615ab714db018,
+    type: 3}
+  m_MoveAction: {fileID: -8784545083839296357, guid: ca9f5fa95ffab41fb9a615ab714db018,
+    type: 3}
+  m_SubmitAction: {fileID: 392368643174621059, guid: ca9f5fa95ffab41fb9a615ab714db018,
+    type: 3}
+  m_CancelAction: {fileID: 7727032971491509709, guid: ca9f5fa95ffab41fb9a615ab714db018,
+    type: 3}
+  m_LeftClickAction: {fileID: 3001919216989983466, guid: ca9f5fa95ffab41fb9a615ab714db018,
+    type: 3}
+  m_MiddleClickAction: {fileID: -2185481485913320682, guid: ca9f5fa95ffab41fb9a615ab714db018,
+    type: 3}
+  m_RightClickAction: {fileID: -4090225696740746782, guid: ca9f5fa95ffab41fb9a615ab714db018,
+    type: 3}
+  m_ScrollWheelAction: {fileID: 6240969308177333660, guid: ca9f5fa95ffab41fb9a615ab714db018,
+    type: 3}
+  m_TrackedDevicePositionAction: {fileID: 6564999863303420839, guid: ca9f5fa95ffab41fb9a615ab714db018,
+    type: 3}
+  m_TrackedDeviceOrientationAction: {fileID: 7970375526676320489, guid: ca9f5fa95ffab41fb9a615ab714db018,
+    type: 3}
+  m_DeselectOnBackgroundClick: 1
+  m_PointerBehavior: 1
+  m_CursorLockBehavior: 0
 --- !u!1 &2139862987
 GameObject:
   m_ObjectHideFlags: 0
@@ -39865,5 +39930,6 @@ SceneRoots:
   - {fileID: 72768806330869770}
   - {fileID: 1830893909}
   - {fileID: 1119697276}
+  - {fileID: 2136271420}
   - {fileID: 1579521358}
   - {fileID: 3008879100212563310}

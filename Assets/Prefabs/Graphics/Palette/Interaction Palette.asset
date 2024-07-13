@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3bfda35d4b7f49ccb8821581c96be7bc, type: 3}
-  m_Name: Pin Interaction Palette
+  m_Name: Interaction Palette
   m_EditorClassIdentifier: 
   handleCol: {r: 0.34117648, g: 0.34117648, b: 0.34117648, a: 1}
-  highlightedHandleCol: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 1}
+  HighlightedHandleCol: {r: 0.6320754, g: 0.6320754, b: 0.6320754, a: 0}
   FocusedHandleCol: {r: 0.20000002, g: 0.3254902, b: 0.42352945, a: 1}
   PinHighlighte: {r: 0.49803925, g: 0.49803925, b: 0.49803925, a: 1}
-  Pindefault: {r: 0, g: 0, b: 0, a: 1}
+  PinDefaultColor: {r: 0, g: 0, b: 0, a: 1}
   WireHighlighte: {r: 0.7735849, g: 0.7699359, b: 0.7699359, a: 1}
