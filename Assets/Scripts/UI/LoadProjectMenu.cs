@@ -1,34 +1,92 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using SFB;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
+using UnityEngine.Windows;
 
 public class LoadProjectMenu : MonoBehaviour
 {
     public Button projectButtonPrefab;
-    public Transform scrollHolder;
-    [SerializeField, HideInInspector]
-    List<Button> loadButtons;
+    public Transform ScrollHolder;
+    public ProjectRenamePopUp RenamePopUp;
+    private List<Button> ProjectButtons = new List<Button>();
 
-    void OnEnable()
+
+
+    public Button SelectedButton { get; private set; }
+    public string SelectedProjectName => SelectedButton.GetComponentInChildren<TMPro.TMP_Text>().text;
+
+    void Start()
     {
-        string[] projectNames = SaveSystem.GetSaveNames();
+        SaveSystem.MigrateSaves();
+
+        ReloadProjectList();
+    }
+
+    public void ReloadProjectList()
+    {
+        ClearProjectButtons();
+        string[] projectNames = SaveSystem.GetProjectNames();
 
         for (int i = 0; i < projectNames.Length; i++)
         {
             string projectName = projectNames[i];
-            if (i >= loadButtons.Count)
-                loadButtons.Add(Instantiate(projectButtonPrefab, parent: scrollHolder));
-            Button loadButton = loadButtons[i];
-            loadButton.GetComponentInChildren<TMPro.TMP_Text>().text =
-                projectName.Trim();
-            loadButton.onClick.AddListener(() => LoadProject(projectName));
+            if (i >= ProjectButtons.Count)
+                ProjectButtons.Add(Instantiate(projectButtonPrefab, parent: ScrollHolder));
+            Button loadButton = ProjectButtons[i];
+            loadButton.GetComponentInChildren<TMPro.TMP_Text>().text =projectName.Trim();
+            loadButton.onClick.AddListener(()=>
+            {
+                SelectedButton= loadButton;
+                loadButton.Select();
+            }) ;
         }
     }
 
-    public void LoadProject(string projectName)
+    private void ClearProjectButtons()
     {
-        SaveSystem.SetActiveProject(projectName);
+        foreach (var button in ProjectButtons)
+        {
+            button.onClick.RemoveAllListeners();
+            Destroy(button.gameObject);
+        }
+        ProjectButtons.Clear();
+    }
+
+    public void LoadProject()
+    {
+        if(SelectedButton == null) return;
+        SaveSystem.ActiveProjectName =SelectedProjectName ;
         UnityEngine.SceneManagement.SceneManager.LoadScene(1);
     }
+
+
+    public void DeleteProject()
+    {
+        if(SelectedButton == null) return;
+        SaveSystem.DeleteProject(SelectedProjectName);
+        ReloadProjectList();
+    }
+
+    public void RenameProject()
+    {
+        if(SelectedButton == null) return;
+        RenamePopUp.Active(false);
+    }
+
+    public void CopyProject()
+    {
+        if(SelectedButton == null) return;
+        RenamePopUp.Active(true);
+    }
+
+    public void OpenProjectFolder()
+    {
+        ///TODO: this code work in editor mode but won't in build
+        //EditorUtility.RevealInFinder(SaveSystem.SaveDataDirectoryPath);
+    }
+
 }

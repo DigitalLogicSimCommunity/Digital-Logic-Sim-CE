@@ -1,20 +1,21 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.Serialization;
+
+
+public enum PinNameDisplayMode
+{
+    AltHover = 0,
+    Hover = 1,
+    AlwaysMain = 2,
+    AlwaysAll = 3
+}
 
 public class ChipEditorOptions : MonoBehaviour
 {
     public static ChipEditorOptions instance;
-
-    public enum PinNameDisplayMode
-    {
-        AltHover = 0,
-        Hover = 1,
-        AlwaysMain = 2,
-        AlwaysAll = 3
-    }
-
-    public PinNameDisplayMode activePinNameDisplayMode;
 
     public Slider scaleSlider;
     public TMP_Text displayPinNamesLabel;
@@ -22,7 +23,19 @@ public class ChipEditorOptions : MonoBehaviour
     public Slider mouseWheelSensitivitySlider;
     public Slider camMoveSpeedSlider;
 
-    void Awake() { instance = this; }
+    public Action<PinNameDisplayMode> OnPinDisplayActionChange;
+    [FormerlySerializedAs("activePinNameDisplayMode")] public PinNameDisplayMode ActiveMode;
+
+    void Awake()
+    {
+        instance = this;
+    }
+
+    void Start()
+    {
+        mouseWheelSensitivitySlider.maxValue = 1f;
+        mouseWheelSensitivitySlider.minValue = 0.1f;
+    }
 
     public void SetUIValues(ChipEditor editor)
     {
@@ -33,38 +46,30 @@ public class ChipEditorOptions : MonoBehaviour
             PlayerPrefs.GetFloat("MouseSensitivity", 0.1f));
         camMoveSpeedSlider.SetValueWithoutNotify(
             PlayerPrefs.GetFloat("CamMoveSpeed", 12f));
-        scaleSlider.SetValueWithoutNotify(editor.Data.scale);
-        ScalingManager.UpdateScale();
+        scaleSlider.SetValueWithoutNotify(editor.CurrentChip.scale);
+        ScalingManager.i.UpdateScale();
     }
 
     public void OnScaleChanged()
     {
-        ScalingManager.scale = scaleSlider.value;
-        ScalingManager.UpdateScale();
+        ScalingManager.i.SetScale(scaleSlider.value);
     }
+
 
     public void OnDisplayPinNamesChanged(int value)
     {
-        switch (value)
+        ActiveMode = (PinNameDisplayMode)value;
+
+        displayPinNamesLabel.text = ActiveMode switch
         {
-            case 0:
-                activePinNameDisplayMode = PinNameDisplayMode.AltHover;
-                displayPinNamesLabel.text = "Alt + Mouse Over";
-                break;
-            case 1:
-                activePinNameDisplayMode = PinNameDisplayMode.Hover;
-                displayPinNamesLabel.text = "Mouse Over";
-                break;
-            case 2:
-                activePinNameDisplayMode = PinNameDisplayMode.AlwaysMain;
-                displayPinNamesLabel.text = "Always Main";
-                break;
-            case 3:
-                activePinNameDisplayMode = PinNameDisplayMode.AlwaysAll;
-                displayPinNamesLabel.text = "Always All";
-                break;
-        }
+            PinNameDisplayMode.AltHover => "Alt + Mouse Over",
+            PinNameDisplayMode.Hover => "Mouse Over",
+            PinNameDisplayMode.AlwaysMain => "Always Main",
+            PinNameDisplayMode.AlwaysAll => "Always All",
+            _ => displayPinNamesLabel.text
+        };
         PlayerPrefs.SetInt("PinNameDisplayMode", value);
+        OnPinDisplayActionChange?.Invoke(ActiveMode);
     }
 
     public void OnShowZoomHelperChanged()

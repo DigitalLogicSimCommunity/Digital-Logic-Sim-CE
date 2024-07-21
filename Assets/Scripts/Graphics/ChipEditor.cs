@@ -1,4 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.Serialization;
 
 public class ChipEditor : MonoBehaviour
 {
@@ -10,13 +14,15 @@ public class ChipEditor : MonoBehaviour
     public ChipInteraction chipInteraction;
     public PinAndWireInteraction pinAndWireInteraction;
 
-    public PinNameDisplayManager pinNameDisplayManager ;
+    public List<InputSignal> InputSignals => inputsEditor.GetAllSignals().Cast<InputSignal>().ToList();
+    public List<OutputSignal> OutputSignals => outputsEditor.GetAllSignals().Cast<OutputSignal>().ToList();
 
-    public ChipData Data;
+
+    public ChipInfo CurrentChip;
 
     void Awake()
     {
-        Data = new ChipData()
+        CurrentChip = new ChipInfo()
         {
             FolderIndex = 0,
             scale = 1
@@ -25,71 +31,59 @@ public class ChipEditor : MonoBehaviour
 
         pinAndWireInteraction.Init(chipInteraction, inputsEditor, outputsEditor);
         pinAndWireInteraction.onConnectionChanged += OnChipNetworkModified;
-        GetComponentInChildren<Canvas>().worldCamera = Camera.main;
+    }
+
+    private void Start()
+    {
+        pinAndWireInteraction.RegisterEditorArea(GetComponentInChildren<PlacmentAreaEvent>(true).MouseInteraction);
     }
 
     void LateUpdate()
     {
-        inputsEditor.OrderedUpdate();
-        outputsEditor.OrderedUpdate();
         pinAndWireInteraction.OrderedUpdate();
         chipInteraction.OrderedUpdate();
     }
 
-    void OnChipNetworkModified() { CycleDetector.MarkAllCycles(this); }
-
-    public void LoadFromSaveData(ChipSaveData saveData)
+    void OnChipNetworkModified()
     {
-        Data = saveData.Data;
-        ScalingManager.scale = Data.scale;
+        CycleDetector.MarkAllCycles(this);
+    }
 
+    public Chip LoadInstanceData(Chip chipData, SavedComponentChip subComponentDescriptor)
+    {
+        Vector2 pos = new Vector2(subComponentDescriptor.posX, subComponentDescriptor.posY);
         // Load component chips
-        foreach (Chip componentChip in saveData.componentChips)
+        switch (chipData)
         {
-            if (componentChip is InputSignal inp)
+            case ChipSignal signal:
             {
-                inp.wireType = inp.outputPins[0].wireType;
-                inputsEditor.LoadSignal(inp);
+                Palette.VoltageColour theme = ThemeManager.instance.GetTheme(subComponentDescriptor.ThemeName);
+                signal.GroupId = subComponentDescriptor.signalGroupId;
+                switch (signal)
+                {
+                    case InputSignal input:
+                        input.wireType = subComponentDescriptor.outputPins[0].wireType;
+                        return inputsEditor.LoadSignal(input, pos.y,theme);
+                    case OutputSignal output:
+                        output.wireType = subComponentDescriptor.inputPins[0].wireType;
+                        return outputsEditor.LoadSignal(output, pos.y,theme);
+                    default:
+                        return null;
+                }
             }
-            else if (componentChip is OutputSignal outp)
-            {
-                outp.wireType = outp.inputPins[0].wireType;
-                outputsEditor.LoadSignal(outp);
-            }
-            else
-            {
-                chipInteraction.LoadChip(componentChip);
-            }
-        }
-
-        // Load wires
-        if (saveData.wires != null)
-        {
-            foreach (Wire wire in saveData.wires)
-            {
-                pinAndWireInteraction.LoadWire(wire);
-            }
-        }
-
-        ChipEditorOptions.instance.SetUIValues(this);
-    }
-
-    public void UpdateChipSizes()
-    {
-        foreach (Chip chip in chipInteraction.allChips)
-        {
-            ChipPackage package = chip.GetComponent<ChipPackage>();
-            if (package)
-            {
-                package.SetSizeAndSpacing(chip);
-            }
+            default:
+                return chipInteraction.LoadChip(chipData, pos);
         }
     }
 
-    void OnDestroy()
+    public Wire LoadWire(Pin connectedPin, Pin pin)
     {
-        chipInteraction.visiblePins.Clear();
-        inputsEditor.visiblePins.Clear();
-        outputsEditor.visiblePins.Clear();
+        return pinAndWireInteraction.CreateAndLoadWire(connectedPin, pin);
+    }
+
+    public void SetSignalCenter(Dictionary<int, float> signalGroupCenter)
+    {
+        inputsEditor.SetSignalCenter(signalGroupCenter);
+        outputsEditor.SetSignalCenter(signalGroupCenter);
     }
 }

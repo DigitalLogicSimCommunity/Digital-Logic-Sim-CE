@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Object = UnityEngine.Object;
 
 public class DLSLogger : MonoBehaviour
 {
     public static DLSLogger instance;
 
-    [Header("References")]
-    public Transform loggingMsgsHolder;
+    [Header("References")] public Transform loggingMsgsHolder;
 
     public Button openLogsButton;
     public TMP_Text logsCounterText;
@@ -68,18 +68,18 @@ public class DLSLogger : MonoBehaviour
         showErrorToggle.image.color = showError ? enabledCol : disabledCol;
 
         debugMessageTemplate = Instantiate(logMsgTemplate, transform, false)
-                                   .GetComponent<LoggingMessage>();
+            .GetComponent<LoggingMessage>();
         debugMessageTemplate.gameObject.SetActive(false);
 
         warningMessageTemplate = Instantiate(logMsgTemplate, transform, false)
-                                     .GetComponent<LoggingMessage>();
+            .GetComponent<LoggingMessage>();
         warningMessageTemplate.iconImage.sprite = warnSprite;
         warningMessageTemplate.iconImage.color = warnCol;
         warningMessageTemplate.headerText.color = warnCol;
         warningMessageTemplate.gameObject.SetActive(false);
 
         errorMessageTemplate = Instantiate(logMsgTemplate, transform, false)
-                                   .GetComponent<LoggingMessage>();
+            .GetComponent<LoggingMessage>();
         errorMessageTemplate.iconImage.sprite = errorSprite;
         errorMessageTemplate.iconImage.color = errorCol;
         errorMessageTemplate.headerText.color = errorCol;
@@ -127,6 +127,7 @@ public class DLSLogger : MonoBehaviour
         {
             GameObject.Destroy(msg);
         }
+
         allDebugLogs.Clear();
         allWarnLogs.Clear();
         allErrorLogs.Clear();
@@ -136,7 +137,7 @@ public class DLSLogger : MonoBehaviour
     }
 
     static GameObject NewLogMessage(LoggingMessage template, string message,
-                                    string details)
+        string details)
     {
         bool detailed = !String.IsNullOrEmpty(details);
         template.headerText.text = message;
@@ -177,8 +178,7 @@ public class DLSLogger : MonoBehaviour
 
     public static void Log(string message, string details = "")
     {
-        Debug.Log(!String.IsNullOrEmpty(details) ? message + ": " + details
-                                                 : message);
+        Debug.Log(!String.IsNullOrEmpty(details) ? message + ": " + details : message);
         GameObject newMessage =
             NewLogMessage(debugMessageTemplate, message, details);
         allDebugLogs.Add(newMessage);
@@ -188,8 +188,10 @@ public class DLSLogger : MonoBehaviour
 
     public static void LogWarning(string message, string details = "")
     {
-        Debug.LogWarning(!String.IsNullOrEmpty(details) ? message + ": " + details
-                                                        : message);
+
+        Debug.LogWarning(!String.IsNullOrEmpty(details)
+            ? message + ": " + details
+            : message);
         GameObject newMessage =
             NewLogMessage(warningMessageTemplate, message, details);
         allWarnLogs.Add(newMessage);
@@ -199,8 +201,9 @@ public class DLSLogger : MonoBehaviour
 
     public static void LogError(string message, string details = "")
     {
-        Debug.LogError(!String.IsNullOrEmpty(details) ? message + ": " + details
-                                                      : message);
+        Debug.LogError(!String.IsNullOrEmpty(details)
+            ? message + ": " + details
+            : message);
         GameObject newMessage =
             NewLogMessage(errorMessageTemplate, message, details);
         allErrorLogs.Add(newMessage);
@@ -208,7 +211,7 @@ public class DLSLogger : MonoBehaviour
         UpdateOpenLogsButton();
         if (showError)
         {
-            UIManager.instance.OpenMenu(MenuType.LoggingMenu);
+            MenuManager.instance.OpenMenu(MenuType.LoggingMenu);
         }
     }
 }

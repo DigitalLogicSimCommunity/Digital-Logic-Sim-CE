@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Modules.ProjectSettings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static Modules.ProjectSettings.ProjectSettings.FolderSystem;
 
 public class ChipBarUI : MonoBehaviour
 {
@@ -29,12 +31,13 @@ public class ChipBarUI : MonoBehaviour
     public Sprite UserSprite;
     public Sprite newFolderIcon;
 
-    public List<CustomButton> customButton = new List<CustomButton>();
-    public Dictionary<int, (RectTransform Holder, int Value)> chipButtonHolders = new Dictionary<int, (RectTransform Holder, int Value)>();
+    public Dictionary<string,CustomButton> ChipButtons = new();
+
+    public Dictionary<int, (RectTransform Holder, int Value)> chipButtonHolders =new();
 
 
     public static int CurrentFolderIndex = 0;
-    TMP_Dropdown.OptionData newFolderOption = new TMP_Dropdown.OptionData("New Folder");
+    TMP_Dropdown.OptionData newFolderOption = new ("New Folder");
 
     void Awake()
     {
@@ -60,21 +63,19 @@ public class ChipBarUI : MonoBehaviour
 
     public void ReloadChipButton()
     {
-
-        foreach (var button in customButton)
+        foreach (var chipButton in ChipButtons.Where(chipButton => chipButton.Value?.gameObject is not null))
         {
-            if (button != null)
-                Destroy(button.gameObject);
+            Destroy(chipButton.Value.gameObject);
         }
 
-        customButton.Clear();
+        ChipButtons.Clear();
 
-        foreach (var BuiltInChip in manager.builtinChips)
-            AddChipButton(BuiltInChip);
+        foreach (var BuiltInChip in manager.SpawnableBuiltinChips)
+            if (BuiltInChip is SpawnableChip spawnableChip)
+                AddChipButton(spawnableChip);
 
         foreach (var Customchip in manager.SpawnableCustomChips)
             AddChipButton(Customchip);
-
 
 
         Canvas.ForceUpdateCanvases();
@@ -84,16 +85,15 @@ public class ChipBarUI : MonoBehaviour
     private void ReloadFolder()
     {
         foreach (var Holder in chipButtonHolders)
-            DestroyImmediate(Holder.Value.Holder.gameObject);
+            Destroy(Holder.Value.Holder.gameObject);
         chipButtonHolders.Clear();
 
         FolderDropdown.options.Clear();
 
-        foreach (var kv in FolderSystem.Enum)
+        foreach (var kv in ProjectSettings.FolderSystem.Enum)
             AddFolderView(kv.Key, kv.Key > 2 ? UserSprite : BuiltInSprite);
 
         ReloadChipButton();
-
     }
 
     public void NotifyRemovedFolder(string FolderName)
@@ -105,7 +105,6 @@ public class ChipBarUI : MonoBehaviour
             FolderDropdown.value = 0;
 
         FolderDropdown.onValueChanged?.Invoke(FolderDropdown.value);
-
     }
 
     public void NotifyFolderNameChanged()
@@ -116,8 +115,10 @@ public class ChipBarUI : MonoBehaviour
     }
 
 
-
-    void LateUpdate() { UpdateBarPos(); }
+    void LateUpdate()
+    {
+        UpdateBarPos();
+    }
 
     void UpdateBarPos()
     {
@@ -125,82 +126,111 @@ public class ChipBarUI : MonoBehaviour
         bar.localPosition = new Vector3(0, barPosY, 0);
     }
 
-    void AddChipButton(Chip chip)
+    public void DeactivateUnsafeToPalaceChip(string chipName)
     {
-
-        if (hideList.Contains(chip.chipName))
-            return;
-
-        ChipPackage package = chip.GetComponent<ChipPackage>();
-        Transform holder;
-        switch (package.chipType)
+        var custom =Manager.instance.SpawnableCustomChips;
+        foreach (var chip in custom)
         {
-            case ChipPackage.ChipType.Combapibility:
-                holder = chipButtonHolders[(int)DefaultKays.Comp].Holder.transform;
+            if (chip.Name == chipName)
+            {
+                ChipButtons[chip.Name].interactable = false;
+                continue;
+            }
+
+            if (chip is not CustomChip customChip) continue;
+
+            if (customChip.IsDependentOn(chipName))
+                ChipButtons[chip.Name].interactable = false;
+        }
+    }
+
+    public void ActivateAllButton()
+    {
+        foreach (var chip in ChipButtons)
+            chip.Value.interactable = true;
+    }
+
+
+    Transform GetFolderUI(SpawnableChip chip)
+    {
+        Transform holder1;
+        switch (chip.ChipType)
+        {
+            case ChipType.Compatibility:
+                holder1 = chipButtonHolders[(int)DefaultKays.Comp].Holder.transform;
                 break;
-            case ChipPackage.ChipType.Gate:
-                holder = chipButtonHolders[(int)DefaultKays.Gate].Holder.transform;
+            case ChipType.Gate:
+                holder1 = chipButtonHolders[(int)DefaultKays.Gate].Holder.transform;
                 break;
-            case ChipPackage.ChipType.Miscellaneous:
-                holder = chipButtonHolders[(int)DefaultKays.Misc].Holder.transform;
+            case ChipType.Miscellaneous:
+                holder1 = chipButtonHolders[(int)DefaultKays.Misc].Holder.transform;
                 break;
+            case ChipType.Custom:
             default:
 
                 int index = (int)DefaultKays.Comp;
                 if (chip is CustomChip customChip)
                 {
-                    if (FolderSystem.ContainsIndex(customChip.FolderIndex))
+                    if (ProjectSettings.FolderSystem.ContainsIndex(customChip.FolderIndex))
                         index = customChip.FolderIndex;
                 }
-                holder = chipButtonHolders[index].Holder.transform;
+
+                holder1 = chipButtonHolders[index].Holder.transform;
                 break;
         }
 
+        return holder1;
+    }
+
+    void AddChipButton(SpawnableChip chip)
+    {
+        if (hideList.Contains(chip.Name))
+            return;
+
         CustomButton button = Instantiate(buttonPrefab);
-        button.gameObject.name = "Create (" + chip.chipName + ")";
+        button.gameObject.name = "Create (" + chip.Name + ")";
         // Set button text
         var buttonTextUI = button.GetComponentInChildren<TMP_Text>();
-        buttonTextUI.text = chip.chipName;
+        buttonTextUI.text = chip.Name;
 
         // Set button size
         var buttonRect = button.GetComponent<RectTransform>();
         buttonRect.sizeDelta =
             new Vector2(buttonTextUI.preferredWidth + buttonWidthPadding,
-                        buttonRect.sizeDelta.y);
+                buttonRect.sizeDelta.y);
+
 
         // Set button position
-        buttonRect.SetParent(holder, false);
+        buttonRect.SetParent(GetFolderUI(chip), false);
 
         // Set button event
-        button.AddListener(() => manager.ChipButtonHanderl(chip));
+        button.AddListener(() => manager.ChipButtonHandler(chip));
 
-        customButton.Add(button);
+        ChipButtons.Add(chip.Name,button);
     }
 
     void UpdateChipButton(Chip chip)
     {
-        if (hideList.Contains(chip.chipName))
+        if (hideList.Contains(chip.Name))
             return;
 
-        CustomButton button =
-            customButton.Find(g => g.name == "Create (" + chip.chipName + ")");
-        if (button != null)
-        {
-            button.ClearEvents();
-            button.AddListener(() => manager.ChipButtonHanderl(chip));
-        }
+        CustomButton button =ChipButtons[chip.Name];
+        if (button == null) return;
+
+        button.ClearEvents();
+        button.AddListener(() => manager.ChipButtonHandler(chip));
     }
 
     public void SelectFolder()
     {
         if (FolderDropdown.value == FolderDropdown.options.Count - 1)
         {
-            UIManager.instance.OpenMenu(MenuType.NewFolderMenu);
+            MenuManager.instance.OpenMenu(MenuType.NewFolderMenu);
             FolderDropdown.value = chipButtonHolders[CurrentFolderIndex].Value; // TODO set Last Used Folder
             return;
         }
 
-        CurrentFolderIndex = FolderSystem.ReverseIndex(FolderDropdown.options[FolderDropdown.value].text);
+        CurrentFolderIndex = ProjectSettings.FolderSystem.ReverseIndex(FolderDropdown.options[FolderDropdown.value].text);
 
         foreach (var chipHolder in chipButtonHolders)
             chipHolder.Value.Holder.gameObject.SetActive(false);
@@ -214,7 +244,7 @@ public class ChipBarUI : MonoBehaviour
 
     public void AddFolderView(int FolderIndex, Sprite sprite)
     {
-        var folderName = FolderSystem.GetFolderName(FolderIndex);
+        var folderName = ProjectSettings.FolderSystem.GetFolderName(FolderIndex);
         TMP_Dropdown.OptionData newOption = new TMP_Dropdown.OptionData(folderName, sprite);
 
 
@@ -229,7 +259,7 @@ public class ChipBarUI : MonoBehaviour
         RectTransform newHolder = Instantiate(chipButtonHolderPrefab).GetComponent<RectTransform>();
         newHolder.gameObject.name = FolderName + "Chips";
         newHolder.gameObject.SetActive(false);
-        chipButtonHolders.Add(FolderIdex, (newHolder, FolderDropdown.options.Count-2));
+        chipButtonHolders.Add(FolderIdex, (newHolder, FolderDropdown.options.Count - 2));
         newHolder.SetParent(scrollRectViewport, false);
     }
 }

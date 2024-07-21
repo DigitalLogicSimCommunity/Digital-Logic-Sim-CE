@@ -12,7 +12,8 @@ public class CustomButton : Button, IPointerDownHandler
     public override void OnPointerDown(PointerEventData eventData)
     {
         base.OnPointerDown(eventData);
-        onPointerDown?.Invoke();
+        if(interactable)
+            onPointerDown?.Invoke();
     }
 
     public void AddListener(System.Action action)
